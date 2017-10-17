@@ -1,0 +1,40 @@
+<ion-content padding class="transparent-header" [ngStyle]="{'background-image': 'url(' + backgroundImage +')'}">
+  <ion-header>
+
+  </ion-header>
+  <div padding>
+    <ion-row>
+      <ion-col>
+        <img class="logo" src="assets/img/logo/logo_igb.png" />
+      </ion-col>
+    </ion-row>
+    <form [formGroup]="loginForm" (ngSubmit)="login()" novalidate>
+      <ion-row>
+        <ion-col>
+          <ion-list inset class="no-border">
+            <ion-item>
+              <ion-label>Usuario</ion-label>
+              <ion-input formControlName="username" type="email"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label>Contrase&ntilde;a</ion-label>
+              <ion-input formControlName="password" type="password"></ion-input>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <button type="submit" ion-button class="login-button" [disabled]="!loginForm.valid">Entrar</button>
+        </ion-col>
+      </ion-row>
+    </form>
+    <ion-row>
+      <ion-col>
+        <div (click)="launchSignup()">
+          <span>O cree una cuenta nueva.</span>
+        </div>
+      </ion-col>
+    </ion-row>
+  </div>
+</ion-content>

@@ -1,0 +1,52 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>{{ producto._id }}</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <img [src]="producto.imagen" alt="">
+  <ion-grid padding>
+    <ion-row>
+      <ion-col align-self-stretch text-center>
+
+        <p>
+          <b>{{ producto.titulo }}</b>
+        </p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col col-6>
+        <b>SKU:</b> {{ producto._id }}
+      </ion-col>
+      <ion-col col-6>
+        <b>Precio:</b> {{ producto.precio | currency:'USD':true  }}
+      </ion-col>
+      <ion-col col-6>
+        <b>Cantidad:</b> {{ producto.existencias }} {{ producto.unidad }}
+      </ion-col>
+      <ion-col col-6>
+        <b>Aplicacion:</b> {{ producto.aplicacion }}
+      </ion-col>
+      <ion-col col-6>
+        <b>Categoria:</b> {{ producto.categoria }}
+      </ion-col>
+      <ion-col col-6>
+        <b>Marcas:</b> {{ producto.marcas }}
+      </ion-col>
+      <ion-col col-6>
+        <b>rev:</b> {{ producto._rev }}
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <button ion-button block icon-start (click)="addProd()" [disabled]="producto.existencias == 0">
+        <ion-icon name="cart"></ion-icon>
+        Agregar al carrito
+      </button>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

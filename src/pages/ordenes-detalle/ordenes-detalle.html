@@ -1,0 +1,62 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Orden Detalle</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+
+  <ion-list >
+    <ion-item *ngFor="let prod of _prods" text-wrap>
+      <ion-thumbnail item-left>
+          <img [src]="prod.imagen">
+        </ion-thumbnail>
+        <h4>{{ prod.titulo }}</h4>
+        <ion-row>
+          <ion-col>
+            <p> <b>{{ prod._id }}</b> </p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <p><b>Cantidad:</b> {{ prod.cant }} </p>
+          </ion-col>
+          <ion-col>
+            <p><b>Total:</b> {{ prod.total | currency:'USD':true }}</p>
+          </ion-col>
+        </ion-row>
+    </ion-item>
+  </ion-list>
+
+  <accordion title="Error en la orden" color="danger" *ngIf="_error">
+    {{ _error }}
+  </accordion>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar >
+    <ion-row *ngIf="_observacion">
+      <ion-col >
+        <b>Observacion:</b>&nbsp; {{ _observacion }}
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="_codSap">
+      <ion-col >
+        <b>Codigo SAP:</b>&nbsp; {{ _codSap }}
+      </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col text-left>
+          <b>Cliente: </b> {{ _cliente }} <br>
+        </ion-col>
+        <ion-col text-right>
+          <b>Total+IVA: </b> {{ _total | currency:'USD':true }}
+        </ion-col>
+    </ion-row>
+
+  </ion-toolbar>
+</ion-footer>

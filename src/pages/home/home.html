@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-navbar>
+    <ion-buttons left>
+      <button ion-button icon-only menuToggle>
+        <ion-icon name="menu"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>
+      Mi tienda
+    </ion-title>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row no-padding>
+      <ion-col col-6 no-padding *ngFor="let prod of prodsService.prods; trackBy: trackByProds">
+        <ion-card >
+          <img [src]="prod.imagen" [alt]="prod.titulo">
+          <div class="post-description" text-wrap>
+            <small>{{ prod.titulo }}</small>
+            <br>
+            <ion-note>
+              <small>
+                {{ prod._id }} |
+              </small>
+              <small>
+                {{ prod.existencias }} {{ prod.unidad | uppercase }}
+              </small>
+            </ion-note>
+          </div>
+          <div>
+            <ion-row no-padding>
+              <ion-col no-padding>
+                <button ion-button block clear color="danger" icon-only [navPush]="pushPage" [navParams]="prod">
+                  <ion-icon name='information-circle'></ion-icon>
+                </button>
+              </ion-col>
+              <ion-col no-padding align-self-center text-center>
+                <button ion-button block clear color="danger" icon-only (click)="addProd(prod)" [disabled]="prod.existencias == 0">
+                  <ion-icon name='add-circle'></ion-icon>
+                </button>
+              </ion-col>
+            </ion-row>
+          </div>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

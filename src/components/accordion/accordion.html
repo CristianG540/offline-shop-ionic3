@@ -1,0 +1,11 @@
+<ion-card>
+  <ion-item [color]="color" (click)="toggleAccordion()">
+    <button ion-button clear small icon-only item-right>
+      <ion-icon color="light" [name]="icon"></ion-icon>
+    </button>
+    {{ title }}
+  </ion-item>
+  <ion-card-content #cc>
+    <ng-content></ng-content>
+  </ion-card-content>
+</ion-card>

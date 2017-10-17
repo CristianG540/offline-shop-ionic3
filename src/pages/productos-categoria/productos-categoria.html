@@ -1,0 +1,27 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Prods Categoria</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+  <ion-list>
+    <ion-item *ngFor="let prod of prodsService.prodsByCat">
+      <ion-thumbnail item-left>
+          <img [src]="prod.imagen" [alt]="prod.titulo">
+      </ion-thumbnail>
+      <h2>{{ prod._id }}</h2>
+      <p>{{ prod.titulo }}</p>
+      <button ion-button clear item-right [navPush]="productoPage" [navParams]="prod" >Ver</button>
+    </ion-item>
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

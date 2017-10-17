@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>Buscar Cliente</ion-title>
+    <ion-buttons right>
+      <button ion-button (click)="dismiss()">
+        <ion-icon name="md-close" ></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-searchbar debounce="2000" cancelButtonText="Cancelar" showCancelButton="true" (ionInput)="updateSearch($event)" (ionCancel)="dismiss()"
+    placeholder="Comience a escribir y seleccione...">
+  </ion-searchbar>
+  <ion-list>
+    <ion-item text-wrap *ngFor="let item of autocompleteItems" tappable (click)="chooseItem(item)" >
+      <span [innerHTML]="item.name"></span>
+    </ion-item>
+  </ion-list>
+</ion-content>

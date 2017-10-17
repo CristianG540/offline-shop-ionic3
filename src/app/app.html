@@ -1,0 +1,28 @@
+<!--Material Design Menu-->
+<ion-menu [content]="content" id="menu-material">
+  <ion-content>
+    <div class="menu-header">
+      <!--material-design-background-->
+      <img class="user-avatar round" [src]="chosenPicture || placeholder" onerror="this.src='assets/img/avatar/girl-avatar.png'"
+      />
+      <p class="name">Paula Bolliger</p>
+      <p class="e-mail">pbolliger@email.com</p>
+    </div>
+    <ion-list no-lines>
+      <button menuClose="left" ion-item detail-none (click)="indexDb()">
+        <ion-icon name="logo-buffer" item-left></ion-icon>
+        Indexar DB
+      </button>
+      <button menuClose="left" ion-item detail-none (click)="verificarOrdenes()" [disabled]="btnVerifOrdState || !util.onlineOffline">
+        <ion-icon name="cloud-upload" item-left></ion-icon>
+        Verificar Ordenes
+      </button>
+      <button ion-item detail-none (click)="logout()">
+        <ion-icon name="power" item-left></ion-icon>
+        Desconectarse
+      </button>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+<!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
+<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>

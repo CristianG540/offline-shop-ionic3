@@ -1,0 +1,25 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Buscar Producto</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content>
+
+  <ion-searchbar debounce="1000" cancelButtonText="Cancelar" showCancelButton="true" (ionInput)="updateSearch($event)"
+    placeholder="Comience a escribir y seleccione...">
+  </ion-searchbar>
+  <ion-list>
+    <ion-item text-wrap *ngFor="let item of autocompleteItems" tappable [navPush]="productoPage" [navParams]="item">
+        <ion-thumbnail item-left>
+            <img [src]="item.imagen" [alt]="item.titulo">
+        </ion-thumbnail>
+        <h2>{{ item._id }}</h2>
+        <p>{{ item.titulo }}</p>
+        <p><b>Disponibles: </b> {{ item.existencias }} </p>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

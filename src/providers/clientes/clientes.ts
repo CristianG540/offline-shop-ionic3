@@ -5,6 +5,7 @@ import PouchDB from 'pouchdb';
 import 'rxjs/add/operator/map';
 
 //Providers
+import { AuthProvider } from '../auth/auth';
 import { Config as cg } from "../config/config";
 
 //Models
@@ -18,7 +19,8 @@ export class ClientesProvider {
 
   constructor(
     public http: Http,
-    private util: cg
+    private util: cg,
+    private authService: AuthProvider,
   ) {
     PouchDB.plugin(require("pouchdb-quick-search"));
     if (!this._db) {
@@ -57,6 +59,7 @@ export class ClientesProvider {
   }
 
   public searchCliente(query: string): Promise<any> {
+
     /**
      * Para mas informacion sobre este plugin la pagina principal:
      * https://github.com/pouchdb-community/pouchdb-quick-search
@@ -64,6 +67,9 @@ export class ClientesProvider {
     return this._db.search({
       query: query,
       fields: ["nombre_cliente"],
+      filter: doc => {
+        return doc.asesor == this.authService.asesorId; // solo los del asesor en sesion
+      },
       limit: 50,
       include_docs: true,
       highlighting: true,
@@ -74,9 +80,19 @@ export class ClientesProvider {
   public indexDbClientes(): any {
     return this._db.search({
       fields: ["nombre_cliente"],
+      filter: doc => {
+        return doc.asesor == this.authService.asesorId; // solo los del asesor en sesion
+      },
       build: true
     });
-    //return this.fetchAndRenderAllDocs();
+  }
+
+  public destroyDB(): void{
+    this._db.destroy().then(() => {
+      this._clientes = [];
+      console.log("database removed");
+    })
+    .catch(console.log.bind(console));
   }
 
   /** *************** Manejo de el estado de la ui    ********************** */
@@ -89,11 +105,12 @@ export class ClientesProvider {
         this._clientes = res.rows.map(row => {
           return new Cliente(
             row.doc._id,
-            row.doc.uid_asesor,
             row.doc.asesor,
+            row.doc.asesor_nombre,
             row.doc.ciudad,
             row.doc.direccion,
             row.doc.nombre_cliente,
+            row.doc.transportadora,
             row.doc._rev
           );
         });
@@ -119,11 +136,12 @@ export class ClientesProvider {
           this._onUpdatedOrInserted(
             new Cliente(
               change.doc._id,
-              change.doc.uid_asesor,
               change.doc.asesor,
+              change.doc.asesor_nombre,
               change.doc.ciudad,
               change.doc.direccion,
               change.doc.nombre_cliente,
+              change.doc.transportadora,
               change.doc._rev
             )
           );

@@ -13,6 +13,7 @@ export class SignupPage {
 
   private name: string;
   private username: string;
+  private asesor_id: number;
   private email: string;
   private password: string;
   private confirmPassword: string;
@@ -34,6 +35,11 @@ export class SignupPage {
       name: this.name,
       username: this.username,
       email: this.email,
+      profile: {
+        asesor_id: this.asesor_id,
+        email: this.email
+      },
+      asesor_id: this.asesor_id,
       password: this.password,
       confirmPassword: this.confirmPassword
     };

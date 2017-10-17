@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import superlogin from 'superlogin-client';
 import { Http, RequestOptions, Response, URLSearchParams } from '@angular/http';
 import { Storage } from '@ionic/storage';
+import _ from 'lodash';
 
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
@@ -65,7 +66,7 @@ export class AuthProvider {
   public getTokenJosefa(): Promise<any> {
     let auth: string = 'Basic ' + btoa('admin:admin1234');
     let options:RequestOptions = Config.JOSEFA_OPTIONS(auth);
-    let url: string = Config.JOSEFA_URL+'/authenticate';
+    let url: string = Config.JOSEFA_URL+'authenticate';
 
     return new Promise( (resolve, reject)=>{
       this.http.post(url, "", options)
@@ -95,6 +96,14 @@ export class AuthProvider {
 
   public get dbUrl() : string {
     return superlogin.getDbUrl('supertest');
+  }
+
+  public get session() : any {
+    return superlogin.getSession();
+  }
+
+  public get asesorId() : string {
+    return _.has(this.session, 'profile.asesor_id') ? this.session.profile.asesor_id : '';
   }
 
 }

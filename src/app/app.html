@@ -3,10 +3,11 @@
   <ion-content>
     <div class="menu-header">
       <!--material-design-background-->
-      <img class="user-avatar round" [src]="chosenPicture || placeholder" onerror="this.src='assets/img/avatar/girl-avatar.png'"
-      />
-      <p class="name">Paula Bolliger</p>
-      <p class="e-mail">pbolliger@email.com</p>
+      <!--<img class="user-avatar round" [src]="chosenPicture || placeholder" onerror="this.src='assets/img/avatar/girl-avatar.png'"
+      />-->
+      <p class="name">{{ authService.session?.user_id }}</p>
+      <p class="e-mail">{{ authService.session?.profile?.email }}</p>
+      <p class="e-mail">{{ authService.asesorId }}</p>
     </div>
     <ion-list no-lines>
       <button menuClose="left" ion-item detail-none (click)="indexDb()">

@@ -49,6 +49,7 @@ export class MyApp {
     if( this.authService.isLogged ){
       this.dbServ.init( this.authService.dbUrl );
       this.rootPage = 'TabsPage';
+      console.log("!!!!!!!!!!!!!!Hlola", this.authService.session);
     }else{
       this.rootPage = 'LoginPage';
     }

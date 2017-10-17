@@ -24,7 +24,7 @@ export class Config {
     });
   }
 
-  static readonly SUPERLOGIN_URL: string = 'http://192.168.11.29:3000';
+  static readonly SUPERLOGIN_URL: string = 'http://45.77.74.23:3000';
 
   /* **************************** Cosas de JOSEFA  *************************** */
   static readonly JOSEFA_URL: string = 'http://gatortyres.com/';
@@ -47,7 +47,7 @@ export class Config {
 
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD en couch
-  static readonly CDB_URL: string = 'http://192.168.11.29:5984/productos';
+  static readonly CDB_URL: string = 'http://45.77.74.23:5984/productos';
   static readonly CDB_URL_CLIENTES: string = 'http://45.77.74.23:5984/clientes';
 
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http

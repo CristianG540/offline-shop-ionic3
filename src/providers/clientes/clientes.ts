@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+
+// lib terceros
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
-import 'rxjs/add/operator/map';
+import pouchAdapterMem from 'pouchdb-adapter-memory';
 
 //Providers
 import { AuthProvider } from '../auth/auth';
@@ -14,28 +15,62 @@ import { Cliente } from "./models/cliente";
 @Injectable()
 export class ClientesProvider {
   private _db: any;
+  private _dbLocal: any;
   private _remoteDB: any;
   private _clientes: Cliente[] = [];
 
   constructor(
-    public http: Http,
     private util: cg,
     private authService: AuthProvider,
   ) {
     PouchDB.plugin(require("pouchdb-quick-search"));
+    PouchDB.plugin(pouchAdapterMem);
     if (!this._db) {
-      this._db = new PouchDB("cliente");
+      let replicationOptions = {
+        live: true,
+        retry: true
+      };
+      // Base de datos remota en couchdb
       this._remoteDB = new PouchDB(cg.CDB_URL_CLIENTES, {
         auth: {
           username: "admin",
           password: "admin"
         }
       });
-      let replicationOptions = {
-        live: true,
-        retry: true
-      };
-      this._db
+      /**
+       * Base de datos local en pouch, lo diferente de esta BD
+       * es que se mantiene en memoria, creo q es mucho mas rapida
+       * que una que almacene en el dispositivo, pero lo malo es que
+       * los datos se pierden si la app se cierra
+       */
+      this._db = new PouchDB("cliente", {adapter: 'memory'});
+      /**
+       * Base de datos local en pouch, esta BD almacena los datos en
+       * el dispositivo usando IndexDB, la ventaja es q los datos se mantienen
+       * si la app se cierra, la desventaja es que creo q es mas lenta
+       * que la BD en memoria
+       */
+      this._dbLocal = new PouchDB("cliente");
+      /**
+       * Que mierda estoy haciendo aqui me preguntare cuando se me olvide esto,
+       * como la bd en memoria es muy rapida pero no conserva los datos, y como
+       * la bd normal si los almacena pero es mas lenta, entonces lo que hago
+       * es replicar los datos de una a la otra, asi puedo hacer las operaciones
+       * CRUD por asi decirlo en la de memoria que es muy rapida, y replicar los
+       * datos a la otra para que los preserve, en teoria deberia funcionar como
+       * una especia de ram o cache algo asi.
+       */
+      PouchDB.sync(this._dbLocal, this._db, replicationOptions)
+        .on("denied", err => {
+          console.error("Clientes*inMemory - a failed to replicate due to permissions",err);
+        })
+        .on("error", err => {
+          console.error("Clientes*inMemory - totally unhandled error (shouldn't happen)", err);
+        });
+
+      // Sincronizo los datos de la BD remota con la local, cualquier cambio
+      // en la base de datos remota afecta la local y viceversa
+      this._dbLocal
         .sync(this._remoteDB, replicationOptions)
         .on("paused", function(info) {
           console.log(
@@ -47,13 +82,13 @@ export class ClientesProvider {
           console.log("Client-replication was resumed", info);
         })
         .on("denied", function(err) {
-          console.log(
+          console.error(
             "Client-a document failed to replicate (e.g. due to permissions)",
             err
           );
         })
         .on("error", function(err) {
-          console.log("Client-totally unhandled error (shouldn't happen)", err);
+          console.error("Client-totally unhandled error (shouldn't happen)", err);
         });
     }
   }

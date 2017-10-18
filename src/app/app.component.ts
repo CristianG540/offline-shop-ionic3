@@ -49,7 +49,6 @@ export class MyApp {
     if( this.authService.isLogged ){
       this.dbServ.init( this.authService.dbUrl );
       this.rootPage = 'TabsPage';
-      console.log("!!!!!!!!!!!!!!Hlola", this.authService.session);
     }else{
       this.rootPage = 'LoginPage';
     }
@@ -62,15 +61,12 @@ export class MyApp {
 
       // watch network for a disconnect
       let disconnectSubscription = this.network.onDisconnect().subscribe(() => {
-        alert('network was disconnected :-(');
         this.util.onlineOffline = false;
       });
 
       // watch network for a connection
       let connectSubscription = this.network.onConnect().subscribe(() => {
-        alert('network connected!');
         this.util.onlineOffline = true;
-        //this.verificarOrdenes();
       });
 
     });
@@ -94,7 +90,11 @@ export class MyApp {
 
     this.authService.isOnline()
       .then(res=>{
-        return this.authService.logout()
+        if( _.has(res, 'status') && res.status == 'ok' ){
+          return this.authService.logout()
+        }else{
+          throw "El api de autenticacion no esta disponible";
+        }
       })
       .then( () => {
         return this.authService.removeTokenJosefa()
@@ -107,14 +107,14 @@ export class MyApp {
       })
       .catch(err=>{
         loading.dismiss();
-        console.log('error en el logout',err);
-        if(err.ok == false || err.message == "Network Error"){
+        console.error('error en el logout',err);
+        //if(err.ok == false || err.message == "Network Error"){
           this.alertCtrl.create({
             title: "Ocurrio un error.",
             message: "Debe estar conectado a la red para desconectarse.",
             buttons: ['Ok']
           }).present();
-        }
+        //}
       })
   }
 

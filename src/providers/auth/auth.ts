@@ -60,6 +60,9 @@ export class AuthProvider {
 
   public isOnline(): Promise<any> {
     return this.http.get(`${Config.SUPERLOGIN_URL}/ping`)
+    .map( (res: Response) => {
+      return res.json();
+    })
     .toPromise()
   }
 

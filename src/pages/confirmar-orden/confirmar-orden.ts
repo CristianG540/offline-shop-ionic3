@@ -3,9 +3,11 @@ import {
   IonicPage,
   NavController,
   NavParams,
-  ModalController
+  ModalController,
+  AlertController
 } from "ionic-angular";
 import { FormGroup, FormArray, FormBuilder, Validators  } from "@angular/forms";
+import _ from 'lodash';
 
 //Providers
 import { CarritoProvider } from "../../providers/carrito/carrito";
@@ -30,9 +32,10 @@ export class ConfirmarOrdenPage {
   private newClientFlag: boolean = false;
 
   constructor(
-    public navCtrl: NavController,
+    private navCtrl: NavController,
     private modalCtrl: ModalController,
-    public navParams: NavParams,
+    private alertCtrl: AlertController,
+    private navParams: NavParams,
     private fb: FormBuilder,
     private cartServ: CarritoProvider,
     private clienteServ: ClientesProvider,
@@ -133,11 +136,25 @@ export class ConfirmarOrdenPage {
         return this.ordenServ.sendOrdersSap();
 
       })
-      .then(res=>{
-        console.warn("RESPUESTA DE LAS ORDENES ", res);
+      .then(responses=>{
+        let failOrders = _.filter(responses.apiRes, (res: any) => {
+          return res.responseApi.code == 400;
+        })
+        if(failOrders.length > 0){
+          this.alertCtrl.create({
+            title: "Advertencia.",
+            message: failOrders.length+' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo',
+            buttons: ['Ok']
+          }).present();
+        }else{
+          this.alertCtrl.create({
+            title: "Info.",
+            message: "Las ordenes se subieron correctamente a sap.",
+            buttons: ['Ok']
+          }).present();
+        }
       })
       .catch(err=>{
-        debugger;
         this.util.errorHandler(err.message, err);
       })
   }

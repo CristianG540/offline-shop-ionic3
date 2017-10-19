@@ -78,5 +78,8 @@
         "platforms": [
             "android"
         ]
+    },
+    "config": {
+        "ionic_uglifyjs": "./config/uglifyjs.config.js"
     }
 }

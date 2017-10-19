@@ -17,6 +17,7 @@ import { Producto } from '../../providers/productos/models/producto';
 import { ProductosProvider } from '../../providers/productos/productos';
 import { CarritoProvider } from "../../providers/carrito/carrito";
 import { Config as Cg} from '../../providers/config/config';
+import { ClientesProvider } from '../../providers/clientes/clientes';
 
 @IonicPage()
 @Component({
@@ -37,6 +38,7 @@ export class HomePage {
     private alertCtrl: AlertController,
     private prodsService: ProductosProvider,
     private cartService: CarritoProvider,
+    private clienteServ: ClientesProvider,
     private util: Cg
   ) {
     this.menuCtrl.enable(true);
@@ -44,7 +46,8 @@ export class HomePage {
 
   ionViewDidLoad(){
     this.showLoading();
-    this.prodsService.initDB().then( info => {
+    this.prodsService.initDB()
+    .then( info => {
       this.loading.dismiss();
       console.warn('Prods- First Replication complete');
     }).catch( err => {
@@ -52,15 +55,30 @@ export class HomePage {
       console.error("Prods-totally unhandled error (shouldn't happen)", err);
     }).then(()=>{
       //this.loading.dismiss();
+      this.indexDB();
       this.prodsService.resetProds();
       this.prodsService.recuperarPagSgte()
         .catch( err => this.errorHandler(err.message, err) );
     });
+
+
   }
 
   ionViewDidEnter(){
     // ESTA MIERDA AQUI ABAJO LA DE RESETEAR LOS PRODS SE DEBE PODER HACER MEJOR CON POUCH
 
+  }
+
+  private indexDB(): void{
+    let loading = this.util.showLoading();
+    this.clienteServ
+    .indexDbClientes()
+    .then(res => {
+      loading.dismiss();
+    })
+    .catch(err => {
+      this.util.errorHandler(err.message, err, loading);
+    });
   }
 
   private doInfinite(infiniteScroll): void {

@@ -108,7 +108,7 @@ export class ClientesProvider {
       limit: 50,
       include_docs: true,
       highlighting: true,
-      stale: 'ok'
+      stale: 'update_after'
     });
   }
 

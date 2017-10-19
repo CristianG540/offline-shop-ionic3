@@ -27,14 +27,14 @@ export class CarritoProvider {
   }
 
   public initDB(){
-    let loading = this.util.showLoading();
+    //let loading = this.util.showLoading();
     this._db = new PouchDB('cart');
     this.fetchAndRenderAllDocs()
       .then( res => {
         this._reactToChanges()
-        loading.dismiss()
+        //loading.dismiss()
       })
-      .catch(err => this.util.errorHandler(err.message, err, loading) );
+      .catch(err => this.util.errorHandler(err.message, err) );
   }
 
   /** *************** Manejo de el estado de la ui    ********************** */

@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import {
   IonicPage,
   NavController,
   NavParams,
   ViewController,
   ToastController,
-  Events
+  Events,
+  Content
 } from "ionic-angular";
 import { CarritoProvider } from "../../providers/carrito/carrito";
 import { Producto } from "../../providers/productos/models/producto";
@@ -18,7 +19,7 @@ import { Config } from "../../providers/config/config";
   templateUrl: 'carrito.html',
 })
 export class CarritoPage {
-
+  @ViewChild('content') content: Content;
   private _prods: Producto[] = [];
   private confirmarOrdenPage: string = 'ConfirmarOrdenPage';
 
@@ -40,6 +41,14 @@ export class CarritoPage {
   }
 
   ionViewDidEnter() {
+
+    /**
+     * Esta vuelta corrige un error donde el contenido de la
+     * app se esconde bajo el header, mas info sobre esta mierda aqui
+     * https://github.com/ionic-team/ionic/issues/13028 y aqui
+     * https://github.com/ionic-team/ionic/issues/13183
+     */
+    this.content.resize();
     this.reloadProds();
   }
 

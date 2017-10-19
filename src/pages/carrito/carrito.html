@@ -10,7 +10,7 @@
 </ion-header>
 
 
-<ion-content>
+<ion-content #content >
   <ion-grid *ngIf="cartServ.carItems.length == 0; else elseBlock">
     <ion-row>
       <ion-col text-center class="empty-cart">

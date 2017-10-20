@@ -43,14 +43,14 @@ export class ClientesProvider {
        * que una que almacene en el dispositivo, pero lo malo es que
        * los datos se pierden si la app se cierra
        */
-      this._db = new PouchDB("cliente", {adapter: 'memory'});
+      this._db = new PouchDB("cliente_mem", {adapter: 'memory', auto_compaction: true});
       /**
        * Base de datos local en pouch, esta BD almacena los datos en
        * el dispositivo usando IndexDB, la ventaja es q los datos se mantienen
        * si la app se cierra, la desventaja es que creo q es mas lenta
        * que la BD en memoria
        */
-      this._dbLocal = new PouchDB("cliente");
+      this._dbLocal = new PouchDB("cliente",{revs_limit: 10, auto_compaction: true});
       /**
        * Que mierda estoy haciendo aqui me preguntare cuando se me olvide esto,
        * como la bd en memoria es muy rapida pero no conserva los datos, y como
@@ -107,8 +107,8 @@ export class ClientesProvider {
       },
       limit: 50,
       include_docs: true,
-      highlighting: true,
-      stale: 'update_after'
+      highlighting: true
+      //stale: 'update_after'
     });
   }
 

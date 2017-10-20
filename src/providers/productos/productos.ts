@@ -49,7 +49,7 @@ export class ProductosProvider {
     return new Promise( (resolve, reject) => {
 
       //this._db = new PouchDB("productos.db", {adapter: 'cordova-sqlite'});
-      this._db = new PouchDB("productos");
+      this._db = new PouchDB("productos", {revs_limit: 10, auto_compaction: true});
       this._remoteDB = new PouchDB(Config.CDB_URL, {
         auth: {
           username: "admin",
@@ -118,6 +118,13 @@ export class ProductosProvider {
             }
           }.toString(), // The .toString() at the end of the map function is necessary to prep the object for becoming valid JSON.
           reduce: '_sum'
+        },
+        producto_categoria: {
+          map : function (doc) {
+            if(doc.marcas && parseInt(doc.existencias)>0){
+              emit(doc.marcas.toLowerCase(), null);
+            }
+          }.toString() // The .toString() at the end of the map function is necessary to prep the object for becoming valid JSON.
         }
       }
     }
@@ -228,33 +235,12 @@ export class ProductosProvider {
   public fetchNextPagByCategoria(categoria : string): any {
 
     categoria = categoria.toLocaleLowerCase();
-    // create a design doc
-    var ddoc = {
-      _id: '_design/categoriaview',
-      views: {
-        producto_categoria: {
-          map : function (doc) {
-            if(doc.marcas && parseInt(doc.existencias)>0){
-              emit(doc.marcas.toLowerCase(), null);
-            }
-          }.toString() // The .toString() at the end of the map function is necessary to prep the object for becoming valid JSON.
-        }
-      }
-    };
 
-    // save the design doc
-    return this._db.put(ddoc).catch(err => {
-      if (err.name !== 'conflict') {
-        throw err;
-      }
-      // ignore if doc already exists
-    }).then( () => {
-      return this._db.query('categoriaview/producto_categoria', {
+    return this._db.query('categoriaview/producto_categoria', {
         key          : categoria,
         skip         : this.skipByCat,
         limit        : this.cantProdsPag,
         include_docs : true
-      });
     }).then(res => {
 
       if (res && res.rows.length > 0) {

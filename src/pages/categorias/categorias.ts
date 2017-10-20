@@ -21,9 +21,7 @@ export class CategoriasPage {
   ) {}
 
   ionViewDidLoad(){
-    this.showLoading();
     this.prodsService.fetchCategorias()
-      .then( () => this.loading.dismiss() )
       .catch( err => this.errorHandler(err.message, err) );
   }
 
@@ -35,13 +33,6 @@ export class CategoriasPage {
       buttons: ['Ok']
     }).present();
     if(err){ console.error(err) }
-  }
-
-  private showLoading(): void {
-    this.loading = this.loadingCtrl.create({
-      content: 'Espere por favor...'
-    });
-    this.loading.present();
   }
 
 }

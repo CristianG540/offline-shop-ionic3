@@ -39,14 +39,12 @@
 
 <ion-footer>
   <ion-toolbar >
-    <ion-row *ngIf="_observacion">
+    <ion-row >
       <ion-col >
-        <b>Observacion:</b>&nbsp; {{ _observacion }}
+        <b>Codigo APP:</b>&nbsp; {{ navParams.data._id }}
       </ion-col>
-    </ion-row>
-    <ion-row *ngIf="_codSap">
-      <ion-col >
-        <b>Codigo SAP:</b>&nbsp; {{ _codSap }}
+      <ion-col *ngIf="navParams.data.docEntry">
+        <b>Codigo SAP:</b>&nbsp; {{ navParams.data.docEntry }}
       </ion-col>
     </ion-row>
     <ion-row>
@@ -54,8 +52,13 @@
           <b>Cliente: </b> {{ _cliente }} <br>
         </ion-col>
         <ion-col text-right>
-          <b>Total+IVA: </b> {{ _total | currency:'USD':true }}
+          <b>Total+IVA: </b> {{ navParams.data.total | currency:'USD':true }}
         </ion-col>
+    </ion-row>
+    <ion-row *ngIf="navParams.data.observaciones">
+      <ion-col >
+        <b>Observacion:</b>&nbsp; {{ navParams.data.observaciones }}
+      </ion-col>
     </ion-row>
 
   </ion-toolbar>

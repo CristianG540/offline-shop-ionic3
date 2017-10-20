@@ -20,11 +20,6 @@ export class OrdenesPage {
   ) {
   }
 
-  ionViewDidLoad() {
-    this.ordenServ.fetchAndRenderAllDocs()
-      .catch(console.log.bind(console))
-  }
-
   public deleteDB(): void {
     this.ordenServ.destroyDB();
   }

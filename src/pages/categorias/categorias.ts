@@ -9,7 +9,6 @@ import { ProductosProvider } from '../../providers/productos/productos';
 })
 export class CategoriasPage {
 
-  private loading: Loading;
   private productosCategoriaPage: string = 'ProductosCategoriaPage';
 
   constructor(
@@ -26,7 +25,6 @@ export class CategoriasPage {
   }
 
   private errorHandler(err: string, errObj?: any): void {
-    if(this.loading){ this.loading.dismiss(); }
     this.alertCtrl.create({
       title: "Ocurrio un error.",
       message: err,

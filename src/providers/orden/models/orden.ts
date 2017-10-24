@@ -6,6 +6,7 @@ export class Orden {
     public observaciones: string,
     public items: CarItem[],
     public total: number,
+    public transp?: number,
     public docEntry?: string, // Aqui va el id del pedido que sap me devuelve del webservice
     public nitCliente?: string,
     public newClient?: any, // Aqui meto el cliente nuevo en caso de que el perro exista

@@ -27,7 +27,7 @@ export class AutocompletePage {
   }
 
   chooseItem(item: any) {
-    this.viewCtrl.dismiss(item.nit);
+    this.viewCtrl.dismiss(item);
   }
 
   updateSearch(ev: any) {
@@ -46,7 +46,8 @@ export class AutocompletePage {
         this.autocompleteItems = _.map(res.rows, (row: any) => {
           return {
             nit  : row.doc._id,
-            name : row.highlighting.nombre_cliente.toLowerCase() + ' - '+row.doc._id
+            name : row.highlighting.nombre_cliente.toLowerCase() + ' - '+row.doc._id,
+            transp : row.doc.transportadora
           }
         });
       })

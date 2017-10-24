@@ -125,6 +125,7 @@ export class OrdenProvider {
               id             : orden._id,
               fecha_creacion : moment(parseInt(orden._id)).format("YYYY-MM-DD"),
               nit_cliente    : orden.nitCliente,
+              trasportadora  : orden.transp,
               comentarios    : orden.observaciones,
               productos      : items
             });

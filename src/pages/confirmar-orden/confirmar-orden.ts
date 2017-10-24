@@ -30,6 +30,7 @@ export class ConfirmarOrdenPage {
   private ordenForm: FormGroup;
   private newClient: FormGroup;
   private newClientFlag: boolean = false;
+  private transportadora: number;
 
   constructor(
     private navCtrl: NavController,
@@ -64,10 +65,10 @@ export class ConfirmarOrdenPage {
 
   showAddressModal () {
     let modal = this.modalCtrl.create("AutocompletePage");
-    let me = this;
     modal.onDidDismiss(data => {
       if(data){
-        this.ordenForm.controls['cliente'].setValue(data);
+        this.ordenForm.controls['cliente'].setValue(data.nit);
+        this.transportadora = data.transp;
       }
     });
     modal.present();
@@ -95,6 +96,7 @@ export class ConfirmarOrdenPage {
         observaciones: observaciones,
         items: carItems,
         total: this.cartServ.totalPrice,
+        transp: this.transportadora,
         estado: false,
         type: "orden"
       }

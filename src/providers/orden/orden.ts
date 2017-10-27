@@ -137,7 +137,7 @@ export class OrdenProvider {
                */
               return {
                 orden       : orden,
-                responseApi : res.json()
+                responseApi : cg.safeJsonParse(res)
               }
             }).catch( (res: Response) => {
               /**
@@ -146,7 +146,7 @@ export class OrdenProvider {
                */
               return Observable.of({
                 orden       : orden,
-                responseApi : res.json()
+                responseApi : cg.safeJsonParse(res)
               })
             })
 

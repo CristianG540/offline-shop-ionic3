@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Headers, RequestOptions } from '@angular/http';
+import { Headers, RequestOptions, Response } from '@angular/http';
 import {
   Loading,
   AlertController,
@@ -75,6 +75,31 @@ export class Config {
       arr[mid][property] < search ? low = mid + 1 : high = mid
     }
     return low;
+  }
+
+  /**
+   * A ver, hay veces que al recibir la respuesta de un api esta no viene totalmente
+   * en un formato json, puede ser que por ejemplo haya un error y la api devuelve
+   * una porsion de html, al intentar hacer el res.json() la app saca un error como * "SyntaxError: Unexpected token < in JSON at position 0 at JSON.parse"
+   * esta funcion se encarga de atraparme ese error y de notificarme cuando pasa
+   *
+   * @static
+   * @param {Response} res
+   * @returns {*}
+   * @memberof Config
+   */
+  static safeJsonParse(res: Response): any {
+    try{
+      return res.json();
+    }catch(err){
+      return {
+        data : {
+          msg : res,
+          err : err
+        },
+        code : 400
+      }
+    }
   }
 
   public errorHandler(err: string, errObj?: any, loading?: Loading): void {

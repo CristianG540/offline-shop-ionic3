@@ -64,11 +64,6 @@ export class HomePage {
 
   }
 
-  ionViewDidEnter(){
-    // ESTA MIERDA AQUI ABAJO LA DE RESETEAR LOS PRODS SE DEBE PODER HACER MEJOR CON POUCH
-
-  }
-
   private indexDB(): void{
     let loading = this.util.showLoading();
     this.clienteServ
@@ -105,23 +100,34 @@ export class HomePage {
   }
 
   private addProd(producto: Producto): void {
-    this.showLoading();
-    this.cartService.pushItem({
-      _id: producto._id,
-      cantidad: 1,
-      totalPrice: producto.precio
-    }).then(res=>{
-      this.loading.dismiss();
-      this.showToast(`El producto ${res.id} se agrego correctamente`);
-    }).catch(err=>{
-      if(err=="duplicate"){
-        this.loading.dismiss();
-        this.showToast(`El producto ya esta en el carrito`);
+
+    this.util.promptAlertCant(d => {
+
+      if( d.txtCantidad && producto.existencias >= d.txtCantidad ){
+
+        this.showLoading();
+        this.cartService.pushItem({
+          _id: producto._id,
+          cantidad: d.txtCantidad,
+          totalPrice: producto.precio * d.txtCantidad
+        }).then(res=>{
+          this.loading.dismiss();
+          this.showToast(`El producto ${res.id} se agrego correctamente`);
+        }).catch(err=>{
+          if(err=="duplicate"){
+            this.loading.dismiss();
+            this.showToast(`El producto ya esta en el carrito`);
+          }else{
+            this.errorHandler(err.message, err);
+          }
+
+        })
       }else{
-        this.errorHandler(err.message, err);
+        this.showToast(`Hay ${producto.existencias} productos, ingrese una cantidad valida.`);
+        return false;
       }
 
-    })
+    });
 
   }
 

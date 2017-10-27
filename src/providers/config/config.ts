@@ -101,6 +101,36 @@ export class Config {
       }
     }
   }
+  /**
+   * Esta funcion me crea una alerta con un input para preguntarle al
+   * usuario cuantas unidades del producto va a agregar al carrito
+   *
+   * @param {*} handler este parametro recibe una funcion con un parametro data que recibe
+   * la cantidad que el usuario ingreso en el input
+   * @memberof Config
+   */
+  public promptAlertCant(handler: any): void {
+    this.alertCtrl.create({
+      title: 'Agregar cantidad',
+      enableBackdropDismiss: false,
+      inputs: [{
+        name: 'txtCantidad',
+        id: 'idTxtCant',
+        type: 'number',
+        placeholder: 'Cantidad'
+      }],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Agregar',
+          handler: handler
+        }
+      ]
+    }).present();
+  }
 
   public errorHandler(err: string, errObj?: any, loading?: Loading): void {
     if(loading){ loading.dismiss() }

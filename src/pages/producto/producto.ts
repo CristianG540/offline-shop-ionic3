@@ -29,22 +29,34 @@ export class ProductoPage {
   }
 
   private addProd(): void {
-    let loading = this.util.showLoading();
-    this.cartService.pushItem({
-      _id: this.producto._id,
-      cantidad: 1,
-      totalPrice: this.producto.precio
-    }).then(res=>{
-      loading.dismiss();
-      this.showToast(`El producto ${res.id} se agrego correctamente`);
-    }).catch(err=>{
-      if(err=="duplicate"){
-        loading.dismiss();
-        this.showToast(`El producto ya esta en el carrito`);
+
+
+    this.util.promptAlertCant(d => {
+      if( d.txtCantidad && this.producto.existencias >= d.txtCantidad ){
+
+        let loading = this.util.showLoading();
+        this.cartService.pushItem({
+          _id: this.producto._id,
+          cantidad: d.txtCantidad,
+          totalPrice: this.producto.precio * d.txtCantidad
+        }).then(res=>{
+          loading.dismiss();
+          this.showToast(`El producto ${res.id} se agrego correctamente`);
+          this.navCtrl.popToRoot();
+        }).catch(err=>{
+          if(err=="duplicate"){
+            loading.dismiss();
+            this.showToast(`El producto ya esta en el carrito`);
+          }else{
+            this.util.errorHandler(err.message, err, loading);
+          }
+        })
+
       }else{
-        this.util.errorHandler(err.message, err, loading);
+        this.showToast(`Hay ${this.producto.existencias} productos, ingrese una cantidad valida.`);
+        return false;
       }
-    })
+    });
 
   }
 

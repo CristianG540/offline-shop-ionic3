@@ -12,7 +12,7 @@
   <ion-list >
     <ion-item *ngFor="let prod of _prods" text-wrap>
       <ion-thumbnail item-left>
-          <img [src]="prod.imagen">
+          <img [src]="prod.imagen" [alt]="prod.titulo" onerror="this.src='assets/img/logo/logo_igb_small.png'">
         </ion-thumbnail>
         <h4>{{ prod.titulo }}</h4>
         <ion-row>

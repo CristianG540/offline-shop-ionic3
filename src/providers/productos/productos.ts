@@ -49,7 +49,7 @@ export class ProductosProvider {
     return new Promise( (resolve, reject) => {
 
       //this._db = new PouchDB("productos.db", {adapter: 'cordova-sqlite'});
-      this._db = new PouchDB("productos", {revs_limit: 10, auto_compaction: true});
+      this._db = new PouchDB("productos_prod", {revs_limit: 5, auto_compaction: true});
       this._remoteDB = new PouchDB(Config.CDB_URL, {
         auth: {
           username: "admin",

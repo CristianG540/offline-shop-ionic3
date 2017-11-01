@@ -47,7 +47,7 @@ export class Config {
 
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD en couch
-  static readonly CDB_URL: string = 'http://45.77.74.23:5984/productos';
+  static readonly CDB_URL: string = 'http://45.77.74.23:5984/productos_prod';
   static readonly CDB_URL_CLIENTES: string = 'http://45.77.74.23:5984/clientes';
 
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http

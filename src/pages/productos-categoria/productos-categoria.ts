@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Loading, AlertController, LoadingController } from 'ionic-angular';
 
 import { ProductosProvider } from '../../providers/productos/productos';
+import { Producto } from '../../providers/productos/models/producto';
 
 @IonicPage()
 @Component({
@@ -20,7 +21,11 @@ export class ProductosCategoriaPage {
     private navParams: NavParams,
     private prodsService: ProductosProvider
   ) {
-    /**
+
+  }
+
+  ionViewDidLoad(){
+     /**
      * Lo siguiente lo hago para resetear las variables que almacenan los datos
      * al mostrar los productos por categoria, si no las reseteo los productos solo
      * se apiñarian uno tras otro y continuarian desde el ultimo producto paginado
@@ -60,6 +65,10 @@ export class ProductosCategoriaPage {
       content: 'Espere por favor...'
     });
     this.loading.present();
+  }
+
+  private trackByProds(index: number, producto: Producto): string {
+    return producto._id;
   }
 
 }

@@ -10,9 +10,9 @@
 <ion-content padding>
 
   <ion-list>
-    <ion-item *ngFor="let prod of prodsService.prodsByCat">
+    <ion-item *ngFor="let prod of prodsService.prodsByCat; trackBy: trackByProds">
       <ion-thumbnail item-left>
-          <img [src]="prod.imagen" [alt]="prod.titulo">
+          <img [src]="prod.imagen" [alt]="prod.titulo" onerror="this.src='assets/img/logo/logo_igb_small.png'">
       </ion-thumbnail>
       <h2>{{ prod._id }}</h2>
       <p>{{ prod.titulo }}</p>

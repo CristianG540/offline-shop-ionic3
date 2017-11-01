@@ -9,6 +9,7 @@ import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { Network } from '@ionic-native/network';
 import _ from "lodash";
+import { ImageLoaderConfig } from 'ionic-image-loader';
 
 //Providers
 import { Config } from "../providers/config/config";
@@ -43,8 +44,14 @@ export class MyApp {
     private dbServ: DbProvider,
     private ordenServ: OrdenProvider,
     private cartServ: CarritoProvider,
-    private util: Config
+    private util: Config,
+    private imageLoaderConfig: ImageLoaderConfig
   ) {
+    /* start config ionic image loader  https://github.com/zyra/ionic-image-loader */
+    //this.imageLoaderConfig.setImageReturnType('base64'); // descomentar para q funcione con el live reload
+    this.imageLoaderConfig.setFallbackUrl('assets/img/logo/logo_igb_small.png');
+    this.imageLoaderConfig.enableFallbackAsPlaceholder(true);
+    /**  fin config image loader */
 
     if( this.authService.isLogged ){
       this.dbServ.init( this.authService.dbUrl );

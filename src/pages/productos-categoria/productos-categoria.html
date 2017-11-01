@@ -12,7 +12,7 @@
   <ion-list>
     <ion-item *ngFor="let prod of prodsService.prodsByCat; trackBy: trackByProds">
       <ion-thumbnail item-left>
-          <img [src]="prod.imagen" [alt]="prod.titulo" onerror="this.src='assets/img/logo/logo_igb_small.png'">
+        <img-loader [src]="prod.imagen" useImg></img-loader>
       </ion-thumbnail>
       <h2>{{ prod._id }}</h2>
       <p>{{ prod.titulo }}</p>

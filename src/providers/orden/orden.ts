@@ -68,7 +68,8 @@ export class OrdenProvider {
   public fetchAndRenderAllDocs(): Promise<any> {
 
     return this._db.allDocs({
-      include_docs: true
+      include_docs: true,
+      descending: true
     }).then( res => {
       this._ordenes = res.rows.map((row) => {
         return row.doc;
@@ -242,7 +243,7 @@ export class OrdenProvider {
    * @memberof OrdenProvider
    */
   public get ordenes() : Orden[] {
-    return JSON.parse(JSON.stringify( _.orderBy(this._ordenes, '_id', 'desc') ));
+    return JSON.parse(JSON.stringify( this._ordenes ));
   }
 
   /**

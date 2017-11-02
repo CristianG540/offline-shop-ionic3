@@ -3,7 +3,7 @@
     <name>Tienda IGB</name>
     <description>Tienda con funcionalidades offline para IGB.</description>
     <author email="cristianneatproy@gmail.com" href="https://registry.jsonresume.org/a59637ee">CristianG540</author>
-    <content src="index.html" />
+    <content original-src="index.html" src="http://192.168.11.29:8100" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-intent href="http://*/*" />

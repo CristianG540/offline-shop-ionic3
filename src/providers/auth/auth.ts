@@ -69,7 +69,7 @@ export class AuthProvider {
   public getTokenJosefa(): Promise<any> {
     let auth: string = 'Basic ' + btoa('admin:admin1234');
     let options:RequestOptions = Config.JOSEFA_OPTIONS(auth);
-    let url: string = Config.JOSEFA_URL+'authenticate';
+    let url: string = Config.JOSEFA_URL+'/authenticate';
 
     return new Promise( (resolve, reject)=>{
       this.http.post(url, "", options)

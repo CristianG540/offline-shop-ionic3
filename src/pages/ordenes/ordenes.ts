@@ -4,6 +4,9 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 //Providers
 import { OrdenProvider } from "../../providers/orden/orden";
 
+//Models
+import { Orden } from '../../providers/orden/models/orden';
+
 @IonicPage()
 @Component({
   selector: 'page-ordenes',
@@ -20,16 +23,15 @@ export class OrdenesPage {
   ) {
   }
 
-  public deleteDB(): void {
-    this.ordenServ.destroyDB();
-  }
-
-
   public iconOrden(orden) : string {
     if(orden.error){
       return 'warning'
     }
     return (orden.estado) ? 'checkmark' : 'time';
+  }
+
+  private trackById(index: number, orden: Orden): string {
+    return orden._id;
   }
 
 

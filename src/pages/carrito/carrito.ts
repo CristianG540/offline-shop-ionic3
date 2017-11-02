@@ -89,4 +89,8 @@ export class CarritoPage {
     }).present();
   }
 
+  private trackByProds(index: number, prod: Producto): string {
+    return prod._id;
+  }
+
 }

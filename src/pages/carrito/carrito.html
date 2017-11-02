@@ -23,7 +23,7 @@
 
   <ng-template #elseBlock>
     <ion-list>
-      <ion-item-sliding *ngFor="let prod of _prods">
+      <ion-item-sliding *ngFor="let prod of _prods; trackBy: trackByProds" >
 
         <ion-item text-wrap>
           <ion-thumbnail item-left>

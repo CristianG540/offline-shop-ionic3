@@ -14,7 +14,7 @@
 
 <ion-content padding>
   <ion-list>
-    <ion-item *ngFor="let orden of ordenServ.ordenes; let i=index" style="font-size: 1.3rem" text-wrap [navPush]="ordenesDetallePage" [navParams]="orden">
+    <ion-item *ngFor="let orden of ordenServ.ordenes; let i=index; trackBy: trackById" style="font-size: 1.3rem" text-wrap [navPush]="ordenesDetallePage" [navParams]="orden">
       <ion-icon [name]="iconOrden(orden)" item-left></ion-icon>
       {{orden?._id}} | {{ orden?._id | date:'dd-MM-y hh:mm a'}} | {{ orden.items.length }}
       <b>{{ (orden.items.length>1)?'referencias':'referencia' }}</b>

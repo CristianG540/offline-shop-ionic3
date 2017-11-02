@@ -8,6 +8,7 @@ import { IonicStorageModule } from '@ionic/storage';
 import { Network } from '@ionic-native/network';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IonicImageLoader } from 'ionic-image-loader';
+import { Pro } from '@ionic/pro';
 
 import { MyApp } from './app.component';
 import { CarritoProvider } from '../providers/carrito/carrito';
@@ -19,6 +20,9 @@ import { OrdenProvider } from '../providers/orden/orden';
 import { AuthProvider } from '../providers/auth/auth';
 import { DbProvider } from '../providers/db/db';
 
+const IonicPro = Pro.init('58f17b7d', {
+  appVersion: "0.0.1"
+});
 
 @NgModule({
   declarations: [

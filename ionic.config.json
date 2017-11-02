@@ -1,6 +1,6 @@
 {
   "name": "igb-store",
-  "app_id": "",
+  "app_id": "58f17b7d",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}

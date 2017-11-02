@@ -68,8 +68,7 @@ export class OrdenProvider {
   public fetchAndRenderAllDocs(): Promise<any> {
 
     return this._db.allDocs({
-      include_docs: true,
-      descending: true
+      include_docs: true
     }).then( res => {
       this._ordenes = res.rows.map((row) => {
         return row.doc;
@@ -132,6 +131,7 @@ export class OrdenProvider {
             });
 
             return this.http.post(url, body, options).map( (res: Response) => {
+
               /**
                * Si la respuesta de la api no tiene ningun error, y la orden se crea
                * y entra correctamente a sap devuelvo entonces la respuesta y la orden
@@ -141,6 +141,7 @@ export class OrdenProvider {
                 responseApi : cg.safeJsonParse(res)
               }
             }).catch( (res: Response) => {
+
               /**
                * Si la respuesta de la api falla, y la orden no se crea
                * correctamente en sap devuelvo entonces la respuesta del error y la orden en un observable
@@ -163,13 +164,21 @@ export class OrdenProvider {
                * el DocEntry que sap me devuelve
                */
               Promise.all(responsesApi.map( (res: any) => {
+
                   if (res.responseApi.code == 201 && _.has(res.responseApi, 'data.DocumentParams.DocEntry') ) {
                     res.orden.estado = true;
                     res.orden.error = '';
                     res.orden.docEntry = res.responseApi.data.DocumentParams.DocEntry;
                     return this.pushItem(res.orden)
                   }else{
-                    res.orden.error = JSON.stringify(res.responseApi.data);
+                    let error: any;
+                    if( _.has(res.responseApi, 'data') ){
+                      error = JSON.stringify(res.responseApi.data);
+                    }else{
+                      error = JSON.stringify(res.responseApi);
+                      res.responseApi.code = 400;
+                    }
+                    res.orden.error = error;
                     return this.pushItem(res.orden)
                   }
                 })
@@ -244,6 +253,17 @@ export class OrdenProvider {
    */
   public get ordenes() : Orden[] {
     return JSON.parse(JSON.stringify( this._ordenes ));
+  }
+
+  /**
+   * Getter que me trae todas los ordenes
+   *
+   * @readonly
+   * @type {Orden[]}
+   * @memberof OrdenProvider
+   */
+  public get ordenesDesc() : Orden[] {
+    return JSON.parse(JSON.stringify( _.orderBy(this._ordenes, '_id', 'desc') ));
   }
 
   /**

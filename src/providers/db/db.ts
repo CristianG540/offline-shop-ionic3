@@ -30,10 +30,14 @@ export class DbProvider {
         console.log("db_averno-replication was resumed", info);
       }).on('denied', function (err) {
         console.error("db_averno-a document failed to replicate (e.g. due to permissions)", err);
-        Raven.captureException( new Error(`db_averno - No se pudo replicar la BD con las ordenes debido a permisos 👮: ${err}`) );
+        Raven.captureException( new Error(`db_averno - No se pudo replicar la BD con las ordenes debido a permisos 👮: ${JSON.stringify(err)}`), {
+          extra: err
+        } );
       }).on('error', function (err) {
         console.error("db_averno-totally unhandled error (shouldn't happen)", err);
-        Raven.captureException( new Error(`db_averno - Error con la BD de las ordenes que no deberia pasar 😫: ${err}`) );
+        Raven.captureException( new Error(`db_averno - Error con la BD de las ordenes que no deberia pasar 😫: ${JSON.stringify(err)}`), {
+          extra: err
+        } );
       });
 
     this._reactToChanges();

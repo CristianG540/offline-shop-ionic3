@@ -131,7 +131,9 @@ export class MyApp {
       .catch(err=>{
         loading.dismiss();
         console.error('error en el logout',err);
-        Raven.captureException( new Error(`error en el logout: ${err}`) );
+        Raven.captureException( new Error(`error en el logout: ${JSON.stringify(err)}`), {
+          extra: err
+        } );
         //if(err.ok == false || err.message == "Network Error"){
           this.alertCtrl.create({
             title: "Ocurrio un error.",

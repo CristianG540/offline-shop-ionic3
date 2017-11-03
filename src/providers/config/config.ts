@@ -137,16 +137,17 @@ export class Config {
   }
 
   public errorHandler(err: string, errObj?: any, loading?: Loading): void {
+    debugger;
     if(loading){ loading.dismiss() }
     this.alertCtrl.create({
       title: "Ocurrio un error.",
       message: err,
       buttons: ['Ok']
     }).present();
-    if(err){
-      console.error("Se presento el error: ",err);
-      Raven.captureException( new Error(`Se presento el error 🐛: ${err}`) );
-    }
+    console.error("Se presento el error: ",errObj);
+    Raven.captureException( new Error(`Se presento el error 🐛: ${JSON.stringify(errObj)}`), {
+      extra: errObj
+    });
   }
 
   public showLoading(): Loading {

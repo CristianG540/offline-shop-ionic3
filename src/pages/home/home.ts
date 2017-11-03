@@ -54,7 +54,9 @@ export class HomePage {
     }).catch( err => {
       this.loading.dismiss();
       console.error("Prods-totally unhandled error (shouldn't happen)", err);
-      Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${err}`) );
+      Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
+        extra: err
+      } );
     }).then(()=>{
       //this.loading.dismiss();
       this.indexDB();

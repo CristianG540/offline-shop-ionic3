@@ -8,8 +8,9 @@ import {
 import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { Network } from '@ionic-native/network';
-import _ from "lodash";
 import { ImageLoaderConfig } from 'ionic-image-loader';
+import _ from "lodash";
+import Raven from "raven-js";
 
 //Providers
 import { Config } from "../providers/config/config";
@@ -54,8 +55,21 @@ export class MyApp {
     /**  fin config image loader */
 
     if( this.authService.isLogged ){
+
+      // Inicio la base de datos del usuario, en esta bd es en las que guardan
+      // las ordenes, la crea automaticamente superlogin y me envia la url
       this.dbServ.init( this.authService.dbUrl );
       this.rootPage = 'TabsPage';
+
+      /**
+       * Aqui le digo a sentry cual es el usuario q esta usando la app
+       */
+      Raven.setUserContext({
+        username: this.authService.userId,
+        email: this.authService.userEmail,
+        id: this.authService.asesorId
+      });
+
     }else{
       this.rootPage = 'LoginPage';
     }
@@ -110,6 +124,7 @@ export class MyApp {
         this.ordenServ.destroyDB();
         this.cartServ.destroyDB();
         this.cargarPagina('LoginPage');
+        Raven.setUserContext();
         loading.dismiss();
       })
       .catch(err=>{

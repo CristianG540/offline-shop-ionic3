@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Events } from 'ionic-angular';
+
+// libs terceros
 import PouchDB from 'pouchdb';
+import Raven from '';
 
 @Injectable()
 export class DbProvider {
@@ -27,8 +30,10 @@ export class DbProvider {
         console.log("db_averno-replication was resumed", info);
       }).on('denied', function (err) {
         console.error("db_averno-a document failed to replicate (e.g. due to permissions)", err);
+        Raven.captureException( new Error(`db_averno - No se pudo replicar la BD con las ordenes debido a permisos 👮: ${err}`) );
       }).on('error', function (err) {
         console.error("db_averno-totally unhandled error (shouldn't happen)", err);
+        Raven.captureException( new Error(`db_averno - Error con la BD de las ordenes que no deberia pasar 😫: ${err}`) );
       });
 
     this._reactToChanges();

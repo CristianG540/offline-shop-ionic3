@@ -1,6 +1,17 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Loading, AlertController, LoadingController } from 'ionic-angular';
+import {
+  IonicPage,
+  NavController,
+  NavParams,
+  Loading,
+  AlertController,
+  LoadingController
+} from 'ionic-angular';
+
+//Providers
 import { ProductosProvider } from '../../providers/productos/productos';
+import { Config } from '../../providers/config/config';
+
 
 @IonicPage()
 @Component({
@@ -16,21 +27,13 @@ export class CategoriasPage {
     private alertCtrl: AlertController,
     private loadingCtrl: LoadingController,
     private navParams: NavParams,
-    private prodsService: ProductosProvider
+    private prodsService: ProductosProvider,
+    private util: Config
   ) {}
 
   ionViewDidLoad(){
     this.prodsService.fetchCategorias()
-      .catch( err => this.errorHandler(err.message, err) );
-  }
-
-  private errorHandler(err: string, errObj?: any): void {
-    this.alertCtrl.create({
-      title: "Ocurrio un error.",
-      message: err,
-      buttons: ['Ok']
-    }).present();
-    if(err){ console.error(err) }
+      .catch( err => this.util.errorHandler(err.message, err) );
   }
 
 }

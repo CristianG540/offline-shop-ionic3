@@ -9,6 +9,7 @@ import {
   Platform,
   MenuController
 } from "ionic-angular";
+import Raven from "raven-js";
 
 /* Models */
 import { Producto } from '../../providers/productos/models/producto';
@@ -53,14 +54,14 @@ export class HomePage {
     }).catch( err => {
       this.loading.dismiss();
       console.error("Prods-totally unhandled error (shouldn't happen)", err);
+      Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${err}`) );
     }).then(()=>{
       //this.loading.dismiss();
       this.indexDB();
       this.prodsService.resetProds();
       this.prodsService.recuperarPagSgte()
-        .catch( err => this.errorHandler(err.message, err) );
+        .catch( err => this.util.errorHandler(err.message, err) );
     });
-
 
   }
 
@@ -80,16 +81,6 @@ export class HomePage {
     this.prodsService.recuperarPagSgte()
       .then( () => infiniteScroll.complete() )
       .catch( err => this.errorHandler(err.message, err) );
-  }
-
-  private errorHandler(err: string, errObj?: any): void {
-    if(this.loading){ this.loading.dismiss(); }
-    this.alertCtrl.create({
-      title: "Ocurrio un error.",
-      message: err,
-      buttons: ['Ok']
-    }).present();
-    if(err){ console.error(err) }
   }
 
   private showLoading(): void {
@@ -118,7 +109,7 @@ export class HomePage {
             this.loading.dismiss();
             this.showToast(`El producto ya esta en el carrito`);
           }else{
-            this.errorHandler(err.message, err);
+            this.util.errorHandler(err.message, err);
           }
 
         })

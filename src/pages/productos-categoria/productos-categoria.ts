@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Loading, AlertController, LoadingController } from 'ionic-angular';
 
+// Providers
 import { ProductosProvider } from '../../providers/productos/productos';
 import { Producto } from '../../providers/productos/models/producto';
+import { Config } from '../../providers/config/config';
 
 @IonicPage()
 @Component({
@@ -19,7 +21,8 @@ export class ProductosCategoriaPage {
     private alertCtrl: AlertController,
     private loadingCtrl: LoadingController,
     private navParams: NavParams,
-    private prodsService: ProductosProvider
+    private prodsService: ProductosProvider,
+    private util: Config
   ) {
 
   }
@@ -35,7 +38,7 @@ export class ProductosCategoriaPage {
     this.showLoading();
     this.prodsService.fetchNextPagByCategoria(this.navParams.get('nombre'))
       .then( () => this.loading.dismiss() )
-      .catch( err => this.errorHandler(err.message, err) );
+      .catch( err => this.util.errorHandler(err.message, err) );
   }
 
   private doInfinite(infiniteScroll): void {
@@ -47,17 +50,7 @@ export class ProductosCategoriaPage {
           infiniteScroll.enable(false);
         }
       })
-      .catch( err => this.errorHandler(err.message, err) );
-  }
-
-  private errorHandler(err: string, errObj?: any): void {
-    if(this.loading){ this.loading.dismiss(); }
-    this.alertCtrl.create({
-      title: "Ocurrio un error.",
-      message: err,
-      buttons: ['Ok']
-    }).present();
-    if(err){ console.error(err) }
+      .catch( err => this.util.errorHandler(err.message, err) );
   }
 
   private showLoading(): void {

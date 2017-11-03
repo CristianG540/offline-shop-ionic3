@@ -19,6 +19,7 @@ import { AuthProvider } from "../providers/auth/auth";
 import { DbProvider } from '../providers/db/db';
 import { OrdenProvider } from "../providers/orden/orden";
 import { CarritoProvider } from "../providers/carrito/carrito";
+import { error } from "util";
 
 @Component({
   templateUrl: "app.html"
@@ -130,6 +131,7 @@ export class MyApp {
       .catch(err=>{
         loading.dismiss();
         console.error('error en el logout',err);
+        Raven.captureException( new Error(`error en el logout: ${err}`) );
         //if(err.ok == false || err.message == "Network Error"){
           this.alertCtrl.create({
             title: "Ocurrio un error.",

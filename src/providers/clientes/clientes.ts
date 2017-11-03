@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import pouchAdapterMem from 'pouchdb-adapter-memory';
+import Raven from 'raven-js';
 
 //Providers
 import { AuthProvider } from '../auth/auth';
@@ -63,9 +64,11 @@ export class ClientesProvider {
       PouchDB.sync(this._dbLocal, this._db, replicationOptions)
         .on("denied", err => {
           console.error("Clientes*inMemory - a failed to replicate due to permissions",err);
+          Raven.captureException( new Error(`Clientes*inMemory - No se pudo replicar debido a permisos 👮: ${err}`) );
         })
         .on("error", err => {
           console.error("Clientes*inMemory - totally unhandled error (shouldn't happen)", err);
+          Raven.captureException( new Error(`Clientes*inMemory - Error que no deberia pasar 😫: ${err}`) );
         });
 
       // Sincronizo los datos de la BD remota con la local, cualquier cambio
@@ -86,9 +89,11 @@ export class ClientesProvider {
             "Client-a document failed to replicate (e.g. due to permissions)",
             err
           );
+          Raven.captureException( new Error(`ClientesBD - No se pudo replicar debido a permisos 👮: ${err}`) );
         })
         .on("error", function(err) {
           console.error("Client-totally unhandled error (shouldn't happen)", err);
+          Raven.captureException( new Error(`ClientesBD - Error que no deberia pasar 😫: ${err}`) );
         });
     }
   }

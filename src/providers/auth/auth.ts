@@ -105,8 +105,38 @@ export class AuthProvider {
     return superlogin.getSession();
   }
 
+  /**
+   * Me devuelve el id del asesor de IGB que se saca de sap
+   *
+   * @readonly
+   * @type {string}
+   * @memberof AuthProvider
+   */
   public get asesorId() : string {
     return _.has(this.session, 'profile.asesor_id') ? this.session.profile.asesor_id : '';
+  }
+
+  /**
+   * me devuelve el id del usuario pero el q se usan en couchdb
+   * algo asi como "cristian540"
+   *
+   * @readonly
+   * @type {string}
+   * @memberof AuthProvider
+   */
+  public get userId() : string {
+    return _.has(this.session, 'user_id') ? this.session.user_id : '';
+  }
+
+  /**
+   * Me regresa el email del usuario
+   *
+   * @readonly
+   * @type {string}
+   * @memberof AuthProvider
+   */
+  public get userEmail() : string {
+    return _.has(this.session, 'profile.email') ? this.session.profile.email : '';
   }
 
 }

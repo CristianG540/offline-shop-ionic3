@@ -80,7 +80,7 @@ export class HomePage {
   private doInfinite(infiniteScroll): void {
     this.prodsService.recuperarPagSgte()
       .then( () => infiniteScroll.complete() )
-      .catch( err => this.errorHandler(err.message, err) );
+      .catch( err => this.util.errorHandler(err.message, err) );
   }
 
   private showLoading(): void {

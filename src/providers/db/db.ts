@@ -3,7 +3,7 @@ import { Events } from 'ionic-angular';
 
 // libs terceros
 import PouchDB from 'pouchdb';
-import Raven from '';
+import Raven from 'raven-js';
 
 @Injectable()
 export class DbProvider {

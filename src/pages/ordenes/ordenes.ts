@@ -21,6 +21,7 @@ export class OrdenesPage {
     public navParams: NavParams,
     private ordenServ: OrdenProvider
   ) {
+    throw new Error('I am a bug... 🐛');
   }
 
   public iconOrden(orden) : string {

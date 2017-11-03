@@ -18,6 +18,7 @@ import { ClientesProvider } from '../providers/clientes/clientes';
 import { OrdenProvider } from '../providers/orden/orden';
 import { AuthProvider } from '../providers/auth/auth';
 import { DbProvider } from '../providers/db/db';
+import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandler';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,7 @@ import { DbProvider } from '../providers/db/db';
     StatusBar,
     SplashScreen,
     Network,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    {provide: ErrorHandler, useClass: SentryErrorHandler},
     CarritoProvider,
     ProductosProvider,
     UsuarioProvider,

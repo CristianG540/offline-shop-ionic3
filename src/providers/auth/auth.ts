@@ -82,8 +82,7 @@ export class AuthProvider {
             resolve();
           },
           err => {
-            err.moreInfo = new Error("Error al conectarse con JOSEFA, el api SAP");
-            reject(err);
+            reject(new Error(`Error al conectarse con JOSEFA, el api SAP 🐛: ${JSON.stringify(err)}`));
           }
         );
     });

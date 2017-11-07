@@ -57,6 +57,20 @@ export class MyApp {
 
     if( this.authService.isLogged ){
 
+      /* Valido que haya conexion a internet */
+      if(this.util.onlineOffline){
+        //Valido que el token de la sesion siga siendo valido
+        this.authService.validateSession()
+        .then(res=>{
+          console.log("la sesion sigue siendo valida", res);
+        })
+        .catch(err => {
+          if(err == "Unauthorized"){
+            this.logout();
+          }
+        });
+      }
+
       // Inicio la base de datos del usuario, en esta bd es en las que guardan
       // las ordenes, la crea automaticamente superlogin y me envia la url
       this.dbServ.init( this.authService.dbUrl );

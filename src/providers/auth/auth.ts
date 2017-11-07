@@ -89,6 +89,18 @@ export class AuthProvider {
 
   }
 
+  public validateSession(): Promise<any> {
+
+    return this.isOnline()
+      .then(res=>{
+        if( _.has(res, 'status') && res.status == 'ok' ){
+          return superlogin.validateSession()
+        }else{
+          throw new Error("El api de autenticacion no esta disponible");
+        }
+      })
+  }
+
   public removeTokenJosefa(): Promise<any>{
     return this.storage.remove('josefa-token');
   }

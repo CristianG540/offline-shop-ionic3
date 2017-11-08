@@ -73,6 +73,7 @@ export class MyApp {
 
       // Inicio la base de datos del usuario, en esta bd es en las que guardan
       // las ordenes, la crea automaticamente superlogin y me envia la url
+      console.log("los datos de la bd son", this.authService.dbUrl);
       this.dbServ.init( this.authService.dbUrl );
       this.rootPage = 'TabsPage';
 

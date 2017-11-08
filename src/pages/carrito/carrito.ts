@@ -6,7 +6,8 @@ import {
   ViewController,
   ToastController,
   Events,
-  Content
+  Content,
+  AlertController
 } from "ionic-angular";
 import { CarritoProvider } from "../../providers/carrito/carrito";
 import { Producto } from "../../providers/productos/models/producto";
@@ -24,11 +25,12 @@ export class CarritoPage {
   private confirmarOrdenPage: string = 'ConfirmarOrdenPage';
 
   constructor(
-    public navCtrl: NavController,
+    private alertCtrl: AlertController,
+    private navCtrl: NavController,
     private viewCtrl: ViewController,
     private toastCtrl: ToastController,
-    public navParams: NavParams,
-    public evts: Events,
+    private navParams: NavParams,
+    private evts: Events,
     private cartServ: CarritoProvider,
     private prodServ: ProductosProvider,
     private util: Config
@@ -50,10 +52,6 @@ export class CarritoPage {
      */
     this.content.resize();
     this.reloadProds();
-  }
-
-  private logCarItems(): void {
-    console.log("Los items del carrito: ", this.cartServ.carItems);
   }
 
   private deleteItem(prod: Producto): void {
@@ -87,6 +85,27 @@ export class CarritoPage {
       showCloseButton: true,
       closeButtonText: "cerrar"
     }).present();
+  }
+
+  private deleteDb(): void {
+
+    this.alertCtrl.create({
+      title: 'Esta seguro de borrar todo el carrito ?',
+      enableBackdropDismiss: false,
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel'
+        },
+        {
+          text: 'Si',
+          handler: () => {
+            this.cartServ.destroyDB(true);
+          }
+        }
+      ]
+    }).present();
+
   }
 
   private trackByProds(index: number, prod: Producto): string {

@@ -168,7 +168,7 @@ export class Config {
       message: msg,
       duration: 3000,
       position: 'top',
-      showCloseButton: true,
+      showCloseButton: false,
       closeButtonText: "cerrar"
     }).present();
   }

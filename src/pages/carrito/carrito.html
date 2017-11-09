@@ -16,7 +16,7 @@
 
 
 <ion-content #content >
-  <ion-grid *ngIf="cartServ.carItems.length == 0; else elseBlock">
+  <ion-grid *ngIf="cartServ.carItems.length == 0">
     <ion-row>
       <ion-col text-center class="empty-cart">
           <ion-icon name="cart" class="icon-5x"></ion-icon>
@@ -26,9 +26,9 @@
     </ion-row>
   </ion-grid>
 
-  <ng-template #elseBlock>
-    <ion-list>
-      <ion-item-sliding *ngFor="let prod of _prods; trackBy: trackByProds" >
+  <div [hidden]="cartServ.carItems.length == 0">
+    <ion-list [virtualScroll]="_prods" [virtualTrackBy]="trackByProds">
+      <ion-item-sliding *virtualItem="let prod" >
 
         <ion-item text-wrap>
           <ion-thumbnail item-left>
@@ -57,7 +57,7 @@
       </ion-item-sliding>
     </ion-list>
 
-  </ng-template>
+  </div>
 
 </ion-content>
 

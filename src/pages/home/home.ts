@@ -46,19 +46,19 @@ export class HomePage {
   }
 
   ionViewDidLoad(){
-    this.showLoading();
+    let loading = this.util.showLoading();
     this.prodsService.initDB()
     .then( info => {
-      this.loading.dismiss();
+      loading.dismiss();
       console.warn('Prods- First Replication complete');
     }).catch( err => {
-      this.loading.dismiss();
+      loading.dismiss();
       console.error("Prods-totally unhandled error (shouldn't happen)", err);
       Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
         extra: err
       } );
     }).then(()=>{
-      //this.loading.dismiss();
+      //loading.dismiss();
       this.indexDB();
       this.prodsService.resetProds();
       this.prodsService.recuperarPagSgte()
@@ -85,30 +85,23 @@ export class HomePage {
       .catch( err => this.util.errorHandler(err.message, err) );
   }
 
-  private showLoading(): void {
-    this.loading = this.loadingCtrl.create({
-      content: 'Espere por favor...'
-    });
-    this.loading.present();
-  }
-
   private addProd(producto: Producto): void {
 
     this.util.promptAlertCant(d => {
 
       if( d.txtCantidad && producto.existencias >= d.txtCantidad ){
+        let loading = this.util.showLoading();
 
-        this.showLoading();
         this.cartService.pushItem({
           _id: producto._id,
           cantidad: d.txtCantidad,
           totalPrice: producto.precio * d.txtCantidad
         }).then(res=>{
-          this.loading.dismiss();
+          loading.dismiss();
           this.showToast(`El producto ${res.id} se agrego correctamente`);
         }).catch(err=>{
           if(err=="duplicate"){
-            this.loading.dismiss();
+            loading.dismiss();
             this.showToast(`El producto ya esta en el carrito`);
           }else{
             this.util.errorHandler(err.message, err);

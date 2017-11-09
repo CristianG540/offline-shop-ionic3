@@ -8,6 +8,7 @@ import {
 import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { Network } from '@ionic-native/network';
+import { Keyboard } from '@ionic-native/keyboard';
 import { ImageLoaderConfig } from 'ionic-image-loader';
 import _ from "lodash";
 import Raven from "raven-js";
@@ -22,7 +23,8 @@ import { CarritoProvider } from "../providers/carrito/carrito";
 import { error } from "util";
 
 @Component({
-  templateUrl: "app.html"
+  templateUrl: "app.html",
+  providers: [Keyboard]
 })
 export class MyApp {
   rootPage: any = "LoginPage";
@@ -39,6 +41,7 @@ export class MyApp {
     statusBar: StatusBar,
     splashScreen: SplashScreen,
     private network: Network,
+    private keyboard: Keyboard,
     private alertCtrl: AlertController,
     private menuCrl: MenuController,
     private clienteServ: ClientesProvider,
@@ -105,6 +108,8 @@ export class MyApp {
       let connectSubscription = this.network.onConnect().subscribe(() => {
         this.util.onlineOffline = true;
       });
+
+      keyboard.hideKeyboardAccessoryBar(false);
 
     });
   }

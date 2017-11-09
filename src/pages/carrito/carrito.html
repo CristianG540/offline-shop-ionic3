@@ -16,18 +16,7 @@
 
 
 <ion-content #content >
-  <ion-grid *ngIf="cartServ.carItems.length == 0">
-    <ion-row>
-      <ion-col text-center class="empty-cart">
-          <ion-icon name="cart" class="icon-5x"></ion-icon>
-          <br>
-          Su carrito esta vaci&oacute;
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
-  <div [hidden]="cartServ.carItems.length == 0">
-    <ion-list [virtualScroll]="_prods" [virtualTrackBy]="trackByProds">
+  <ion-list [virtualScroll]="_prods" [virtualTrackBy]="trackByProds" [approxItemHeight]="'115px'" [hidden]="cartServ.carItems.length == 0">
       <ion-item-sliding *virtualItem="let prod" >
 
         <ion-item text-wrap>
@@ -39,7 +28,7 @@
             <ion-col>
               <p> <b>{{ prod._id }}</b> </p>
               <p>{{ prod.aplicacion }}</p>
-              <p>{{ prod.precio | currency:'USD':true }}</p>
+              <p>{{ prod.precio | currency: 'USD': 'symbol' }}</p>
             </ion-col>
             <ion-col text-right>
               <number-picker [num]="cartServ.getProdCant(prod)" [max]="prod.existencias" (numChange)="cartServ.setProdCant($event, prod)"></number-picker>
@@ -56,9 +45,15 @@
 
       </ion-item-sliding>
     </ion-list>
-
-  </div>
-
+  <ion-grid *ngIf="cartServ.carItems.length == 0">
+    <ion-row>
+      <ion-col text-center class="empty-cart">
+          <ion-icon name="cart" class="icon-5x"></ion-icon>
+          <br>
+          Su carrito esta vaci&oacute;
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
 
 
@@ -74,9 +69,9 @@
       </button>-->
     </ion-buttons>
     <ion-buttons right>
-      <b>Subtotal:</b> {{ cartServ.subTotalPrice | currency:'USD':true }} <br>
-      <b>IVA:</b> {{ cartServ.ivaPrice | currency:'USD':true }} <br>
-      <b>Total:</b> {{ cartServ.subTotalPrice + cartServ.ivaPrice | currency:'USD':true }}
+      <b>Subtotal:</b> {{ cartServ.subTotalPrice | currency: 'USD': 'symbol' }} <br>
+      <b>IVA:</b> {{ cartServ.ivaPrice | currency: 'USD': 'symbol' }} <br>
+      <b>Total:</b> {{ cartServ.subTotalPrice + cartServ.ivaPrice | currency: 'USD': 'symbol' }}
     </ion-buttons>
   </ion-toolbar>
 </ion-footer>

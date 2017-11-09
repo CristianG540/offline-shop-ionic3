@@ -9,7 +9,7 @@
 <ion-content>
 
   <ion-searchbar debounce="3000" cancelButtonText="Cancelar" showCancelButton="true" (ionInput)="updateSearch($event)"
-    placeholder="Comience a escribir y seleccione...">
+    placeholder="Busqueda por SKU...">
   </ion-searchbar>
   <ion-list>
       <ion-item-sliding *ngFor="let item of autocompleteItems">

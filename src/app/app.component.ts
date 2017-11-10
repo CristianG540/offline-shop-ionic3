@@ -23,7 +23,6 @@ import { CarritoProvider } from "../providers/carrito/carrito";
 import { error } from "util";
 
 //Pages
-import { TabsPage } from "../pages/tabs/tabs";
 import { LoginPage } from "../pages/login/login";
 
 @Component({
@@ -82,7 +81,7 @@ export class MyApp {
       // las ordenes, la crea automaticamente superlogin y me envia la url
       console.log("los datos de la bd son", this.authService.dbUrl);
       this.dbServ.init( this.authService.dbUrl );
-      this.rootPage = TabsPage;
+      this.rootPage = 'TabsPage';
 
       /**
        * Aqui le digo a sentry cual es el usuario q esta usando la app
@@ -148,7 +147,7 @@ export class MyApp {
       .then( () => {
         this.ordenServ.destroyDB();
         this.cartServ.destroyDB();
-        this.cargarPagina('LoginPage');
+        this.cargarPagina(LoginPage);
         Raven.setUserContext();
         loading.dismiss();
       })

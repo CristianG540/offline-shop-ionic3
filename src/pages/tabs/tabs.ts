@@ -1,23 +1,23 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController } from 'ionic-angular';
 import { CarritoProvider } from "../../providers/carrito/carrito";
 
 import { HomePage } from '../home/home';
+import { IonicPage } from 'ionic-angular';
 
+@IonicPage()
 @Component({
   selector: 'page-tabs',
   templateUrl: 'tabs.html'
 })
 export class TabsPage {
 
-  home = HomePage
-  categorias = 'CategoriasPage'
-  ordenes = 'OrdenesPage'
-  carrito = 'CarritoPage'
-  buscar = 'SearchProdPage'
+  home: any = HomePage
+  categorias: any = 'CategoriasPage'
+  ordenes: any = 'OrdenesPage'
+  carrito: any = 'CarritoPage'
+  buscar: any = 'SearchProdPage'
 
   constructor(
-    public navCtrl: NavController,
     private cartService: CarritoProvider
   ) {
   }

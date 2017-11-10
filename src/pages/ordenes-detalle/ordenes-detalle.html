@@ -25,7 +25,7 @@
             <p><b>Cantidad:</b> {{ prod.cant }} </p>
           </ion-col>
           <ion-col>
-            <p><b>Total:</b> {{ prod.total | currency:'USD':true }}</p>
+            <p><b>Total:</b> {{ prod.total | currency:'USD':'symbol': '1.0-0' }}</p>
           </ion-col>
         </ion-row>
     </ion-item>
@@ -52,7 +52,7 @@
           <b>Cliente: </b> {{ _cliente }} <br>
         </ion-col>
         <ion-col text-right>
-          <b>Total+IVA: </b> {{ navParams.data.total | currency:'USD':true }}
+          <b>Total+IVA: </b> {{ navParams.data.total | currency:'USD':'symbol': '1.0-0' }}
         </ion-col>
     </ion-row>
     <ion-row *ngIf="navParams.data.observaciones">

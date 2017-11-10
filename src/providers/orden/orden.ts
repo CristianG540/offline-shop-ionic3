@@ -22,6 +22,7 @@ import { DbProvider } from "../db/db";
 //Models
 import { Orden } from './models/orden';
 import { CarItem } from "../carrito/models/carItem";
+import { AuthProvider } from "../auth/auth";
 
 @Injectable()
 export class OrdenProvider {
@@ -35,7 +36,8 @@ export class OrdenProvider {
     private evts: Events,
     private util : cg,
     private http: Http,
-    private storage: Storage
+    private storage: Storage,
+    private authService: AuthProvider
   ) {
     this.evts.subscribe('db:init', () => {
       this.initDB();
@@ -126,7 +128,7 @@ export class OrdenProvider {
               fecha_creacion : moment(parseInt(orden._id)).format("YYYY-MM-DD"),
               nit_cliente    : orden.nitCliente,
               trasportadora  : orden.transp,
-              comentarios    : orden.observaciones,
+              comentarios    : orden.observaciones+` ##${this.authService.asesorId}##`,
               productos      : items
             });
 

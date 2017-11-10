@@ -2,14 +2,15 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController } from 'ionic-angular';
 import { CarritoProvider } from "../../providers/carrito/carrito";
 
-@IonicPage()
+import { HomePage } from '../home/home';
+
 @Component({
   selector: 'page-tabs',
   templateUrl: 'tabs.html'
 })
 export class TabsPage {
 
-  home = 'HomePage'
+  home = HomePage
   categorias = 'CategoriasPage'
   ordenes = 'OrdenesPage'
   carrito = 'CarritoPage'

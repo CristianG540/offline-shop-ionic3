@@ -20,7 +20,6 @@ import { CarritoProvider } from "../../providers/carrito/carrito";
 import { Config as Cg} from '../../providers/config/config';
 import { ClientesProvider } from '../../providers/clientes/clientes';
 
-@IonicPage()
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'

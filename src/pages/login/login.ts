@@ -8,8 +8,6 @@ import { DbProvider } from "../../providers/db/db";
 import { Config as cg } from "../../providers/config/config";
 import { CarritoProvider } from '../../providers/carrito/carrito';
 
-
-@IonicPage()
 @Component({
   selector: 'page-login',
   templateUrl: 'login.html',

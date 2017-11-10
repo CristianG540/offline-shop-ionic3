@@ -22,12 +22,16 @@ import { OrdenProvider } from "../providers/orden/orden";
 import { CarritoProvider } from "../providers/carrito/carrito";
 import { error } from "util";
 
+//Pages
+import { TabsPage } from "../pages/tabs/tabs";
+import { LoginPage } from "../pages/login/login";
+
 @Component({
   templateUrl: "app.html",
   providers: [Keyboard]
 })
 export class MyApp {
-  rootPage: any = "LoginPage";
+  rootPage: any = LoginPage;
   @ViewChild('content') content: NavController;
 
   // guardo el estado del boton para verficar las ordenes
@@ -78,7 +82,7 @@ export class MyApp {
       // las ordenes, la crea automaticamente superlogin y me envia la url
       console.log("los datos de la bd son", this.authService.dbUrl);
       this.dbServ.init( this.authService.dbUrl );
-      this.rootPage = 'TabsPage';
+      this.rootPage = TabsPage;
 
       /**
        * Aqui le digo a sentry cual es el usuario q esta usando la app
@@ -90,7 +94,7 @@ export class MyApp {
       });
 
     }else{
-      this.rootPage = 'LoginPage';
+      this.rootPage = LoginPage;
     }
 
     platform.ready().then(() => {

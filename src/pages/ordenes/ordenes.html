@@ -13,12 +13,14 @@
 
 
 <ion-content padding>
-  <ion-list>
-    <ion-item *ngFor="let orden of ordenServ.ordenesDesc; let i=index; trackBy: trackById" style="font-size: 1.3rem" text-wrap [navPush]="ordenesDetallePage" [navParams]="orden">
+  <ion-list [virtualScroll]="_ordenes" [virtualTrackBy]="trackById" [approxItemHeight]="'115px'">
+
+    <ion-item *virtualItem="let orden" style="font-size: 1.3rem" text-wrap [navPush]="ordenesDetallePage" [navParams]="orden">
       <ion-icon [name]="iconOrden(orden)" item-left></ion-icon>
       {{orden?._id}} | {{ orden?._id | date:'dd-MM-y hh:mm a'}} | {{ orden.items.length }}
       <b>{{ (orden.items.length>1)?'referencias':'referencia' }}</b>
     </ion-item>
+
   </ion-list>
   <br>
   <!--<button ion-button (click)="deleteDB()">destroy db</button>-->

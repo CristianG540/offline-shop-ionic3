@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
 
 //Providers
 import { OrdenProvider } from "../../providers/orden/orden";
@@ -16,11 +16,33 @@ export class OrdenesPage {
 
   private ordenesDetallePage = 'OrdenesDetallePage';
 
+  private _ordenes: Orden[] = [];
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private ordenServ: OrdenProvider
+    private ordenServ: OrdenProvider,
+    private evts: Events,
   ) {
+    /**
+     * Antes para tener en tiempo real las ordenes lo que hacia era
+     * usar el getter de las ordenes directamente en el for que las pinta
+     * en la vista, el problema con eso es que por algun motivo tenia un
+     * problema de rendimiento enorme, no paraba de llamar el getter
+     * por lo q tome la desicion de usar los eventos en la pagina de las ordenes
+     * y asignar a una variable local los valores del getter de esta manera el getter
+     * solo se llama cuando se necesita y el performance aumenta mucho
+     */
+    this.evts.subscribe('orden:changed', (doc: Orden) => {
+      this._ordenes = this.ordenServ.ordenesDesc;
+    });
+    this.evts.subscribe('orden:deleted', (doc: Orden) => {
+      this._ordenes = this.ordenServ.ordenesDesc;
+    });
+  }
+
+  ionViewDidEnter() {
+    this._ordenes = this.ordenServ.ordenesDesc;
   }
 
   public iconOrden(orden) : string {

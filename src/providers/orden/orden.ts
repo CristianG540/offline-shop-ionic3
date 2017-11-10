@@ -219,12 +219,7 @@ export class OrdenProvider {
     if (doc && doc._id == id) {
       this._ordenes.splice(index, 1);
     }
-    /**
-     * Actualiza la interfaz de usuario
-     * https://angular.io/api/core/ApplicationRef
-     * https://goo.gl/PDi6iM
-     */
-    this.appRef.tick();
+
   }
 
   private _onUpdatedOrInserted(newDoc: Orden): void {
@@ -239,7 +234,7 @@ export class OrdenProvider {
     } else { // insert
       this._ordenes.splice(index, 0, newDoc);
     }
-    this.appRef.tick();
+
   }
   /** *********** Fin Manejo de el estado de la ui    ********************** */
 

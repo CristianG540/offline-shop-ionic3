@@ -9,6 +9,10 @@ import { Network } from '@ionic-native/network';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IonicImageLoader } from 'ionic-image-loader';
 
+//Pagaes without lazy loading
+import { HomePage } from '../pages/home/home';
+import { LoginPage } from '../pages/login/login';
+
 import { MyApp } from './app.component';
 import { CarritoProvider } from '../providers/carrito/carrito';
 import { ProductosProvider } from '../providers/productos/productos';
@@ -22,7 +26,9 @@ import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandl
 
 @NgModule({
   declarations: [
-    MyApp
+    MyApp,
+    HomePage,
+    LoginPage
   ],
   imports: [
     BrowserModule,
@@ -34,7 +40,9 @@ import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandl
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp
+    MyApp,
+    HomePage,
+    LoginPage
   ],
   providers: [
     StatusBar,

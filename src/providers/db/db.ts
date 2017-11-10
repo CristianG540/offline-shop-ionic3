@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Events } from 'ionic-angular';
+import { Events, AlertController } from 'ionic-angular';
 
 // libs terceros
 import PouchDB from 'pouchdb';
 import Raven from 'raven-js';
+import _ from 'lodash';
 
 @Injectable()
 export class DbProvider {
@@ -12,7 +13,8 @@ export class DbProvider {
   private _remoteDB: any;
 
   constructor(
-    public evts: Events
+    private evts: Events,
+    private alertCtrl: AlertController,
   ) {
   }
 
@@ -33,11 +35,24 @@ export class DbProvider {
         Raven.captureException( new Error(`db_averno - No se pudo replicar la BD con las ordenes debido a permisos 👮: ${JSON.stringify(err)}`), {
           extra: err
         } );
-      }).on('error', function (err) {
+      }).on('error', (err) => {
         console.error("db_averno-totally unhandled error (shouldn't happen)", err);
+
+        if(_.has(err, 'error')){
+          if(err.error == "unauthorized"){
+            this.alertCtrl.create({
+              title: "Session caducada.",
+              message: "Para que los pedidos puedan subirse a SAP por favor cierra la sesion he inicie de nuevo.",
+              buttons: ['Ok'],
+              enableBackdropDismiss: false,
+            }).present();
+          }
+        }
+
         Raven.captureException( new Error(`db_averno - Error con la BD de las ordenes que no deberia pasar 😫: ${JSON.stringify(err)}`), {
           extra: err
         } );
+
       });
 
     this._reactToChanges();

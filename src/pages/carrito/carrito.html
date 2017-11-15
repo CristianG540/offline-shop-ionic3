@@ -36,10 +36,17 @@
           </ion-row>
         </ion-item>
 
-        <ion-item-options>
-          <button ion-button icon-right color="danger" (click)="deleteItem(prod)">
+        <ion-item-options side="right">
+          <button ion-button color="danger" (click)="deleteItem(prod)">
             <ion-icon name="trash"></ion-icon>
             Borrar
+          </button>
+        </ion-item-options>
+
+        <ion-item-options side="left">
+          <button ion-button color="primary" [navPush]="productoPage" [navParams]="prod">
+            <ion-icon name="eye"></ion-icon>
+            Ver
           </button>
         </ion-item-options>
 

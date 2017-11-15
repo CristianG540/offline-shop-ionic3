@@ -23,6 +23,7 @@ export class CarritoPage {
   @ViewChild('content') content: Content;
   private _prods: Producto[] = [];
   private confirmarOrdenPage: string = 'ConfirmarOrdenPage';
+  private productoPage: string = 'ProductoPage';
 
   constructor(
     private alertCtrl: AlertController,

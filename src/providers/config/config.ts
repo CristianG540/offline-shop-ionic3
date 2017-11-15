@@ -30,7 +30,7 @@ export class Config {
   static readonly SUPERLOGIN_URL: string = 'http://45.77.74.23:3000';
 
   /* **************************** Cosas de JOSEFA  *************************** */
-  static readonly JOSEFA_URL: string = 'http://gatortyres.com/';
+  static readonly JOSEFA_URL: string = 'http://gatortyres.com';
   //static readonly JOSEFA_URL: string = 'http://josefa2.igb';
   static JOSEFA_OPTIONS(auth: string): RequestOptions{
     let headers = new Headers({

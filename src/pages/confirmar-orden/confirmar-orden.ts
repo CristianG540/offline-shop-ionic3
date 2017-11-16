@@ -140,7 +140,7 @@ export class ConfirmarOrdenPage {
       })
       .then(responses=>{
         let failOrders = _.filter(responses.apiRes, (res: any) => {
-          return res.responseApi.code == 400;
+          return res.responseApi.code >= 400;
         })
         if(failOrders.length > 0){
           this.alertCtrl.create({

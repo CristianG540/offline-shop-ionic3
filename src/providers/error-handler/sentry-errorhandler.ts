@@ -12,7 +12,7 @@ import { IonicErrorHandler } from 'ionic-angular';
 
 Raven
   .config("https://fe7ba4a5cedd4b828f9c5e5ab35b8da0@sentry.io/239622", {
-    release: "1.2.2",
+    release: "1.2.3",
     dataCallback: data => {
       if (data.culprit) {
         data.culprit = data.culprit.substring(data.culprit.lastIndexOf("/"));

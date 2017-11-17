@@ -38,7 +38,7 @@ export class OrdenesDetallePage {
 
     this.prodServ.fetchProdsByids(prodsId)
       .then((prods: Producto[])=>{
-
+        prods = prods.filter(Boolean);
         this._prods = _.map(prods, (prod: Producto) => {
           let itemId = cg.binarySearch(this._itemsOrder, '_id', prod._id);
           return {

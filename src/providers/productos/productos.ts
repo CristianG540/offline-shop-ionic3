@@ -202,7 +202,7 @@ export class ProductosProvider {
           this.skip = 1;
           let prods: Producto[] = _.map(res.rows, (v: any, k: number) => {
             // El precio llega en un formato como "$20.200" entonces lo saneo para que quede "20200"
-            let precio = v.doc.precio.toString().replace('.','');
+            let precio = (_.has(v.doc, 'precio')) ? v.doc.precio : 0;
             precio = parseInt( (precio[0]=='$') ? precio.substring(1) : precio );
             return new Producto(
               v.doc._id,
@@ -246,7 +246,7 @@ export class ProductosProvider {
       if (res && res.rows.length > 0) {
         this.skipByCat += this.cantProdsPag;
         let prods: Producto[] = _.map(res.rows, (v: any, k: number) => {
-          let precio = v.doc.precio.toString().replace('.','');
+          let precio = (_.has(v.doc, 'precio')) ? v.doc.precio : 0;
           precio = parseInt( (precio[0]=='$') ? precio.substring(1) : precio );
           return new Producto(
             v.doc._id,
@@ -278,20 +278,22 @@ export class ProductosProvider {
       console.log("all_docs ids", res)
       if (res && res.rows.length > 0) {
         return _.map(res.rows, (v: any) => {
-          let precio = v.doc.precio.toString().replace('.','');
-          precio = parseInt( (precio[0]=='$') ? precio.substring(1) : precio );
-          return new Producto(
-            v.doc._id,
-            v.doc.titulo,
-            v.doc.aplicacion,
-            v.doc.imagen,
-            v.doc.categoria,
-            v.doc.marcas,
-            v.doc.unidad,
-            parseInt(v.doc.existencias),
-            precio,
-            v.doc._rev
-          );
+          let precio: number = 0;
+          if(_.has(v.doc, 'precio')){
+            precio = v.doc.precio;
+            return new Producto(
+              v.doc._id,
+              v.doc.titulo,
+              v.doc.aplicacion,
+              v.doc.imagen,
+              v.doc.categoria,
+              v.doc.marcas,
+              v.doc.unidad,
+              parseInt(v.doc.existencias),
+              precio,
+              v.doc._rev
+            );
+          }
         }) ;
       }else{
         return [];
@@ -323,20 +325,22 @@ export class ProductosProvider {
 
       if (res && res.rows.length > 0) {
         return _.map(res.rows, (v: any) => {
-          let precio = v.doc.precio.toString().replace('.','');
-          precio = parseInt( (precio[0]=='$') ? precio.substring(1) : precio );
-          return new Producto(
-            v.doc._id,
-            v.doc.titulo,
-            v.doc.aplicacion,
-            v.doc.imagen,
-            v.doc.categoria,
-            v.doc.marcas,
-            v.doc.unidad,
-            parseInt(v.doc.existencias),
-            precio,
-            v.doc._rev
-          );
+          let precio: number = 0;
+          if(_.has(v.doc, 'precio')){
+            precio = v.doc.precio;
+            return new Producto(
+              v.doc._id,
+              v.doc.titulo,
+              v.doc.aplicacion,
+              v.doc.imagen,
+              v.doc.categoria,
+              v.doc.marcas,
+              v.doc.unidad,
+              parseInt(v.doc.existencias),
+              precio,
+              v.doc._rev
+            );
+          }
         }) ;
       }else{
         return [];

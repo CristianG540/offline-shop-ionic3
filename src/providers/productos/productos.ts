@@ -54,6 +54,9 @@ export class ProductosProvider {
         auth: {
           username: "admin",
           password: "admin"
+        },
+        ajax: {
+          timeout: 60000
         }
       });
 

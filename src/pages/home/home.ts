@@ -56,6 +56,10 @@ export class HomePage {
       Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
         extra: err
       } );
+      /**
+       * si algun error se presenta recargo la aplicacion
+       */
+      window.location.reload();
     }).then(()=>{
       //loading.dismiss();
       this.indexDB();

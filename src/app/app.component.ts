@@ -9,7 +9,6 @@ import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { Network } from '@ionic-native/network';
 import { Keyboard } from '@ionic-native/keyboard';
-import { ImageLoaderConfig, ImageLoader } from 'ionic-image-loader';
 import _ from "lodash";
 import Raven from "raven-js";
 
@@ -53,14 +52,7 @@ export class MyApp {
     private ordenServ: OrdenProvider,
     private cartServ: CarritoProvider,
     private util: Config,
-    private imageLoaderConfig: ImageLoaderConfig,
-    private imageLoader: ImageLoader
   ) {
-    /* start config ionic image loader  https://github.com/zyra/ionic-image-loader */
-    //this.imageLoaderConfig.setImageReturnType('base64'); // descomentar para q funcione con el live reload
-    this.imageLoaderConfig.setFallbackUrl('assets/img/logo/logo_igb_small.png');
-    this.imageLoaderConfig.enableFallbackAsPlaceholder(true);
-    /**  fin config image loader */
 
     if( this.authService.isLogged ){
 
@@ -206,7 +198,4 @@ export class MyApp {
     this.menuCrl.close();
   }
 
-  private cleanImgCache(): void{
-    this.imageLoader.clearCache();
-  }
 }

@@ -7,7 +7,6 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { IonicStorageModule } from '@ionic/storage';
 import { Network } from '@ionic-native/network';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { IonicImageLoader } from 'ionic-image-loader';
 
 //Pagaes without lazy loading
 import { HomePage } from '../pages/home/home';
@@ -35,8 +34,7 @@ import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandl
     HttpModule,
     BrowserAnimationsModule,
     IonicModule.forRoot(MyApp),
-    IonicStorageModule.forRoot(),
-    IonicImageLoader.forRoot()
+    IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [

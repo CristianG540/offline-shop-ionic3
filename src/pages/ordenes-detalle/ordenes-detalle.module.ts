@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 import { OrdenesDetallePage } from './ordenes-detalle';
 import { AccordionComponent } from '../../components/accordion/accordion';
-import { IonicImageLoader } from 'ionic-image-loader';
 
 @NgModule({
   declarations: [
@@ -10,8 +9,7 @@ import { IonicImageLoader } from 'ionic-image-loader';
     AccordionComponent
   ],
   imports: [
-    IonicPageModule.forChild(OrdenesDetallePage),
-    IonicImageLoader
+    IonicPageModule.forChild(OrdenesDetallePage)
   ],
 })
 export class OrdenesDetallePageModule {}

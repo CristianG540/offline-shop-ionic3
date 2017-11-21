@@ -17,7 +17,7 @@
     <ion-row no-padding>
       <ion-col col-6 no-padding *ngFor="let prod of prodsService.prods; trackBy: trackByProds">
         <ion-card >
-          <img-loader [src]="prod.imagen" useImg></img-loader>
+          <img [src]="prod.imagen" onerror="this.src='assets/img/logo/logo_igb_small.png'"/>
           <div class="post-description" text-wrap>
             <small>{{ prod.titulo }}</small>
             <br>

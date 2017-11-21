@@ -8,7 +8,7 @@
 
 
 <ion-content>
-  <img-loader [src]="producto.imagen" useImg></img-loader>
+  <img [src]="producto.imagen" onerror="this.src='assets/img/logo/logo_igb_small.png'"/>
   <ion-grid padding>
     <ion-row>
       <ion-col align-self-stretch text-center>

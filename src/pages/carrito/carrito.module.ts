@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 import { CarritoPage } from './carrito';
 import { NumberPickerComponent } from "../../components/number-picker/number-picker";
-import { IonicImageLoader } from 'ionic-image-loader';
 
 @NgModule({
   declarations: [
@@ -10,8 +9,7 @@ import { IonicImageLoader } from 'ionic-image-loader';
     NumberPickerComponent
   ],
   imports: [
-    IonicPageModule.forChild(CarritoPage),
-    IonicImageLoader
+    IonicPageModule.forChild(CarritoPage)
   ],
 })
 export class CarritoPageModule {}

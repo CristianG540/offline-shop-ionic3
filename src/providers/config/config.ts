@@ -27,10 +27,10 @@ export class Config {
     });
   }
 
-  static readonly SUPERLOGIN_URL: string = 'http://45.77.74.23:3000';
+  static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3444';
 
   /* **************************** Cosas de JOSEFA  *************************** */
-  static readonly JOSEFA_URL: string = 'http://gatortyres.com';
+  static readonly JOSEFA_URL: string = 'https://gatortyres.com';
   //static readonly JOSEFA_URL: string = 'http://josefa2.igb';
   static JOSEFA_OPTIONS(auth: string): RequestOptions{
     let headers = new Headers({
@@ -51,8 +51,8 @@ export class Config {
 
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD en couch
-  static readonly CDB_URL: string = 'http://45.77.74.23:5984/productos_prod';
-  static readonly CDB_URL_CLIENTES: string = 'http://45.77.74.23:5984/clientes';
+  static readonly CDB_URL: string = 'https://www.gatortyres.com:6984/productos_prod';
+  static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes';
 
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http
   //el header de autotizacion creoq se puede hacer de una forma mejor

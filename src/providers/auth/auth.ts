@@ -77,6 +77,7 @@ export class AuthProvider {
           return res.json();
         }).subscribe(
           (res) => {
+
             this.storage.set('josefa-token', res.data.token)
               .catch(err => reject(err));
             resolve();

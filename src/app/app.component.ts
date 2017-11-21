@@ -124,10 +124,12 @@ export class MyApp {
   }
 
   private logout(): void {
+    debugger;
     let loading = this.util.showLoading();
 
     this.authService.isOnline()
       .then(res=>{
+        debugger;
         if( _.has(res, 'status') && res.status == 'ok' ){
           return this.authService.logout()
         }else{
@@ -135,9 +137,14 @@ export class MyApp {
         }
       })
       .then( () => {
-        return this.authService.removeTokenJosefa()
-      })
-      .then( () => {
+        debugger;
+        this.authService.removeTokenJosefa()
+          .catch(err=>{
+            console.error('error al eliminar el token de josefa',err);
+            Raven.captureException( new Error(`error al eliminar el token de josefa: ${JSON.stringify(err)}`), {
+              extra: err
+            } );
+          })
         this.ordenServ.destroyDB();
         this.cartServ.destroyDB();
         this.cargarPagina(LoginPage);
@@ -145,6 +152,7 @@ export class MyApp {
         loading.dismiss();
       })
       .catch(err=>{
+        debugger;
         loading.dismiss();
         console.error('error en el logout',err);
         Raven.captureException( new Error(`error en el logout: ${JSON.stringify(err)}`), {

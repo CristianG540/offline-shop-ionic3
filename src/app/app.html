@@ -19,6 +19,10 @@
         <ion-icon name="cloud-upload" item-left></ion-icon>
         Verificar Ordenes
       </button>
+      <button menuClose="left" ion-item detail-none (click)="cleanImgCache()" >
+        <ion-icon name="refresh-circle" item-left></ion-icon>
+        Limpiar cache img
+      </button>
       <button ion-item detail-none (click)="logout()">
         <ion-icon name="power" item-left></ion-icon>
         Desconectarse

@@ -19,6 +19,7 @@ import { ProductosProvider } from '../../providers/productos/productos';
 import { CarritoProvider } from "../../providers/carrito/carrito";
 import { Config as Cg} from '../../providers/config/config';
 import { ClientesProvider } from '../../providers/clientes/clientes';
+import _ from 'lodash';
 
 @Component({
   selector: 'page-home',
@@ -57,9 +58,15 @@ export class HomePage {
         extra: err
       } );
       /**
-       * si algun error se presenta recargo la aplicacion
+       * si algun error se presenta recargo la aplicacion,
+       * a menos que sea un error de conexion por falta de datos o de conexion
+       * en ese caso no la recargo por q entra en un loop infinito cuando el celular
+       * no tiene conexion
        */
-      window.location.reload();
+      if(_.has(err, 'message') && err.message != "getCheckpoint rejected with " ){
+        window.location.reload();
+      }
+
     }).then(()=>{
       //loading.dismiss();
       this.indexDB();

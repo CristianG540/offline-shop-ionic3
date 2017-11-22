@@ -192,16 +192,19 @@ export class OrdenProvider {
                   localdbRes : res
                 })
               }).catch(err => {
+
                 reject(err)
               })
 
             },
             err => {
+
               reject(err)
             }
           )
 
       }).catch(err => {
+
         reject(err)
       });
 

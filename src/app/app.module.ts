@@ -34,7 +34,10 @@ import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandl
     HttpModule,
     BrowserAnimationsModule,
     IonicModule.forRoot(MyApp),
-    IonicStorageModule.forRoot()
+    IonicStorageModule.forRoot({
+      name: '_ionicstorage',
+      driverOrder: ['indexeddb', 'sqlite', 'websql']
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [

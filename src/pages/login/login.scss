@@ -14,8 +14,8 @@ page-login {
     overflow: hidden;
   }
   .logo {
-    width: 50%;
-    height: auto;
+    max-width: 60%;
+    height: auto !important;
     margin: 0 auto;
     padding-bottom: 50px;
   }

@@ -11,6 +11,10 @@
       <p class="e-mail">Version: 1.3.2</p>
     </div>
     <ion-list no-lines>
+      <button menuClose="left" ion-item detail-none (click)="reloadApp()">
+        <ion-icon name="sync" item-left></ion-icon>
+        Recargar App
+      </button>
       <button menuClose="left" ion-item detail-none (click)="indexDb()">
         <ion-icon name="logo-buffer" item-left></ion-icon>
         Actualizar Clientes

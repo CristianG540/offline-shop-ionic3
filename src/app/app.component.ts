@@ -19,7 +19,7 @@ import { AuthProvider } from "../providers/auth/auth";
 import { DbProvider } from '../providers/db/db';
 import { OrdenProvider } from "../providers/orden/orden";
 import { CarritoProvider } from "../providers/carrito/carrito";
-import { error } from "util";
+import { PushNotificationProvider } from "../providers/push-notification/push-notification";
 
 //Pages
 import { LoginPage } from "../pages/login/login";
@@ -52,6 +52,7 @@ export class MyApp {
     private ordenServ: OrdenProvider,
     private cartServ: CarritoProvider,
     private util: Config,
+    private pushNotification: PushNotificationProvider
   ) {
 
     if( this.authService.isLogged ){
@@ -73,7 +74,15 @@ export class MyApp {
       // Inicio la base de datos del usuario, en esta bd es en las que guardan
       // las ordenes, la crea automaticamente superlogin y me envia la url
       console.log("los datos de la bd son", this.authService.dbUrl);
-      this.dbServ.init( this.authService.dbUrl );
+      this.dbServ.init( this.authService.dbUrl ).then( info => {
+        console.warn('DbAverno- First Replication complete');
+      }).catch( err => {
+        console.error("DbAverno-totally unhandled error (shouldn't happen)", err);
+        Raven.captureException( new Error(`DbAverno- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
+          extra: err
+        } );
+      });
+
       this.rootPage = 'TabsPage';
 
       /**
@@ -106,6 +115,8 @@ export class MyApp {
       });
 
       keyboard.hideKeyboardAccessoryBar(false);
+
+      this.pushNotification.init();
 
     });
   }
@@ -204,6 +215,10 @@ export class MyApp {
   private cargarPagina(pagina: any): void {
     this.content.setRoot(pagina);
     this.menuCrl.close();
+  }
+
+  private reloadApp(): void {
+    window.location.reload();
   }
 
 }

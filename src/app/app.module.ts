@@ -7,6 +7,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { IonicStorageModule } from '@ionic/storage';
 import { Network } from '@ionic-native/network';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { OneSignal } from '@ionic-native/onesignal';
 
 //Pagaes without lazy loading
 import { HomePage } from '../pages/home/home';
@@ -22,6 +23,7 @@ import { OrdenProvider } from '../providers/orden/orden';
 import { AuthProvider } from '../providers/auth/auth';
 import { DbProvider } from '../providers/db/db';
 import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandler';
+import { PushNotificationProvider } from '../providers/push-notification/push-notification';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandl
     ClientesProvider,
     OrdenProvider,
     AuthProvider,
-    DbProvider
+    DbProvider,
+    OneSignal,
+    PushNotificationProvider
   ]
 })
 export class AppModule {}

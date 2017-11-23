@@ -19,7 +19,7 @@ import { AuthProvider } from "../providers/auth/auth";
 import { DbProvider } from '../providers/db/db';
 import { OrdenProvider } from "../providers/orden/orden";
 import { CarritoProvider } from "../providers/carrito/carrito";
-import { error } from "util";
+import { PushNotificationProvider } from "../providers/push-notification/push-notification";
 
 //Pages
 import { LoginPage } from "../pages/login/login";
@@ -52,6 +52,7 @@ export class MyApp {
     private ordenServ: OrdenProvider,
     private cartServ: CarritoProvider,
     private util: Config,
+    private pushNotification: PushNotificationProvider
   ) {
 
     if( this.authService.isLogged ){
@@ -106,6 +107,8 @@ export class MyApp {
       });
 
       keyboard.hideKeyboardAccessoryBar(false);
+
+      this.pushNotification.init();
 
     });
   }

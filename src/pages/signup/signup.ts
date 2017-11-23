@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Loading, LoadingController } from 'ionic-angular';
 
+//Libs terceros
+import Raven from 'raven-js';
+
+// Providers
 import { DbProvider } from '../../providers/db/db';
 import { AuthProvider } from '../../providers/auth/auth';
 
@@ -48,7 +52,16 @@ export class SignupPage {
     .then(res=>{
       console.log(res);
       this.loading.dismiss();
-      this.dbServ.init(res.userDBs.supertest);
+
+      this.dbServ.init(res.userDBs.supertest).then( info => {
+        console.warn('DbAverno- First Replication complete');
+      }).catch( err => {
+        console.error("DbAverno-totally unhandled error (shouldn't happen)", err);
+        Raven.captureException( new Error(`DbAverno- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
+          extra: err
+        } );
+      });;
+
       this.navCtrl.setRoot('TabsPage');
     }).catch(err=>{
       console.log(err);

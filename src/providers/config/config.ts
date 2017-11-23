@@ -51,7 +51,7 @@ export class Config {
 
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD en couch
-  static readonly CDB_URL: string = 'https://www.gatortyres.com:6984/productos_prod';
+  static readonly CDB_URL: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/productos_prod';
   static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes';
 
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http

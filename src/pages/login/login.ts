@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, MenuController } from 'ionic-angular';
 import { FormGroup, FormBuilder, Validators  } from "@angular/forms";
 
+//libs terceros
+import Raven from 'raven-js';
+
 //Providers
 import { AuthProvider } from '../../providers/auth/auth';
 import { DbProvider } from "../../providers/db/db";
@@ -56,7 +59,16 @@ export class LoginPage {
     this.authService.login(credentials)
     .then(res=>{
       console.log(res);
-      this.dbServ.init(res.userDBs.supertest);
+
+      this.dbServ.init(res.userDBs.supertest).then( info => {
+        console.warn('DbAverno- First Replication complete');
+      }).catch( err => {
+        console.error("DbAverno-totally unhandled error (shouldn't happen)", err);
+        Raven.captureException( new Error(`DbAverno- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
+          extra: err
+        } );
+      });
+
       this.cartServ.initDB();
       this.navCtrl.setRoot('TabsPage');
       return this.authService.getTokenJosefa();

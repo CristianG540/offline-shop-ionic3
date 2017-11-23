@@ -18,45 +18,66 @@ export class DbProvider {
   ) {
   }
 
-  public init(urlDB: string): void {
-    this._db = new PouchDB('db_averno');
-    this._remoteDB = new PouchDB(urlDB);
+  public init(urlDB: string): Promise<any> {
+    return new Promise( (resolve, reject) => {
+      this._db = new PouchDB('db_averno');
+      this._remoteDB = new PouchDB(urlDB);
+
+      PouchDB.replicate(this._db, this._remoteDB, { batch_size : 500 })
+      .on('change', function (info) {
+        console.warn("Orders-Primera replicada change", info);
+      })
+      .on("complete", info => {
+        this.syncDB();
+        resolve(info);
+      })
+      .on("error", err => {
+        this.syncDB();
+        reject(err);
+      });
+
+
+    })
+  }
+
+  private syncDB(): void {
+
     let replicationOptions = {
       live: true,
       retry: true
     };
+
     this._db.sync(this._remoteDB, replicationOptions)
-      .on('paused', function (info) {
-        console.log("db_averno-replication was paused,usually because of a lost connection", info);
-      }).on('active', function (info) {
-        console.log("db_averno-replication was resumed", info);
-      }).on('denied', function (err) {
-        console.error("db_averno-a document failed to replicate (e.g. due to permissions)", err);
-        Raven.captureException( new Error(`db_averno - No se pudo replicar la BD con las ordenes debido a permisos 👮: ${JSON.stringify(err)}`), {
-          extra: err
-        } );
-      }).on('error', (err) => {
-        console.error("db_averno-totally unhandled error (shouldn't happen)", err);
+    .on('paused', function (info) {
+      console.log("db_averno-replication was paused,usually because of a lost connection", info);
+    }).on('active', function (info) {
+      console.log("db_averno-replication was resumed", info);
+    }).on('denied', function (err) {
+      console.error("db_averno-a document failed to replicate (e.g. due to permissions)", err);
+      Raven.captureException( new Error(`db_averno - No se pudo replicar la BD con las ordenes debido a permisos 👮: ${JSON.stringify(err)}`), {
+        extra: err
+      } );
+    }).on('error', (err) => {
+      console.error("db_averno-totally unhandled error (shouldn't happen)", err);
 
-        if(_.has(err, 'error')){
-          if(err.error == "unauthorized"){
-            this.alertCtrl.create({
-              title: "Session caducada.",
-              message: "Para que los pedidos puedan subirse a SAP por favor cierra la sesion he inicie de nuevo.",
-              buttons: ['Ok'],
-              enableBackdropDismiss: false,
-            }).present();
-          }
+      if(_.has(err, 'error')){
+        if(err.error == "unauthorized"){
+          this.alertCtrl.create({
+            title: "Session caducada.",
+            message: "Para que los pedidos puedan subirse a SAP por favor cierra la sesion he inicie de nuevo.",
+            buttons: ['Ok'],
+            enableBackdropDismiss: false,
+          }).present();
         }
+      }
 
-        Raven.captureException( new Error(`db_averno - Error con la BD de las ordenes que no deberia pasar 😫: ${JSON.stringify(err)}`), {
-          extra: err
-        } );
+      Raven.captureException( new Error(`db_averno - Error con la BD de las ordenes que no deberia pasar 😫: ${JSON.stringify(err)}`), {
+        extra: err
+      } );
 
-      });
+    });
 
     this._reactToChanges();
-
     this.evts.publish('db:init');
   }
 

@@ -124,7 +124,7 @@ export class OrdenProvider {
               fecha_creacion : moment(parseInt(orden._id)).format("YYYY-MM-DD"),
               nit_cliente    : orden.nitCliente,
               trasportadora  : orden.transp,
-              comentarios    : orden.observaciones+` ##${this.authService.asesorId}##`,
+              comentarios    : orden.observaciones+` ##${this.authService.asesorId}## ++${cg.APP_VER}++`,
               productos      : items,
               asesor         : this.authService.userId,
               asesor_id      : this.authService.asesorId

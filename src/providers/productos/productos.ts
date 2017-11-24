@@ -462,7 +462,13 @@ export class ProductosProvider {
     if (doc && doc._id == newDoc._id) { // update
       this._prods[index] = newDoc;
     } else { // insert
-      this._prods.splice(index, 0, newDoc);
+      /**
+       * Comento esta parte del codigo, no por que este mala,
+       * la comento por que por el momento no me interesa que ingrese
+       * los productos a los que se ven en el home, por ejemplo en el home se ven 5
+       * si se modfica un producto en couch, se agrega al y serian 5
+       */
+      //this._prods.splice(index, 0, newDoc);
     }
     this.appRef.tick();
   }

@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
 
 //Providers
 import { OrdenProvider } from "../../providers/orden/orden";
+import { Config } from '../../providers/config/config';
 
 //Models
 import { Orden } from '../../providers/orden/models/orden';
@@ -14,6 +15,7 @@ import { Orden } from '../../providers/orden/models/orden';
 })
 export class OrdenesPage {
 
+  private appVer: string = Config.APP_VER;
   private ordenesDetallePage = 'OrdenesDetallePage';
 
   private _ordenes: Orden[] = [];
@@ -23,6 +25,7 @@ export class OrdenesPage {
     public navParams: NavParams,
     private ordenServ: OrdenProvider,
     private evts: Events,
+    private util: Config
   ) {
     /**
      * Antes para tener en tiempo real las ordenes lo que hacia era

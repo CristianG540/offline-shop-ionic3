@@ -27,6 +27,7 @@ export class Config {
     });
   }
 
+  static readonly APP_VER: string = "1.3.6";
   static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
 
   /* **************************** Cosas de JOSEFA  *************************** */

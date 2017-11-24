@@ -29,6 +29,7 @@ import { LoginPage } from "../pages/login/login";
   providers: [Keyboard]
 })
 export class MyApp {
+  private appVer: string = Config.APP_VER;
   rootPage: any = LoginPage;
   @ViewChild('content') content: NavController;
 

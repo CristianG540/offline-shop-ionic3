@@ -12,6 +12,9 @@ export class DbProvider {
   private _db: any;
   private _remoteDB: any;
 
+  private _replication: any;
+  private _sync: any;
+
   constructor(
     private evts: Events,
     private alertCtrl: AlertController,
@@ -23,7 +26,7 @@ export class DbProvider {
       this._db = new PouchDB('db_averno');
       this._remoteDB = new PouchDB(urlDB);
 
-      PouchDB.replicate(this._db, this._remoteDB, { batch_size : 500 })
+      this._replication = PouchDB.replicate(this._db, this._remoteDB, { batch_size : 500 })
       .on('change', function (info) {
         console.warn("Orders-Primera replicada change", info);
       })
@@ -47,7 +50,7 @@ export class DbProvider {
       retry: true
     };
 
-    this._db.sync(this._remoteDB, replicationOptions)
+    this._sync = this._db.sync(this._remoteDB, replicationOptions)
     .on('paused', function (info) {
       console.log("db_averno-replication was paused,usually because of a lost connection", info);
     }).on('active', function (info) {
@@ -132,9 +135,15 @@ export class DbProvider {
     }
   }
 
-  public destroyDB(): void{
-    this._db.destroy().then(() => {
-      console.log("database removed");
+  public destroyDB(): Promise<any> {
+    this._replication.cancel();
+    this._sync.cancel();
+    return this._db.destroy().then(() => {
+      console.log(" db_averno - database removed");
+    }).catch(err=>{
+      Raven.captureException( new Error(`db_averno - Error al eliminar la bd 😫: ${JSON.stringify(err)}`), {
+        extra: err
+      } );
     });
   }
 

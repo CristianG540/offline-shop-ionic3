@@ -86,11 +86,7 @@ export class OrdenProvider {
   }
 
   public destroyDB(): void{
-    this._db.destroy().then(() => {
-      this._ordenes = [];
-      console.log("database removed");
-    })
-    .catch(console.log.bind(console));
+    this.dbServ.destroyDB().then( () => this._ordenes = [] );
   }
 
 

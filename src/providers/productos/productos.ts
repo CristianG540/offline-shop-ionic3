@@ -282,6 +282,12 @@ export class ProductosProvider {
       if (res && res.rows.length > 0) {
         return _.map(res.rows, (v: any) => {
           let precio: number = 0;
+          /**
+           * esta validacion la hago por si se elimina un producto de la bd
+           * por falta de existencias, a veces pasaba que si habia un producto
+           * en el carrito y casualmente se elimina, ocurria un error donde
+           * no se encontraba el _id
+           */
           if(_.has(v.doc, 'precio')){
             precio = v.doc.precio;
             return new Producto(
@@ -295,6 +301,19 @@ export class ProductosProvider {
               parseInt(v.doc.existencias),
               precio,
               v.doc._rev
+            );
+          }else{
+            return new Producto(
+              v.id,
+              'producto agotado',
+              'producto agotado',
+              'https://www.igbcolombia.com/app/www/assets/img/logo/logo_igb_small.png',
+              null,
+              '',
+              'UND',
+              0,
+              0,
+              ''
             );
           }
         }) ;

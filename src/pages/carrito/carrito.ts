@@ -72,7 +72,7 @@ export class CarritoPage {
     let prodsId = this.cartServ.carIdItems;
     this.prodServ.fetchProdsByids(prodsId)
       .then((prods: Producto[])=>{
-        this._prods = prods;
+        this._prods = prods.filter(Boolean);
         console.log("prods carrito", this._prods);
       })
       .catch(console.log.bind(console))

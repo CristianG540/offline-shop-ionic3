@@ -42,6 +42,7 @@ export class ProductosProvider {
   constructor(
     public http: Http,
     private appRef: ApplicationRef, // lo uso para actualizar la UI cuando se hace un cambio fiera de la ngZone
+    private util: Config
   ) {}
 
   public initDB(): Promise<any>{
@@ -61,8 +62,9 @@ export class ProductosProvider {
       });
 
       PouchDB.replicate(this._remoteDB, this._db, { batch_size : 500 })
-        .on('change', function (info) {
+        .on('change', info => {
           console.warn("Primera replicada change", info);
+          this.util.setLoadingText( `Cargando productos y sus cambios: ${info.docs_written.toString()}` );
         })
         .on("complete", info => {
           //Si la primera replicacion se completa con exito sincronizo la db

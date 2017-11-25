@@ -53,7 +53,7 @@ export class Config {
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD en couch
   static readonly CDB_URL: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/productos_prod';
-  static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes';
+  static readonly CDB_URL_CLIENTES: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/clientes';
 
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http
   //el header de autotizacion creoq se puede hacer de una forma mejor
@@ -162,6 +162,15 @@ export class Config {
     });
     loading.present();
     return loading;
+  }
+
+  /**
+   * https://chariotsolutions.com/blog/post/ionic-3-updating-loading-spinner-text/
+   * @param text
+   */
+  public setLoadingText(text: string) {
+    const elem = document.querySelector("div.loading-wrapper div.loading-content");
+    if(elem) elem.innerHTML = text;
   }
 
   public showToast(msg:string): void {

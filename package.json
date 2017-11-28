@@ -52,11 +52,13 @@
     "moment": "^2.18.1",
     "onesignal-cordova-plugin": "^2.2.2",
     "pouchdb": "^6.3.4",
-    "pouchdb-adapter-cordova-sqlite": "git+https://github.com/CristianG540/pouchdb-adapter-cordova-sqlite.git",
+    "pouchdb-adapter-cordova-sqlite":
+      "git+https://github.com/CristianG540/pouchdb-adapter-cordova-sqlite.git",
     "pouchdb-adapter-memory": "^6.3.4",
     "pouchdb-adapter-websql-core": "^6.3.4",
     "pouchdb-load": "git+https://github.com/CristianG540/pouchdb-load.git",
-    "pouchdb-quick-search": "git+https://github.com/CristianG540/pouchdb-quick-search.git",
+    "pouchdb-quick-search":
+      "git+https://github.com/CristianG540/pouchdb-quick-search.git",
     "pouchdb-upsert": "^2.2.0",
     "raven-js": "^3.19.1",
     "rxjs": "^5.5.2",
@@ -84,10 +86,7 @@
       "cordova-sqlite-storage": {},
       "onesignal-cordova-plugin": {}
     },
-    "platforms": [
-      "android",
-      "browser"
-    ]
+    "platforms": ["android", "browser"]
   },
   "config": {
     "ionic_uglifyjs": "./config/uglifyjs.config.js"

@@ -46,13 +46,11 @@ export class HomePage {
   }
 
   ionViewDidLoad(){
-    let loading = this.util.showLoading();
+
     this.prodsService.initDB()
     .then( info => {
-      loading.dismiss();
       console.warn('Prods- First Replication complete');
     }).catch( err => {
-      loading.dismiss();
       console.error("Prods-totally unhandled error (shouldn't happen)", err);
       Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
         extra: err
@@ -67,26 +65,16 @@ export class HomePage {
         window.location.reload();
       }
 
-    }).then(()=>{
-      //loading.dismiss();
-      this.indexDB();
-      this.prodsService.resetProds();
-      this.prodsService.recuperarPagSgte()
-        .catch( err => this.util.errorHandler(err.message, err) );
-    });
-
-  }
-
-  private indexDB(): void{
-    let loading = this.util.showLoading();
-    this.clienteServ
-    .indexDbClientes()
-    .then(res => {
-      loading.dismiss();
     })
-    .catch(err => {
-      this.util.errorHandler(err.message, err, loading);
-    });
+
+    let loading = this.util.showLoading();
+    this.prodsService.resetProds();
+    this.prodsService.recuperarPagSgte()
+      .then(()=>{
+        loading.dismiss();
+      })
+      .catch( err => this.util.errorHandler(err.message, err, loading) );
+
   }
 
   private doInfinite(infiniteScroll): void {

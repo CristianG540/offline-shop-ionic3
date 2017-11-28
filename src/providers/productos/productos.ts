@@ -141,7 +141,7 @@ export class ProductosProvider {
    * @returns {Promise<any>}
    * @memberof ProductosProvider
    */
-  async replicateDB(db, filename, numFiles?): Promise<any> {
+  private async replicateDB(db, filename, numFiles?): Promise<any> {
 
     if (await this.checkReplicated(db)) {
       console.log(`${filename}: replication already done`);
@@ -159,9 +159,7 @@ export class ProductosProvider {
           });
         }catch(err){
           console.error("Error al cargar el dump", err);
-          Raven.captureException( new Error(`error al cargar el dump 🐛: ${JSON.stringify(err)}`), {
-            extra: err
-          });
+          Raven.captureException( new Error(`error al cargar el dump 🐛: ${JSON.stringify(err)}`) );
         }
       }
     } else {
@@ -314,42 +312,64 @@ export class ProductosProvider {
 
   }
 
+  private async allDocs(db, options): Promise<any> {
+    let res = await db.allDocs(options);
+    if(res && res.rows.length > 0){
+      return res;
+    }else{
+      throw new Error('No se encontraron docs');
+    }
+  }
+
+  private async doLocalFirst(dbFun) {
+    // hit the local DB first; if it 404s, then hit the remote
+    try {
+      return await dbFun(this._db);
+    } catch (err) {
+      return await dbFun(this._remoteDB);
+    }
+  }
+
   /**
    * Esta funcion es la que rcupera los productos del infinite scroll
    * de la pagina principal
    */
-  public recuperarPagSgte(): Promise<any> {
-    return this._db.allDocs({
+  public async recuperarPagSgte(): Promise<any> {
+
+    let res = await this.doLocalFirst(db => {
+      return this.allDocs(db, {
         include_docs : true,
         limit        : this.cantProdsPag,
         skip         : this.skip,
         startkey     : this.startkey
-      }).then(res => {
-        if (res && res.rows.length > 0) {
-          this.startkey = res.rows[res.rows.length - 1].key;
-          this.skip = 1;
-          let prods: Producto[] = _.map(res.rows, (v: any, k: number) => {
-            // El precio llega en un formato como "$20.200" entonces lo saneo para que quede "20200"
-            let precio = (_.has(v.doc, 'precio')) ? v.doc.precio : 0;
-            precio = parseInt( (precio[0]=='$') ? precio.substring(1) : precio );
-            return new Producto(
-              v.doc._id,
-              v.doc.titulo,
-              v.doc.aplicacion,
-              v.doc.imagen,
-              v.doc.categoria,
-              v.doc.marcas,
-              v.doc.unidad,
-              parseInt(v.doc.existencias),
-              precio,
-              v.doc._rev
-            );
-          });
-          this._prods.push(...prods );
-        }
-        console.log("prodsProvider-recuperarPagSgte",this._prods);
-        return res;
       })
+    });
+
+    if (res && res.rows.length > 0) {
+      this.startkey = res.rows[res.rows.length - 1].key;
+      this.skip = 1;
+      let prods: Producto[] = _.map(res.rows, (v: any, k: number) => {
+        // El precio llega en un formato como "$20.200" entonces lo saneo para que quede "20200"
+        let precio = (_.has(v.doc, 'precio')) ? v.doc.precio : 0;
+        precio = parseInt( (precio[0]=='$') ? precio.substring(1) : precio );
+        return new Producto(
+          v.doc._id,
+          v.doc.titulo,
+          v.doc.aplicacion,
+          v.doc.imagen,
+          v.doc.categoria,
+          v.doc.marcas,
+          v.doc.unidad,
+          parseInt(v.doc.existencias),
+          precio,
+          v.doc._rev
+        );
+      });
+      this._prods.push(...prods );
+    }
+    console.log("prodsProvider-recuperarPagSgte",this._prods);
+    return res;
+
   }
 
   /**

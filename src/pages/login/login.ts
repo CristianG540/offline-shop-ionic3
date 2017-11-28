@@ -69,11 +69,11 @@ export class LoginPage {
         } );
       });
 
-      this.cartServ.initDB();
-      this.navCtrl.setRoot('TabsPage');
       return this.authService.getTokenJosefa();
     })
     .then( () => {
+      this.cartServ.initDB();
+      this.navCtrl.setRoot('TabsPage');
       loading.dismiss();
     } )
     .catch( err => this.util.errorHandler(err.message, err, loading) )

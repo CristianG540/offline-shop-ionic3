@@ -84,8 +84,6 @@ export class MyApp {
         } );
       });
 
-      this.rootPage = 'TabsPage';
-
       /**
        * Aqui le digo a sentry cual es el usuario q esta usando la app
        */
@@ -94,6 +92,8 @@ export class MyApp {
         email: this.authService.userEmail,
         id: this.authService.asesorId
       });
+
+      this.rootPage = 'TabsPage';
 
     }else{
       this.rootPage = LoginPage;

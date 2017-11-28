@@ -4,9 +4,13 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 /* librerias de terceros */
+import Raven from "raven-js";
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
-import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
+import PouchUpsert from 'pouchdb-upsert';
+import PouchLoad from 'pouchdb-load';
+
+//import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
 //Providers
 import { Config } from '../config/config'
 // Models
@@ -46,6 +50,8 @@ export class ProductosProvider {
   ) {}
 
   public initDB(): Promise<any>{
+    PouchDB.plugin(PouchUpsert);
+    PouchDB.plugin(PouchLoad);
     //PouchDB.plugin(cordovaSqlitePlugin);
     return new Promise( (resolve, reject) => {
 
@@ -61,7 +67,15 @@ export class ProductosProvider {
         }
       });
 
-      PouchDB.replicate(this._remoteDB, this._db, { batch_size : 500 })
+      /**
+       * Cargo los productos desde un archivo en los assets para tratar
+       * de acelerar el proceso de la primera carga de datos.
+       * cuando los datos se cargan procedo con la replicacion y sincronizacion normal
+       */
+      this.replicateDB(this._db, 'assets/db_initial_data/productos_prod_dump.txt')
+      .then(()=>{
+
+        this._db.replicate.from(this._remoteDB, { batch_size : 500 })
         .on('change', info => {
           console.warn("Primera replicada change", info);
           this.util.setLoadingText( `Cargando productos y sus cambios: ${info.docs_written.toString()}` );
@@ -83,6 +97,11 @@ export class ProductosProvider {
           reject(err);
         });
 
+      })
+      .catch(err=>{
+        reject(err);
+      })
+
     })
 
   }
@@ -102,6 +121,110 @@ export class ProductosProvider {
     });
     this._reactToChanges();
   }
+
+  /******************************************************************************* */
+
+  /**
+   * Para mas info sobre lo q hago aqui, revisar el sgte articulo
+   * http://www.pocketjavascript.com/blog/2015/11/23/introducing-pokedex-org
+   * y el siguinte archivo en el github del proyecto
+   * https://github.com/nolanlawson/pokedex.org/blob/master/src/js/worker/databaseService.js
+   */
+
+  /**
+   * Esta funcion se encarga de replicar los datos por primera vez desde un
+   * archivo txt con una carga inicial de los productos
+   *
+   * @param {any} db
+   * @param {any} filename
+   * @param {any} [numFiles]
+   * @returns {Promise<any>}
+   * @memberof ProductosProvider
+   */
+  async replicateDB(db, filename, numFiles?): Promise<any> {
+
+    if (await this.checkReplicated(db)) {
+      console.log(`${filename}: replication already done`);
+      return;
+    }
+
+    console.log(`${filename}: started replication`);
+
+    if (numFiles) {
+      for (var i = 1; i <= numFiles; i++) {
+        // file was broken up into smaller files
+        try {
+          await db.load(filename.replace('.txt', `-${i}.txt`), {
+            proxy: Config.CDB_LOAD_PROXY
+          });
+        }catch(err){
+          console.error("Error al cargar el dump", err);
+          Raven.captureException( new Error(`error al cargar el dump 🐛: ${JSON.stringify(err)}`), {
+            extra: err
+          });
+        }
+      }
+    } else {
+
+      try {
+        await db.load(filename, {
+          proxy: Config.CDB_LOAD_PROXY
+        });
+      }catch(err){
+        console.error("Error al cargar el dump", err);
+        Raven.captureException( new Error(`error al cargar el dump 🐛: ${JSON.stringify(err)}`) );
+      }
+
+    }
+    console.log(`${filename}: done replicating`);
+
+    try{
+      await this.markReplicated(db);
+    } catch (err) {
+      console.error("Error al marcar la replica", err);
+      Raven.captureException( new Error(`Error al marcar la replica 🐛: ${JSON.stringify(err)}`) );
+    }
+  }
+
+  /**
+   * Esta funciontrata de recuperar un documento local de couchdb/pouchdb
+   * si el doc existe significa que ya se hizo la replicacion de los datos
+   * desde el archivo local y no es necesario hacer la replicacion local de nuevo
+   * si el archivo no exste entonces devuelve false y se replica la bd desde el
+   * archivo local.
+   *
+   * @private
+   * @param {any} db
+   * @returns {Promise<boolean>}
+   * @memberof ProductosProvider
+   */
+  private async checkReplicated(db): Promise<boolean> {
+    try {
+      await db.get('_local/v1-load-complete');
+      return true;
+    } catch (err) {
+      console.log("Error al recuperar doc local", err);
+      return false;
+    }
+  }
+
+  /**
+   * Esta funcion es la que se encarga de crear el documento local que marca
+   * si la replicacion local ya se realizo o si es la primera vez, en esta funcion
+   * hago uso del plugin "upsert" de pouchdb
+   *
+   * @private
+   * @param {any} db
+   * @returns {Promise<any>}
+   * @memberof ProductosProvider
+   */
+  private async markReplicated(db): Promise<any> {
+    return await db.putIfNotExists({
+      _id: '_local/v1-load-complete'
+    });
+  }
+
+  /******************************************************************************* */
 
   /**
    * Basandome en este articulo "http://acdcjunior.github.io/querying-couchdb-pouchdb-map-reduce-group-by-example.html"

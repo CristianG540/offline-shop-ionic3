@@ -44,16 +44,18 @@ export class Config {
     });
     return options;
   }
-
   /* ************************* Fin Cosas de JOSEFA *****************************/
 
 
 
 
   /* **************************** Cosas de CouchDB  *************************** */
-  // Url base de la BD en couch
+  // Url base de la BD de los productos en couch
   static readonly CDB_URL: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/productos_prod';
+  // Url base de la BD de los Clientes en couch
   static readonly CDB_URL_CLIENTES: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/clientes';
+
+  static readonly CDB_LOAD_PROXY: string = `https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix:42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e@3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/productos_prod`;
 
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http
   //el header de autotizacion creoq se puede hacer de una forma mejor
@@ -69,6 +71,8 @@ export class Config {
     return options;
   }
   /* ************************* Fin Cosas de CouchDB *****************************/
+
+
   // Esta es una version mas rapida del "_.find" de lodash :3
   // Gracias a https://pouchdb.com/2015/02/28/efficiently-managing-ui-state-in-pouchdb.html
   static binarySearch(arr: any, property: string, search: any): number {

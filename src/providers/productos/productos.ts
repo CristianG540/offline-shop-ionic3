@@ -3,6 +3,8 @@ import { Http, RequestOptions, Response, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
+import { Storage } from '@ionic/storage';
+
 /* librerias de terceros */
 import Raven from "raven-js";
 import _ from 'lodash';
@@ -46,7 +48,8 @@ export class ProductosProvider {
   constructor(
     public http: Http,
     private appRef: ApplicationRef, // lo uso para actualizar la UI cuando se hace un cambio fiera de la ngZone
-    private util: Config
+    private util: Config,
+    private storage: Storage
   ) {}
 
   public initDB(): Promise<any>{
@@ -73,6 +76,12 @@ export class ProductosProvider {
         this.util.setLoadingText( `Cargando productos y sus cambios: ${info.docs_written.toString()}` );
       })
       .on("complete", info => {
+        /**
+         * Cuando la bd se termina de replicar y esta disponible local
+         * creo una bandera en el storage que me indica que ya esta lista
+         */
+        this.storage.set('prods-db-status', true).catch(err => reject(err));
+
         //Si la primera replicacion se completa con exito sincronizo la db
         //y de vuelvo la info sobre la sincronizacion
         this.syncDB();
@@ -214,6 +223,70 @@ export class ProductosProvider {
 
   /****************************** fin replica local ******************** */
 
+  /************************ Metodos Offline First ***************************** */
+
+  /**
+   * Los metodos acontinuacion los uso para usar alguna clase de implementacion
+   * de Offline first, lo qsignifica que primero intento consultar los datos
+   * en la base de datos local, pero si estos aun no estan disponibles, entonces
+   * consulto la base de datos en linea
+   */
+
+  private async allDocs(db, options): Promise<any> {
+    let res = await db.allDocs(options);
+    if(! await this.storage.get('prods-db-status') && !db._remote ){
+      throw new Error('No se encontraron docs');
+    }
+    return res;
+  }
+
+  private async getManyByIds(db, ids): Promise<any> {
+    let res = await db.allDocs({
+      include_docs : true,
+      keys         : ids
+    });
+    if (!res.rows.every(row => row.doc)) {
+      throw new Error('doc not found');
+    }
+    return res;
+  }
+
+  private async designDocCategoriaView(db): Promise<any>{
+    let res = await db.query('categoriaview', {
+      group_level : 1,
+      group       : true,
+      reduce      : true
+    });
+    if(! await this.storage.get('prods-db-status') && !db._remote ){
+      throw new Error('No se encontraron docs');
+    }
+    return res;
+  }
+
+  private async queryCategoriaView(db, categoria): Promise<any>{
+    let res = db.query('categoriaview/producto_categoria', {
+      key          : categoria,
+      skip         : this.skipByCat,
+      limit        : this.cantProdsPag,
+      include_docs : true
+    })
+    if(! await this.storage.get('prods-db-status') && !db._remote ){
+      throw new Error('No se encontraron docs');
+    }
+    return res;
+  }
+
+  private async doLocalFirst(dbFun) {
+    // hit the local DB first; if it 404s, then hit the remote
+    try {
+      return await dbFun(this._db);
+    } catch (err) {
+      return await dbFun(this._remoteDB);
+    }
+  }
+
+  /******************** FIN Metodos Offline First ***************************** */
+
   /**
    * Basandome en este articulo "http://acdcjunior.github.io/querying-couchdb-pouchdb-map-reduce-group-by-example.html"
    * creo una vista map/reduce en couchdb que me agrupa los productos por categoria y me cuenta las
@@ -252,11 +325,7 @@ export class ProductosProvider {
       }
       // ignore if doc already exists
     }).then( () => {
-      return this._db.query('categoriaview', {
-        group_level : 1,
-        group       : true,
-        reduce      : true
-      });
+      return this.doLocalFirst( db => this.designDocCategoriaView(db) );
     }).then(res => {
       if (res && res.rows.length > 0) {
         this._categorias = _.map(res.rows, (v: any, k: number) => {
@@ -300,24 +369,6 @@ export class ProductosProvider {
     })
     */
 
-  }
-
-  private async allDocs(db, options): Promise<any> {
-    let res = await db.allDocs(options);
-    if(res && res.rows.length > 0){
-      return res;
-    }else{
-      throw new Error('No se encontraron docs');
-    }
-  }
-
-  private async doLocalFirst(dbFun) {
-    // hit the local DB first; if it 404s, then hit the remote
-    try {
-      return await dbFun(this._db);
-    } catch (err) {
-      return await dbFun(this._remoteDB);
-    }
   }
 
   /**
@@ -374,13 +425,8 @@ export class ProductosProvider {
 
     categoria = categoria.toLocaleLowerCase();
 
-    return this._db.query('categoriaview/producto_categoria', {
-        key          : categoria,
-        skip         : this.skipByCat,
-        limit        : this.cantProdsPag,
-        include_docs : true
-    }).then(res => {
-
+    return this.doLocalFirst( db => this.queryCategoriaView(db, categoria) )
+    .then(res => {
       if (res && res.rows.length > 0) {
         this.skipByCat += this.cantProdsPag;
         let prods: Producto[] = _.map(res.rows, (v: any, k: number) => {
@@ -408,11 +454,8 @@ export class ProductosProvider {
 
   public fetchProdsByids( ids: any ): Promise<any>{
 
-    return this._db.allDocs({
-      include_docs : true,
-      keys         : ids
-    }).then(res => {
-
+    return this.doLocalFirst( db => this.getManyByIds(db, ids) )
+    .then(res => {
       console.log("all_docs ids", res)
       if (res && res.rows.length > 0) {
         return _.map(res.rows, (v: any) => {

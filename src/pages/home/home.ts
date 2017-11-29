@@ -9,7 +9,11 @@ import {
   Platform,
   MenuController
 } from "ionic-angular";
+import { Storage } from '@ionic/storage';
+
+/* Libs Terceros */
 import Raven from "raven-js";
+import _ from 'lodash';
 
 /* Models */
 import { Producto } from '../../providers/productos/models/producto';
@@ -19,7 +23,6 @@ import { ProductosProvider } from '../../providers/productos/productos';
 import { CarritoProvider } from "../../providers/carrito/carrito";
 import { Config as Cg} from '../../providers/config/config';
 import { ClientesProvider } from '../../providers/clientes/clientes';
-import _ from 'lodash';
 
 @Component({
   selector: 'page-home',
@@ -40,13 +43,22 @@ export class HomePage {
     private prodsService: ProductosProvider,
     private cartService: CarritoProvider,
     private clienteServ: ClientesProvider,
-    private util: Cg
+    private util: Cg,
+    private storage: Storage
   ) {
     this.menuCtrl.enable(true);
   }
 
   ionViewDidLoad(){
 
+    /**
+     * Cuando la bd se termina de replicar y esta disponible local
+     * creo una bandera en el storage que me indica que ya esta lista
+     */
+    this.storage.set('prods-db-status', false).catch(err => {
+      console.error("DbProds- Error al guardar la bandera replicacion", err);
+      Raven.captureException( new Error(`DbProds- Error al guardar la bandera replicacion 😫: ${JSON.stringify(err)}`) );
+    });
     this.prodsService.initDB()
     .then( info => {
       console.warn('Prods- First Replication complete');

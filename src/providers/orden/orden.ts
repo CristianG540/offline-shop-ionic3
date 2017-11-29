@@ -23,12 +23,14 @@ import { DbProvider } from "../db/db";
 import { Orden } from './models/orden';
 import { CarItem } from "../carrito/models/carItem";
 import { AuthProvider } from "../auth/auth";
+import { Node } from "@angular/compiler";
 
 @Injectable()
 export class OrdenProvider {
 
   private _db: any;
   private _ordenes: Orden[] = [];
+  public intervalValOrders: NodeJS.Timer;
 
   constructor(
     private appRef: ApplicationRef, // lo uso para actualizar la UI cuando se hace un cambio fiera de la ngZone
@@ -206,6 +208,32 @@ export class OrdenProvider {
 
     });
 
+  }
+
+  public setIntervalOrdersSap(): void {
+    this.intervalValOrders = setInterval( () => {
+
+      if(this.ordenesPendientes.length > 0){
+
+        this.sendOrdersSap()
+        .then(responses=>{
+          let failOrders = _.filter(responses.apiRes, (res: any) => {
+            return res.responseApi.code >= 400;
+          })
+          if(failOrders.length > 0){
+            console.error(failOrders.length+' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo');
+          }else{
+            this.util.showToast("Las ordenes se subieron correctamente a sap.");
+          }
+          console.warn("RESPUESTA DE LAS ORDENES ", responses);
+        })
+        .catch(err=>{
+          this.util.errorHandler(err.message, err);
+        })
+
+      }
+
+    }, 40000 );
   }
 
   /** *************** Manejo de el estado de la ui    ********************** */

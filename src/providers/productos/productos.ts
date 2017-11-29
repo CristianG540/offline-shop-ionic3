@@ -67,40 +67,27 @@ export class ProductosProvider {
         }
       });
 
-      /**
-       * Cargo los productos desde un archivo en los assets para tratar
-       * de acelerar el proceso de la primera carga de datos.
-       * cuando los datos se cargan procedo con la replicacion y sincronizacion normal
-       */
-      this.replicateDB(this._db, 'assets/db_initial_data/productos_prod_dump.txt')
-      .then(()=>{
-
-        this._db.replicate.from(this._remoteDB, { batch_size : 500 })
-        .on('change', info => {
-          console.warn("Primera replicada change", info);
-          this.util.setLoadingText( `Cargando productos y sus cambios: ${info.docs_written.toString()}` );
-        })
-        .on("complete", info => {
-          //Si la primera replicacion se completa con exito sincronizo la db
-          //y de vuelvo la info sobre la sincronizacion
-          this.syncDB();
-          resolve(info);
-        })
-        .on("error", err => {
-          //Me preguntare a mi mismo en el futuro por que mierda pongo a sincronizar
-          //La base de datos si la primera sincronisacion falla, lo pongo aqui por q
-          //si el usuario cierra la app y la vuelve a iniciar, el evento de initdb
-          //se ejecutaria de nuevo y si por algun motivo no tiene internet entonces
-          // la replicacion nunca se va completar y la base de datos
-          //no se va a sincronizar, por eso lo lanzo de nuevo aqui el sync
-          this.syncDB();
-          reject(err);
-        });
-
+      this._db.replicate.from(this._remoteDB, { batch_size : 100 })
+      .on('change', info => {
+        console.warn("Primera replicada change", info);
+        this.util.setLoadingText( `Cargando productos y sus cambios: ${info.docs_written.toString()}` );
       })
-      .catch(err=>{
+      .on("complete", info => {
+        //Si la primera replicacion se completa con exito sincronizo la db
+        //y de vuelvo la info sobre la sincronizacion
+        this.syncDB();
+        resolve(info);
+      })
+      .on("error", err => {
+        //Me preguntare a mi mismo en el futuro por que mierda pongo a sincronizar
+        //La base de datos si la primera sincronisacion falla, lo pongo aqui por q
+        //si el usuario cierra la app y la vuelve a iniciar, el evento de initdb
+        //se ejecutaria de nuevo y si por algun motivo no tiene internet entonces
+        // la replicacion nunca se va completar y la base de datos
+        //no se va a sincronizar, por eso lo lanzo de nuevo aqui el sync
+        this.syncDB();
         reject(err);
-      })
+      });
 
     })
 
@@ -122,7 +109,7 @@ export class ProductosProvider {
     this._reactToChanges();
   }
 
-  /******************************************************************************* */
+  /********************** Cosas para replica local *************** */
 
   /**
    * Para mas info sobre lo q hago aqui, revisar el sgte articulo
@@ -132,6 +119,9 @@ export class ProductosProvider {
    */
 
   /**
+   * DESHABILITADA GASTA DEMACIADA MEMORIA EN LOS CELULARES
+   * LA DEJO SOLO CON VALOR EDUCATIVO
+   *
    * Esta funcion se encarga de replicar los datos por primera vez desde un
    * archivo txt con una carga inicial de los productos
    *
@@ -222,7 +212,7 @@ export class ProductosProvider {
     });
   }
 
-  /******************************************************************************* */
+  /****************************** fin replica local ******************** */
 
   /**
    * Basandome en este articulo "http://acdcjunior.github.io/querying-couchdb-pouchdb-map-reduce-group-by-example.html"

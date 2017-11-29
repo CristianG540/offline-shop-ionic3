@@ -93,6 +93,9 @@ export class MyApp {
         id: this.authService.asesorId
       });
 
+      // Creo un setinterval que verifica las ordenes cada X tiempo
+      this.ordenServ.setIntervalOrdersSap();
+
       this.rootPage = 'TabsPage';
 
     }else{
@@ -161,6 +164,8 @@ export class MyApp {
         this.cartServ.destroyDB();
         this.cargarPagina(LoginPage);
         Raven.setUserContext();
+        // Paro el timer que verifica las ordenes
+        clearInterval(this.ordenServ.intervalValOrders);
         loading.dismiss();
       })
       .catch(err=>{

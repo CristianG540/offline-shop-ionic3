@@ -10,6 +10,7 @@ import { AuthProvider } from '../../providers/auth/auth';
 import { DbProvider } from "../../providers/db/db";
 import { Config as cg } from "../../providers/config/config";
 import { CarritoProvider } from '../../providers/carrito/carrito';
+import { OrdenProvider } from '../../providers/orden/orden';
 
 @Component({
   selector: 'page-login',
@@ -31,6 +32,7 @@ export class LoginPage {
     private authService: AuthProvider,
     private dbServ: DbProvider,
     private cartServ: CarritoProvider,
+    private ordenServ: OrdenProvider,
     private util: cg
   ) {
     this.menuCtrl.enable(false);
@@ -73,8 +75,19 @@ export class LoginPage {
     })
     .then( () => {
       this.cartServ.initDB();
+      /**
+       * Aqui le digo a sentry cual es el usuario q esta usando la app
+       */
+      Raven.setUserContext({
+        username: this.authService.userId,
+        email: this.authService.userEmail,
+        id: this.authService.asesorId
+      });
+      // Creo un setinterval que verifica las ordenes cada X tiempo
+      this.ordenServ.setIntervalOrdersSap();
       this.navCtrl.setRoot('TabsPage');
       loading.dismiss();
+
     } )
     .catch( err => this.util.errorHandler(err.message, err, loading) )
   }

@@ -51,14 +51,6 @@ export class HomePage {
 
   ionViewDidLoad(){
 
-    /**
-     * Cuando la bd se termina de replicar y esta disponible local
-     * creo una bandera en el storage que me indica que ya esta lista
-     */
-    this.storage.set('prods-db-status', false).catch(err => {
-      console.error("DbProds- Error al guardar la bandera replicacion", err);
-      Raven.captureException( new Error(`DbProds- Error al guardar la bandera replicacion 😫: ${JSON.stringify(err)}`) );
-    });
     this.prodsService.initDB()
     .then( info => {
       console.warn('Prods- First Replication complete');

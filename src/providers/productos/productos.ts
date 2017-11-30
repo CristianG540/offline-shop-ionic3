@@ -70,10 +70,12 @@ export class ProductosProvider {
         }
       });
 
-      this._db.replicate.from(this._remoteDB, { batch_size : 100 })
+      this._db.replicate.from(this._remoteDB, { batch_size : 1000 })
       .on('change', info => {
+
         console.warn("Primera replicada change", info);
         this.util.setLoadingText( `Cargando productos y sus cambios: ${info.docs_written.toString()}` );
+
       })
       .on("complete", info => {
         /**
@@ -264,7 +266,7 @@ export class ProductosProvider {
   }
 
   private async queryCategoriaView(db, categoria): Promise<any>{
-    let res = db.query('categoriaview/producto_categoria', {
+    let res = await db.query('categoriaview/producto_categoria', {
       key          : categoria,
       skip         : this.skipByCat,
       limit        : this.cantProdsPag,

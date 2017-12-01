@@ -19,6 +19,7 @@ import { Config } from '../config/config'
 import { Producto } from './models/producto';
 import { Categoria } from './models/categoria';
 import { CarItem } from "../carrito/models/carItem";
+import { WorkerRes } from "../config/models/workerRes"
 // Info del por que hago esto https://github.com/domiSchenk/PouchDB-typescript-definitions/issues/4
 declare var emit:any;
 
@@ -54,100 +55,97 @@ export class ProductosProvider {
     private storage: Storage
   ) {
     this.replicationWorker = new Worker('./assets/js/pouch_replication_worker/dist/bundle.js');
+    this.replicationWorker.onmessage = (event) => {
+      let d: WorkerRes = event.data;
+      switch (d.method) {
+        case "replicate":
+          this._replicateDB(d)
+          break;
+        case "sync":
+          console.error("Prods- Error en sincronizacion 🐛", d.info);
+          Raven.captureException( new Error(`Prods- Error en sincronizacion 🐛: ${JSON.stringify(d.info)}`) );
+          break;
+        case "changes":
+          this._reactToChanges(d);
+          break;
+        default:
+          break;
+      }
+    }
   }
 
-  public initDB(): Promise<any>{
+  public initDB(): void {
     //PouchDB.plugin(PouchUpsert);
     //PouchDB.plugin(PouchLoad);
     //PouchDB.plugin(cordovaSqlitePlugin);
-    return new Promise( (resolve, reject) => {
+    //this._db = new PouchDB("productos.db", {adapter: 'cordova-sqlite'});
+    this._db = new PouchDB("productos_prod", {revs_limit: 5, auto_compaction: true});
+    this._remoteDB = new PouchDB(Config.CDB_URL, {
+      auth: {
+        username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
+        password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
+      },
+      ajax: {
+        timeout: 60000
+      }
+    });
 
-      //this._db = new PouchDB("productos.db", {adapter: 'cordova-sqlite'});
-      this._db = new PouchDB("productos_prod", {revs_limit: 5, auto_compaction: true});
-      this._remoteDB = new PouchDB(Config.CDB_URL, {
-        auth: {
-          username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
-          password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
-        },
-        ajax: {
-          timeout: 60000
-        }
-      });
-
-      this.replicationWorker.postMessage({
-        local: {
-          name: "productos_prod",
-          options: {revs_limit: 5, auto_compaction: true}
-        },
-        remote: {
-          name: Config.CDB_URL,
-          options : {
-            auth: {
-              username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
-              password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
-            },
-            ajax: {
-              timeout: 60000
-            }
+    this.replicationWorker.postMessage({
+      db: "productos",
+      local: {
+        name: "productos_prod",
+        options: {revs_limit: 5, auto_compaction: true}
+      },
+      remote: {
+        name: Config.CDB_URL,
+        options : {
+          auth: {
+            username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
+            password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
+          },
+          ajax: {
+            timeout: 60000
           }
         }
-      });
-
-      this.replicationWorker.onmessage = (event) => {
-        let d: { event: string, info: any} = event.data;
-        switch (d.event) {
-          case "change":
-            console.warn("Primera replicada change", d.info);
-            this.util.setLoadingText( `Cargando productos y sus cambios: ${d.info.docs_written.toString()}` );
-            break;
-
-          case "complete":
-            /**
-             * Cuando la bd se termina de replicar y esta disponible local
-             * creo una bandera en el storage que me indica que ya esta lista
-             */
-            this.storage.set('prods-db-status', true).catch(err => reject(err));
-            this.statusDB = true;
-            //Si la primera replicacion se completa con exito sincronizo la db
-            //y de vuelvo la info sobre la sincronizacion
-            this.syncDB();
-            resolve(d.info);
-            break;
-
-          case "error":
-            //Me preguntare a mi mismo en el futuro por que mierda pongo a sincronizar
-            //La base de datos si la primera sincronisacion falla, lo pongo aqui por q
-            //si el usuario cierra la app y la vuelve a iniciar, el evento de initdb
-            //se ejecutaria de nuevo y si por algun motivo no tiene internet entonces
-            // la replicacion nunca se va completar y la base de datos
-            //no se va a sincronizar, por eso lo lanzo de nuevo aqui el sync
-            this.syncDB();
-            reject(d.info);
-            break;
-
-          default:
-            break;
-        }
-      };
-
-    })
+      }
+    });
 
   }
 
-  private syncDB(): void {
-    let replicationOptions = {
-      live       : true,
-      retry      : true,
-      batch_size : 500
-    };
-    PouchDB.sync(this._db, this._remoteDB, replicationOptions)
-    .on("denied", err => {
-      console.log("Prods-a failed to replicate due to permissions",err);
-    })
-    .on("error", err => {
-      console.log("Prods-totally unhandled error (shouldn't happen)", err);
-    });
-    this._reactToChanges();
+  private _replicateDB(d): void {
+    switch (d.event) {
+      case "change":
+        console.warn("Primera replicada change", d.info);
+        this.util.setLoadingText( `Cargando productos y sus cambios: ${d.info.docs_written.toString()}` );
+        break;
+      case "complete":
+        /**
+         * Cuando la bd se termina de replicar y esta disponible local
+         * creo una bandera en el storage que me indica que ya esta lista
+         */
+        this.storage.set('prods-db-status', true).catch(err => {
+          Raven.captureException( new Error(`Productos- Error al guardar la bandera estado de la bd😫: ${JSON.stringify(err)}`), { extra: err } );
+        });
+        this.statusDB = true;
+        console.warn('Prods- First Replication complete');
+        break;
+      case "error":
+        console.error("Prods-totally unhandled error (shouldn't happen)", d.info);
+        Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(d.info)}`), { extra: d.info } );
+        /**
+         * si algun error se presenta recargo la aplicacion,
+         * a menos que sea un error de conexion por falta de datos o de conexion
+         * en ese caso no la recargo por q entra en un loop infinito cuando el celular
+         * no tiene conexion
+         */
+        if(_.has(d.info, 'message') && d.info.message != "getCheckpoint rejected with " ){
+          window.location.reload();
+        }
+        break;
+
+      default:
+        break;
+    }
   }
 
   /********************** Cosas para replica local *************** */
@@ -172,7 +170,7 @@ export class ProductosProvider {
    * @returns {Promise<any>}
    * @memberof ProductosProvider
    */
-  private async replicateDB(db, filename, numFiles?): Promise<any> {
+  private async loadDB(db, filename, numFiles?): Promise<any> {
 
     if (await this.checkReplicated(db)) {
       console.log(`${filename}: replication already done`);
@@ -626,24 +624,24 @@ export class ProductosProvider {
 
 
   /** *************** Manejo de el estado de la ui    ********************** */
-  private _reactToChanges(): void {
-    this._db.changes({
-      live: true,
-      since: 'now',
-      include_docs: true
-    })
-    .on( 'change', change => {
-
-      if (change.deleted) {
+  private _reactToChanges(d: WorkerRes): void {
+    switch (d.event) {
+      case "deleted":
         // change.id holds the deleted id
-        this._onDeleted(change.doc._id);
-      } else { // updated/inserted
+        this._onDeleted(d.info.doc._id);
+        break;
+      case "upsert":
+        // updated/inserted
         // change.doc holds the new doc
-        this._onUpdatedOrInserted(change.doc);
-      }
-
-    })
-    .on( 'error', console.log.bind(console));
+        this._onUpdatedOrInserted(d.info.doc);
+        break;
+      case "error":
+        console.error("Prods- Error react to changes 🐛", d.info);
+        Raven.captureException( new Error(`Prods- Error react to changes 🐛: ${JSON.stringify(d.info)}`) );
+        break;
+      default:
+        break;
+    }
   }
 
   private _onDeleted(id: string): void {

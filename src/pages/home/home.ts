@@ -51,26 +51,7 @@ export class HomePage {
 
   ionViewDidLoad(){
 
-    this.prodsService.initDB()
-    .then( info => {
-      console.warn('Prods- First Replication complete');
-      this.util.showToast("Se descargaron los productos con exito.");
-    }).catch( err => {
-      console.error("Prods-totally unhandled error (shouldn't happen)", err);
-      Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
-        extra: err
-      } );
-      /**
-       * si algun error se presenta recargo la aplicacion,
-       * a menos que sea un error de conexion por falta de datos o de conexion
-       * en ese caso no la recargo por q entra en un loop infinito cuando el celular
-       * no tiene conexion
-       */
-      if(_.has(err, 'message') && err.message != "getCheckpoint rejected with " ){
-        window.location.reload();
-      }
-
-    })
+    this.prodsService.initDB();
 
     let loading = this.util.showLoading();
     this.prodsService.resetProds();

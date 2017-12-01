@@ -29,6 +29,13 @@
   border-radius: 50%;
 }
 
+.red {
+  color: #ff0000 !important;
+}
+.green {
+  color: #00ff14 !important;
+}
+
 // Material Design Sidemenu
 #menu-material {
   .menu-header {
@@ -42,6 +49,10 @@
       font-size: 22px;
     }
     .e-mail {
+      margin-top: 0;
+      margin-bottom: 5px;
+    }
+    .bd-status {
       margin-top: 0;
       margin-bottom: 5px;
     }

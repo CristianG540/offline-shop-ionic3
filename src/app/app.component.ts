@@ -19,6 +19,7 @@ import { AuthProvider } from "../providers/auth/auth";
 import { DbProvider } from '../providers/db/db';
 import { OrdenProvider } from "../providers/orden/orden";
 import { CarritoProvider } from "../providers/carrito/carrito";
+import { ProductosProvider } from "../providers/productos/productos";
 import { PushNotificationProvider } from "../providers/push-notification/push-notification";
 
 //Pages
@@ -52,6 +53,7 @@ export class MyApp {
     private dbServ: DbProvider,
     private ordenServ: OrdenProvider,
     private cartServ: CarritoProvider,
+    private prodServ: ProductosProvider,
     private util: Config,
     private pushNotification: PushNotificationProvider
   ) {

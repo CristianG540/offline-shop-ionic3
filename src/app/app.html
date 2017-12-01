@@ -9,6 +9,9 @@
       <p class="e-mail">{{ authService.session?.profile?.email }}</p>
       <p class="e-mail">{{ authService.asesorId }}</p>
       <p class="e-mail">Version: {{ appVer }}</p>
+      <hr>
+      <p class="bd-status">BD Productos: <ion-icon [ngClass]="(prodServ.statusDB)?'green':'red'" name="radio-button-on" item-left></ion-icon></p>
+      <p class="bd-status">BD Clientes: <ion-icon [ngClass]="(clienteServ.statusDB)?'green':'red'" name="radio-button-on" item-left></ion-icon></p>
     </div>
     <ion-list no-lines>
       <button menuClose="left" ion-item detail-none (click)="reloadApp()">

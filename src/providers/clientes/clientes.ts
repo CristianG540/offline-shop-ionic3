@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Storage } from '@ionic/storage';
 
 // lib terceros
 import _ from 'lodash';
@@ -19,18 +20,17 @@ export class ClientesProvider {
   private _dbLocal: any;
   private _remoteDB: any;
   private _clientes: Cliente[] = [];
+  public statusDB: boolean = false;
 
   constructor(
     private util: cg,
     private authService: AuthProvider,
+    private storage: Storage
   ) {
     PouchDB.plugin(require("pouchdb-quick-search"));
     PouchDB.plugin(pouchAdapterMem);
     if (!this._db) {
-      let replicationOptions = {
-        live: true,
-        retry: true
-      };
+
       // Base de datos remota en couchdb
       this._remoteDB = new PouchDB(cg.CDB_URL_CLIENTES, {
         auth: {
@@ -52,58 +52,92 @@ export class ClientesProvider {
        * que la BD en memoria
        */
       this._dbLocal = new PouchDB("cliente",{revs_limit: 10, auto_compaction: true});
-      /**
-       * Que mierda estoy haciendo aqui me preguntare cuando se me olvide esto,
-       * como la bd en memoria es muy rapida pero no conserva los datos, y como
-       * la bd normal si los almacena pero es mas lenta, entonces lo que hago
-       * es replicar los datos de una a la otra, asi puedo hacer las operaciones
-       * CRUD por asi decirlo en la de memoria que es muy rapida, y replicar los
-       * datos a la otra para que los preserve, en teoria deberia funcionar como
-       * una especia de ram o cache algo asi.
-       */
-      PouchDB.sync(this._dbLocal, this._db, replicationOptions)
-        .on("denied", err => {
-          console.error("Clientes*inMemory - a failed to replicate due to permissions",err);
-          Raven.captureException( new Error(`Clientes*inMemory - No se pudo replicar debido a permisos 👮: ${JSON.stringify(err)}`), {
-            extra: err
-          } );
-        })
-        .on("error", err => {
-          console.error("Clientes*inMemory - totally unhandled error (shouldn't happen)", err);
-          Raven.captureException( new Error(`Clientes*inMemory - Error que no deberia pasar 😫: ${JSON.stringify(err)}`), {
-            extra: err
-          } );
-        });
 
-      // Sincronizo los datos de la BD remota con la local, cualquier cambio
-      // en la base de datos remota afecta la local y viceversa
-      this._dbLocal
-        .sync(this._remoteDB, replicationOptions)
-        .on("paused", function(info) {
-          console.log(
-            "Client-replication was paused,usually because of a lost connection",
-            info
-          );
-        })
-        .on("active", function(info) {
-          console.log("Client-replication was resumed", info);
-        })
-        .on("denied", function(err) {
-          console.error(
-            "Client-a document failed to replicate (e.g. due to permissions)",
-            err
-          );
-          Raven.captureException( new Error(`ClientesBD - No se pudo replicar debido a permisos 👮: ${JSON.stringify(err)}`), {
-            extra: err
-          } );
-        })
-        .on("error", function(err) {
-          console.error("Client-totally unhandled error (shouldn't happen)", err);
-          Raven.captureException( new Error(`ClientesBD - Error que no deberia pasar 😫: ${JSON.stringify(err)}`), {
-            extra: err
-          } );
+      /**
+       * The next technique results in fewer HTTP requests being used and better
+       * performance than just using db.sync on its own.
+       */
+      PouchDB.replicate(this._remoteDB, this._dbLocal)
+      .on('change', function (info) {
+        console.warn("Clientes-Primera replicada change", info);
+      })
+      .on("complete", info => {
+        /**
+         * Cuando la bd se termina de replicar y esta disponible local
+         * creo una bandera en el storage que me indica que ya esta lista
+         */
+        this.storage.set('clientes-db-status', true).catch(err => {
+          Raven.captureException( new Error(`Clientes- Error al guardar la bandera del estado de la bd😫: ${JSON.stringify(err)}`), { extra: err } );
         });
+        this.statusDB = true;
+        console.warn("Clientes-Primera replicada complete", info);
+        this.syncDB();
+      })
+      .on("error", err => {
+        console.error("Clientes- first replication totally unhandled error (shouldn't happen)", err);
+        Raven.captureException( new Error(`Clientes - Primera replica error que no deberia pasar 😫: ${JSON.stringify(err)}`), { extra: err } );
+        this.syncDB();
+      });
+
     }
+  }
+
+  private syncDB(): void {
+    let replicationOptions = {
+      live: true,
+      retry: true
+    };
+    /**
+     * Que mierda estoy haciendo aqui me preguntare cuando se me olvide esto,
+     * como la bd en memoria es muy rapida pero no conserva los datos, y como
+     * la bd normal si los almacena pero es mas lenta, entonces lo que hago
+     * es replicar los datos de una a la otra, asi puedo hacer las operaciones
+     * CRUD por asi decirlo en la de memoria que es muy rapida, y replicar los
+     * datos a la otra para que los preserve, en teoria deberia funcionar como
+     * una especia de ram o cache algo asi.
+     */
+    PouchDB.sync(this._dbLocal, this._db, replicationOptions)
+    .on("denied", err => {
+      console.error("Clientes*inMemory - a failed to replicate due to permissions",err);
+      Raven.captureException( new Error(`Clientes*inMemory - No se pudo replicar debido a permisos 👮: ${JSON.stringify(err)}`), {
+        extra: err
+      } );
+    })
+    .on("error", err => {
+      console.error("Clientes*inMemory - totally unhandled error (shouldn't happen)", err);
+      Raven.captureException( new Error(`Clientes*inMemory - Error que no deberia pasar 😫: ${JSON.stringify(err)}`), {
+        extra: err
+      } );
+    });
+
+    // Sincronizo los datos de la BD remota con la local, cualquier cambio
+    // en la base de datos remota afecta la local y viceversa
+    this._dbLocal.sync(this._remoteDB, replicationOptions)
+    .on("paused", function(info) {
+      console.log(
+        "Client-replication was paused,usually because of a lost connection",
+        info
+      );
+    })
+    .on("active", function(info) {
+      console.log("Client-replication was resumed", info);
+    })
+    .on("denied", function(err) {
+      console.error(
+        "Client-a document failed to replicate (e.g. due to permissions)",
+        err
+      );
+      Raven.captureException( new Error(`ClientesBD - No se pudo replicar debido a permisos 👮: ${JSON.stringify(err)}`), {
+        extra: err
+      } );
+    })
+    .on("error", function(err) {
+      console.error("Client-totally unhandled error (shouldn't happen)", err);
+      Raven.captureException( new Error(`ClientesBD - Error que no deberia pasar 😫: ${JSON.stringify(err)}`), {
+        extra: err
+      } );
+    });
+
   }
 
   public searchCliente(query: string): Promise<any> {

@@ -30,7 +30,7 @@ export class OrdenesDetallePage {
 
   ionViewDidLoad() {
     let loading = this.util.showLoading();
-    console.log('ionViewDidLoad OrdenesDetallePage', this.navParams.data);
+    //console.log('ionViewDidLoad OrdenesDetallePage', this.navParams.data);
     this._itemsOrder = this.navParams.data.items;
     this._cliente = (this.navParams.data.nitCliente) ? this.navParams.data.nitCliente : this.navParams.data.newClient.codCliente;
     this._error = this.navParams.data.error;

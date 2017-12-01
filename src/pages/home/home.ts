@@ -54,6 +54,7 @@ export class HomePage {
     this.prodsService.initDB()
     .then( info => {
       console.warn('Prods- First Replication complete');
+      this.util.showToast("Se descargaron los productos con exito.");
     }).catch( err => {
       console.error("Prods-totally unhandled error (shouldn't happen)", err);
       Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {

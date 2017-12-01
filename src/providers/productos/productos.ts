@@ -9,8 +9,8 @@ import { Storage } from '@ionic/storage';
 import Raven from "raven-js";
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
-import PouchUpsert from 'pouchdb-upsert';
-import PouchLoad from 'pouchdb-load';
+//import PouchUpsert from 'pouchdb-upsert';
+//import PouchLoad from 'pouchdb-load';
 
 //import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
 //Providers
@@ -30,6 +30,8 @@ export class ProductosProvider {
   private _prods: Producto[] = [];
   private _categorias: Categoria[] = [];
   private _prodsByCat: Producto[] = [];
+  private replicationWorker: Worker;
+  public statusDB: boolean = false;
 
   /* parametros usados por couchdb para la paginacion de los productos */
   /* mas info: https://pouchdb.com/2014/04/14/pagination-strategies-with-pouchdb.html */
@@ -50,11 +52,13 @@ export class ProductosProvider {
     private appRef: ApplicationRef, // lo uso para actualizar la UI cuando se hace un cambio fiera de la ngZone
     private util: Config,
     private storage: Storage
-  ) {}
+  ) {
+    this.replicationWorker = new Worker('./assets/js/pouch_replication_worker/dist/bundle.js');
+  }
 
   public initDB(): Promise<any>{
-    PouchDB.plugin(PouchUpsert);
-    PouchDB.plugin(PouchLoad);
+    //PouchDB.plugin(PouchUpsert);
+    //PouchDB.plugin(PouchLoad);
     //PouchDB.plugin(cordovaSqlitePlugin);
     return new Promise( (resolve, reject) => {
 
@@ -70,35 +74,61 @@ export class ProductosProvider {
         }
       });
 
-      this._db.replicate.from(this._remoteDB, { batch_size : 1000 })
-      .on('change', info => {
-
-        console.warn("Primera replicada change", info);
-        this.util.setLoadingText( `Cargando productos y sus cambios: ${info.docs_written.toString()}` );
-
-      })
-      .on("complete", info => {
-        /**
-         * Cuando la bd se termina de replicar y esta disponible local
-         * creo una bandera en el storage que me indica que ya esta lista
-         */
-        this.storage.set('prods-db-status', true).catch(err => reject(err));
-
-        //Si la primera replicacion se completa con exito sincronizo la db
-        //y de vuelvo la info sobre la sincronizacion
-        this.syncDB();
-        resolve(info);
-      })
-      .on("error", err => {
-        //Me preguntare a mi mismo en el futuro por que mierda pongo a sincronizar
-        //La base de datos si la primera sincronisacion falla, lo pongo aqui por q
-        //si el usuario cierra la app y la vuelve a iniciar, el evento de initdb
-        //se ejecutaria de nuevo y si por algun motivo no tiene internet entonces
-        // la replicacion nunca se va completar y la base de datos
-        //no se va a sincronizar, por eso lo lanzo de nuevo aqui el sync
-        this.syncDB();
-        reject(err);
+      this.replicationWorker.postMessage({
+        local: {
+          name: "productos_prod",
+          options: {revs_limit: 5, auto_compaction: true}
+        },
+        remote: {
+          name: Config.CDB_URL,
+          options : {
+            auth: {
+              username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
+              password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
+            },
+            ajax: {
+              timeout: 60000
+            }
+          }
+        }
       });
+
+      this.replicationWorker.onmessage = (event) => {
+        let d: { event: string, info: any} = event.data;
+        switch (d.event) {
+          case "change":
+            console.warn("Primera replicada change", d.info);
+            this.util.setLoadingText( `Cargando productos y sus cambios: ${d.info.docs_written.toString()}` );
+            break;
+
+          case "complete":
+            /**
+             * Cuando la bd se termina de replicar y esta disponible local
+             * creo una bandera en el storage que me indica que ya esta lista
+             */
+            this.storage.set('prods-db-status', true).catch(err => reject(err));
+            this.statusDB = true;
+            //Si la primera replicacion se completa con exito sincronizo la db
+            //y de vuelvo la info sobre la sincronizacion
+            this.syncDB();
+            resolve(d.info);
+            break;
+
+          case "error":
+            //Me preguntare a mi mismo en el futuro por que mierda pongo a sincronizar
+            //La base de datos si la primera sincronisacion falla, lo pongo aqui por q
+            //si el usuario cierra la app y la vuelve a iniciar, el evento de initdb
+            //se ejecutaria de nuevo y si por algun motivo no tiene internet entonces
+            // la replicacion nunca se va completar y la base de datos
+            //no se va a sincronizar, por eso lo lanzo de nuevo aqui el sync
+            this.syncDB();
+            reject(d.info);
+            break;
+
+          default:
+            break;
+        }
+      };
 
     })
 
@@ -237,7 +267,7 @@ export class ProductosProvider {
   private async allDocs(db, options): Promise<any> {
     let res = await db.allDocs(options);
     if(! await this.storage.get('prods-db-status') && !db._remote ){
-      throw new Error('No se encontraron docs');
+      throw new Error('No se ha completado la replicacion');
     }
     return res;
   }
@@ -247,9 +277,11 @@ export class ProductosProvider {
       include_docs : true,
       keys         : ids
     });
-    if (!res.rows.every(row => row.doc)) {
-      throw new Error('doc not found');
+    if(! await this.storage.get('prods-db-status') && !db._remote ){
+      debugger;
+      throw new Error('No se ha completado la replicacion');
     }
+    debugger;
     return res;
   }
 
@@ -260,7 +292,7 @@ export class ProductosProvider {
       reduce      : true
     });
     if(! await this.storage.get('prods-db-status') && !db._remote ){
-      throw new Error('No se encontraron docs');
+      throw new Error('No se ha completado la replicacion');
     }
     return res;
   }
@@ -273,7 +305,7 @@ export class ProductosProvider {
       include_docs : true
     })
     if(! await this.storage.get('prods-db-status') && !db._remote ){
-      throw new Error('No se encontraron docs');
+      throw new Error('No se ha completado la replicacion');
     }
     return res;
   }

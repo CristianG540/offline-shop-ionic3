@@ -1,3 +1,10 @@
+/**
+ * Aun no entiendo bien por que, pero mandar muchos console.log bloquean el dom
+ * asi se manden desde el worker, lo mismo pasa con los postMessage entonces hay q tener
+ * eso muy en cuenta
+ */
+console.log = function() {}
+
 import PouchDB from "pouchdb";
 
 class DbActions {
@@ -7,9 +14,14 @@ class DbActions {
   }
 
   replicate() {
-    this.localDB.replicate.from(this.remoteDB, { batch_size : 500 })
+    this.localDB.replicate.from(this.remoteDB, { batch_size : 50 })
     .on('change', info => {
-      self.postMessage({ event : "change", method: "replicate", info : info })
+      /**
+       * Esto lo comento por que el enviar muchos mensajes al hilo
+       * principal hace q se bloquee el dom entonces hay q tratat
+       * de enviar la menor cantidad posible de mensajes
+      */
+      //self.postMessage({ event : "change", method: "replicate", info : info })
     })
     .on("complete", info => {
       //Si la primera replicacion se completa con exito sincronizo la db

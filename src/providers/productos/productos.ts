@@ -114,10 +114,15 @@ export class ProductosProvider {
 
   private _replicateDB(d): void {
     switch (d.event) {
-      case "change":
+      /**
+       * Esto lo comento por que el enviar muchos mensajes al hilo
+       * principal hace q se bloquee el dom entonces hay q tratat
+       * de enviar la menor cantidad posible de mensajes
+      **/
+      /*case "change":
         console.warn("Primera replicada change", d.info);
         this.util.setLoadingText( `Cargando productos y sus cambios: ${d.info.docs_written.toString()}` );
-        break;
+        break;*/
       case "complete":
         /**
          * Cuando la bd se termina de replicar y esta disponible local
@@ -173,11 +178,11 @@ export class ProductosProvider {
   private async loadDB(db, filename, numFiles?): Promise<any> {
 
     if (await this.checkReplicated(db)) {
-      console.log(`${filename}: replication already done`);
+      console.log(filename+": replication already done");
       return;
     }
 
-    console.log(`${filename}: started replication`);
+    console.log(filename+": started replication");
 
     if (numFiles) {
       for (var i = 1; i <= numFiles; i++) {

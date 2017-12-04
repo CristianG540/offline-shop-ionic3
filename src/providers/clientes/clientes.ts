@@ -13,6 +13,7 @@ import { Config as cg } from "../config/config";
 
 //Models
 import { Cliente } from "./models/cliente";
+import { WorkerRes } from "../config/models/workerRes"
 
 @Injectable()
 export class ClientesProvider {
@@ -21,12 +22,31 @@ export class ClientesProvider {
   private _remoteDB: any;
   private _clientes: Cliente[] = [];
   public statusDB: boolean = false;
+  private replicationWorker: Worker;
 
   constructor(
     private util: cg,
     private authService: AuthProvider,
     private storage: Storage
   ) {
+    this.replicationWorker = new Worker('./assets/js/pouch_replication_worker/dist/bundle.js');
+    this.replicationWorker.onmessage = (event) => {
+      let d: WorkerRes = event.data;
+      switch (d.method) {
+        case "replicate":
+          this._replicateDB(d)
+          break;
+        case "sync":
+          console.error("Clientes- Error en sincronizacion 🐛", d.info);
+          Raven.captureException( new Error(`Clientes- Error en sincronizacion 🐛: ${JSON.stringify(d.info)}`) );
+          break;
+        case "changes":
+          this._reactToChanges(d);
+          break;
+        default:
+          break;
+      }
+    }
     PouchDB.plugin(require("pouchdb-quick-search"));
     PouchDB.plugin(pouchAdapterMem);
     if (!this._db) {
@@ -53,15 +73,32 @@ export class ClientesProvider {
        */
       this._dbLocal = new PouchDB("cliente",{revs_limit: 10, auto_compaction: true});
 
-      /**
-       * The next technique results in fewer HTTP requests being used and better
-       * performance than just using db.sync on its own.
-       */
-      PouchDB.replicate(this._remoteDB, this._dbLocal)
-      .on('change', function (info) {
-        console.warn("Clientes-Primera replicada change", info);
-      })
-      .on("complete", info => {
+      this.replicationWorker.postMessage({
+        db: "clientes",
+        local: {
+          name: "cliente",
+          options: {revs_limit: 5, auto_compaction: true}
+        },
+        remote: {
+          name: cg.CDB_URL_CLIENTES,
+          options : {
+            auth: {
+              username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
+              password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
+            },
+            ajax: {
+              timeout: 60000
+            }
+          }
+        }
+      });
+
+    }
+  }
+
+  private _replicateDB(d): void {
+    switch (d.event) {
+      case "complete":
         /**
          * Cuando la bd se termina de replicar y esta disponible local
          * creo una bandera en el storage que me indica que ya esta lista
@@ -70,15 +107,26 @@ export class ClientesProvider {
           Raven.captureException( new Error(`Clientes- Error al guardar la bandera del estado de la bd😫: ${JSON.stringify(err)}`), { extra: err } );
         });
         this.statusDB = true;
-        console.warn("Clientes-Primera replicada complete", info);
+        console.warn("Clientes-Primera replicada completa", d.info);
         this.syncDB();
-      })
-      .on("error", err => {
-        console.error("Clientes- first replication totally unhandled error (shouldn't happen)", err);
-        Raven.captureException( new Error(`Clientes - Primera replica error que no deberia pasar 😫: ${JSON.stringify(err)}`), { extra: err } );
+        break;
+      case "error":
+        console.error("Clientes- first replication totally unhandled error (shouldn't happen)", d.info);
+        Raven.captureException( new Error(`Clientes - Primera replica error que no deberia pasar 😫: ${JSON.stringify(d.info)}`), { extra: d.info } );
+        /**
+         * si algun error se presenta recargo la aplicacion,
+         * a menos que sea un error de conexion por falta de datos o de conexion
+         * en ese caso no la recargo por q entra en un loop infinito cuando el celular
+         * no tiene conexion
+         */
+        if(_.has(d.info, 'message') && d.info.message != "getCheckpoint rejected with " ){
+          window.location.reload();
+        }
         this.syncDB();
-      });
+        break;
 
+      default:
+        break;
     }
   }
 
@@ -106,34 +154,6 @@ export class ClientesProvider {
     .on("error", err => {
       console.error("Clientes*inMemory - totally unhandled error (shouldn't happen)", err);
       Raven.captureException( new Error(`Clientes*inMemory - Error que no deberia pasar 😫: ${JSON.stringify(err)}`), {
-        extra: err
-      } );
-    });
-
-    // Sincronizo los datos de la BD remota con la local, cualquier cambio
-    // en la base de datos remota afecta la local y viceversa
-    this._dbLocal.sync(this._remoteDB, replicationOptions)
-    .on("paused", function(info) {
-      console.log(
-        "Client-replication was paused,usually because of a lost connection",
-        info
-      );
-    })
-    .on("active", function(info) {
-      console.log("Client-replication was resumed", info);
-    })
-    .on("denied", function(err) {
-      console.error(
-        "Client-a document failed to replicate (e.g. due to permissions)",
-        err
-      );
-      Raven.captureException( new Error(`ClientesBD - No se pudo replicar debido a permisos 👮: ${JSON.stringify(err)}`), {
-        extra: err
-      } );
-    })
-    .on("error", function(err) {
-      console.error("Client-totally unhandled error (shouldn't happen)", err);
-      Raven.captureException( new Error(`ClientesBD - Error que no deberia pasar 😫: ${JSON.stringify(err)}`), {
         extra: err
       } );
     });
@@ -177,8 +197,6 @@ export class ClientesProvider {
     .catch(console.log.bind(console));
   }
 
-  /** *************** Manejo de el estado de la ui    ********************** */
-
   public fetchAndRenderAllDocs(): Promise<any> {
 
     return this._db.allDocs({
@@ -201,36 +219,37 @@ export class ClientesProvider {
       });
   }
 
-  private _reactToChanges(): void {
-    this._db
-      .changes({
-        live: true,
-        since: "now",
-        include_docs: true
-      })
-      .on("change", change => {
-        if (change.deleted) {
-          // change.id holds the deleted id
-          this._onDeleted(change.id);
-        } else {
-          // updated/inserted
-          // change.doc holds the new doc
-          this._onUpdatedOrInserted(
-            new Cliente(
-              change.doc._id,
-              change.doc.asesor,
-              change.doc.asesor_nombre,
-              change.doc.ciudad,
-              change.doc.direccion,
-              change.doc.nombre_cliente,
-              change.doc.transportadora,
-              change.doc._rev
-            )
-          );
-        }
-        console.log("clientes change", this._clientes);
-      })
-      .on("error", console.log.bind(console));
+  /** *************** Manejo de el estado de la ui    ********************** */
+
+  private _reactToChanges(d: WorkerRes): void {
+    switch (d.event) {
+      case "deleted":
+        // change.id holds the deleted id
+        this._onDeleted(d.info.doc._id);
+        break;
+      case "upsert":
+        // updated/inserted
+        // change.doc holds the new doc
+        this._onUpdatedOrInserted(
+          new Cliente(
+            d.info.doc._id,
+            d.info.doc.asesor,
+            d.info.doc.asesor_nombre,
+            d.info.doc.ciudad,
+            d.info.doc.direccion,
+            d.info.doc.nombre_cliente,
+            d.info.doc.transportadora,
+            d.info.doc._rev
+          )
+        );
+        break;
+      case "error":
+        console.error("Clientes- Error react to changes 🐛", d.info);
+        Raven.captureException( new Error(`Clientes- Error react to changes 🐛: ${JSON.stringify(d.info)}`) );
+        break;
+      default:
+        break;
+    }
   }
 
   private _onDeleted(id: string): void {

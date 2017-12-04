@@ -81,6 +81,12 @@ class Producto extends DbActions{
   }
 }
 
+class Cliente extends DbActions{
+  constructor(localDB, remoteDB){
+    super(localDB, remoteDB);
+  }
+}
+
 self.onmessage = e => {
   //debugger;
   let d = e.data;
@@ -91,6 +97,11 @@ self.onmessage = e => {
     case "productos":
       let productos = new Producto(localDB, remoteDB);
       productos.replicate();
+      break;
+
+    case "clientes":
+      let clientes = new Cliente(localDB, remoteDB);
+      clientes.replicate();
       break;
 
     default:

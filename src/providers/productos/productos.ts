@@ -276,10 +276,10 @@ export class ProductosProvider {
       keys         : ids
     });
     if(! await this.storage.get('prods-db-status') && !db._remote ){
-      debugger;
+
       throw new Error('No se ha completado la replicacion');
     }
-    debugger;
+
     return res;
   }
 
@@ -542,43 +542,44 @@ export class ProductosProvider {
    * @param {string} query
    * @memberof ProductosProvider
    */
-  public searchAutocomplete(query: string): Promise<any> {
+  public async searchAutocomplete(query: string): Promise<any> {
     /**
      * Para mas informacion sobre este plugin la pagina principal:
      * https://github.com/pouchdb-community/pouchdb-quick-search
      */
     query = (query) ? query.toUpperCase() : "";
-    return this._db.allDocs({
-      include_docs : true,
-      startkey     : query,
-      endkey       : query+"\uffff",
-      limit        : 30
-    }).then(res => {
 
-      if (res && res.rows.length > 0) {
-        return _.map(res.rows, (v: any) => {
-          let precio: number = 0;
-          if(_.has(v.doc, 'precio')){
-            precio = v.doc.precio;
-            return new Producto(
-              v.doc._id,
-              v.doc.titulo,
-              v.doc.aplicacion,
-              v.doc.imagen,
-              v.doc.categoria,
-              v.doc.marcas,
-              v.doc.unidad,
-              parseInt(v.doc.existencias),
-              precio,
-              v.doc._rev
-            );
-          }
-        }) ;
-      }else{
-        return [];
-      }
-
+    let res = await await this.doLocalFirst(db => {
+      return this.allDocs(db, {
+        include_docs : true,
+        startkey     : query,
+        endkey       : query+"\uffff",
+        limit        : 30
+      })
     });
+
+    if (res && res.rows.length > 0) {
+      return _.map(res.rows, (v: any) => {
+        let precio: number = 0;
+        if(_.has(v.doc, 'precio')){
+          precio = v.doc.precio;
+          return new Producto(
+            v.doc._id,
+            v.doc.titulo,
+            v.doc.aplicacion,
+            v.doc.imagen,
+            v.doc.categoria,
+            v.doc.marcas,
+            v.doc.unidad,
+            parseInt(v.doc.existencias),
+            precio,
+            v.doc._rev
+          );
+        }
+      }) ;
+    }else{
+      return [];
+    }
 
   }
 

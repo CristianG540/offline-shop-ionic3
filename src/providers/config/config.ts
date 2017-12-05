@@ -55,8 +55,10 @@ export class Config {
   // Url base de la BD de los Clientes en couch
   static readonly CDB_URL_CLIENTES: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/clientes';
 
-  static readonly CDB_LOAD_PROXY: string = `https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix:42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e@3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/productos_prod`;
+  static readonly CDB_USER: string = "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix";
+  static readonly CDB_PASS: string = "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e";
 
+  static readonly CDB_LOAD_PROXY: string = `https://${Config.CDB_USER}:${Config.CDB_PASS}@3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/productos_prod`;
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http
   //el header de autotizacion creoq se puede hacer de una forma mejor
   static CDB_OPTIONS(): RequestOptions{

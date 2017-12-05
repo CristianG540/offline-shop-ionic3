@@ -44,9 +44,10 @@ export class AutocompletePage {
         loading.dismiss();
         console.log("Resultados busqueda clientes",res)
         this.autocompleteItems = _.map(res.rows, (row: any) => {
+          let name: string = _.has(row, 'highlighting') ? row.highlighting.nombre_cliente : row.doc.nombre_cliente;
           return {
             nit  : row.doc._id,
-            name : row.highlighting.nombre_cliente.toLowerCase() + ' - '+row.doc._id,
+            name : name.toLowerCase() + ' - '+ row.doc._id,
             transp : row.doc.transportadora
           }
         });

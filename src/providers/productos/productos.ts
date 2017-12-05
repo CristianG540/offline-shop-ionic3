@@ -54,9 +54,26 @@ export class ProductosProvider {
     private util: Config,
     private storage: Storage
   ) {
+    /**
+     * Creo un nuevo worker desde el bundle que hago con webpack en los assets
+     * este worker se encarga de todo lo que este relacionado con la replicacion
+     * y la sincroniazion de las bd mediante pouchdb
+     */
     this.replicationWorker = new Worker('./assets/js/pouch_replication_worker/dist/bundle.js');
+
+    /**
+     * bueno esto es parecido a un observable, lo que hace es recibir una funcion
+     * que se ejecuta cada vez que llegue un mensaje desde el worker
+     */
     this.replicationWorker.onmessage = (event) => {
+      //saco los datos que vienen en el evento
       let d: WorkerRes = event.data;
+
+      /**
+       * con este switch verifico que clase de mensaje envie desde el
+       * worker, y asi realizo la accion indicada, que se peude hacer mejor
+       * yo creo q si, si sabe como hagalo usted
+       */
       switch (d.method) {
         case "replicate":
           this._replicateDB(d)
@@ -71,7 +88,9 @@ export class ProductosProvider {
         default:
           break;
       }
+
     }
+
   }
 
   public initDB(): void {
@@ -90,6 +109,12 @@ export class ProductosProvider {
       }
     });
 
+    /**
+     * postMessage se encarga de enviar un mensaje al worker
+     * yo aqui lo uso para enviarle los datos de la bd de la que quiero q se
+     * encargue, le mando los datos de la bd local y de la remota para q se encargue
+     * de la replicacion y la sincronizacion
+     */
     this.replicationWorker.postMessage({
       db: "productos",
       local: {
@@ -100,8 +125,8 @@ export class ProductosProvider {
         name: Config.CDB_URL,
         options : {
           auth: {
-            username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
-            password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
+            username: Config.CDB_USER,
+            password: Config.CDB_PASS
           },
           ajax: {
             timeout: 60000
@@ -269,6 +294,12 @@ export class ProductosProvider {
 
   private async allDocs(db, options): Promise<any> {
     let res = await db.allDocs(options);
+    /**
+     * si la base de datos aun no se ha replicado y si la bd
+     * a la que se le esta haciendo la consulta es la local
+     * entonces lanzo un error para que el metodo doLocalFirst
+     * intente de nuevo la consulta pero con la bd remota
+     */
     if(! await this.storage.get('prods-db-status') && !db._remote ){
       throw new Error('No se ha completado la replicacion');
     }

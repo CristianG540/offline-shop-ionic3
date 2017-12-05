@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
+import { HttpModule } from '@angular/http';// angular <4
+import {HttpClientModule} from '@angular/common/http'; // angular >5
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -34,6 +35,7 @@ import { PushNotificationProvider } from '../providers/push-notification/push-no
   imports: [
     BrowserModule,
     HttpModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     IonicModule.forRoot(MyApp),
     IonicStorageModule.forRoot({

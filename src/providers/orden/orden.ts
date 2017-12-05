@@ -228,7 +228,9 @@ export class OrdenProvider {
           console.warn("RESPUESTA DE LAS ORDENES ", responses);
         })
         .catch(err=>{
-          this.util.errorHandler(err.message, err);
+          if(err.message != "No hay conexión, su pedido quedara almacenado en el dispositivo."){
+            this.util.errorHandler(err.message, err);
+          }
         })
 
       }

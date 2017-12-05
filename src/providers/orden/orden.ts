@@ -233,7 +233,7 @@ export class OrdenProvider {
 
       }
 
-    }, 40000 );
+    }, 60000 );
   }
 
   /** *************** Manejo de el estado de la ui    ********************** */

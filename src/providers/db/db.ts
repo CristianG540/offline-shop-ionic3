@@ -24,7 +24,11 @@ export class DbProvider {
   public init(urlDB: string): Promise<any> {
     return new Promise( (resolve, reject) => {
       this._db = new PouchDB('db_averno');
-      this._remoteDB = new PouchDB(urlDB);
+      this._remoteDB = new PouchDB(urlDB, {
+        ajax: {
+          timeout: 60000
+        }
+      });
 
       this._replication = PouchDB.replicate(this._db, this._remoteDB, { batch_size : 500 })
       .on('change', function (info) {

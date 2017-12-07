@@ -3,7 +3,7 @@
  * asi se manden desde el worker, lo mismo pasa con los postMessage entonces hay q tener
  * eso muy en cuenta
  */
-console.log = function() {}
+//console.log = function() {}
 
 import PouchDB from "pouchdb";
 

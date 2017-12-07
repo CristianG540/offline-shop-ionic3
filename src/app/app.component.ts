@@ -9,6 +9,7 @@ import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { Network } from '@ionic-native/network';
 import { Keyboard } from '@ionic-native/keyboard';
+import { BackgroundMode } from '@ionic-native/background-mode';
 import _ from "lodash";
 import Raven from "raven-js";
 
@@ -55,7 +56,8 @@ export class MyApp {
     private cartServ: CarritoProvider,
     private prodServ: ProductosProvider,
     private util: Config,
-    private pushNotification: PushNotificationProvider
+    private pushNotification: PushNotificationProvider,
+    private backgroundMode: BackgroundMode
   ) {
 
     if( this.authService.isLogged ){
@@ -109,6 +111,7 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
+      this.backgroundMode.enable();
 
       // watch network for a disconnect
       let disconnectSubscription = this.network.onDisconnect().subscribe(() => {

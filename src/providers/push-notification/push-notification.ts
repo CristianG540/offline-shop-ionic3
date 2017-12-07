@@ -10,7 +10,6 @@ export class PushNotificationProvider {
     private platform: Platform,
     private oneSignal: OneSignal
   ) {
-    console.log('Hello PushNotificationProvider Provider');
   }
 
   init () : void {

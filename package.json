@@ -21,6 +21,7 @@
         "@angular/http": "^5.0.1",
         "@angular/platform-browser": "^5.0.1",
         "@angular/platform-browser-dynamic": "^5.0.1",
+        "@ionic-native/background-mode": "^4.4.2",
         "@ionic-native/core": "4.3.0",
         "@ionic-native/keyboard": "^4.3.2",
         "@ionic-native/network": "^4.3.1",
@@ -36,6 +37,7 @@
         "@types/pouchdb-upsert": "^2.2.1",
         "cordova-android": "^6.2.3",
         "cordova-browser": "^4.1.0",
+        "cordova-plugin-background-mode": "^0.7.2",
         "cordova-plugin-console": "^1.0.5",
         "cordova-plugin-device": "^1.1.4",
         "cordova-plugin-ionic-webview": "^1.1.11",
@@ -82,7 +84,8 @@
             "cordova-plugin-network-information": {},
             "cordova-plugin-ionic-webview": {},
             "cordova-sqlite-storage": {},
-            "onesignal-cordova-plugin": {}
+            "onesignal-cordova-plugin": {},
+            "cordova-plugin-background-mode": {}
         },
         "platforms": [
             "android",

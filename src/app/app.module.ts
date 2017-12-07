@@ -9,6 +9,7 @@ import { IonicStorageModule } from '@ionic/storage';
 import { Network } from '@ionic-native/network';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { OneSignal } from '@ionic-native/onesignal';
+import { BackgroundMode } from '@ionic-native/background-mode';
 
 //Pagaes without lazy loading
 import { HomePage } from '../pages/home/home';
@@ -63,7 +64,8 @@ import { PushNotificationProvider } from '../providers/push-notification/push-no
     AuthProvider,
     DbProvider,
     OneSignal,
-    PushNotificationProvider
+    PushNotificationProvider,
+    BackgroundMode
   ]
 })
 export class AppModule {}

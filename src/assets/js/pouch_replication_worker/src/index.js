@@ -3,7 +3,24 @@
  * asi se manden desde el worker, lo mismo pasa con los postMessage entonces hay q tener
  * eso muy en cuenta
  */
-//console.log = function() {}
+// Avoid `console` errors in browsers that lack a console.
+(function () {
+  var method;
+  var noop = function noop() { };
+  var methods = [
+  'assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error',
+  'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log',
+  'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd',
+  'timeStamp', 'trace', 'warn'
+  ];
+  var length = methods.length;
+  var console = (self.console = self.console || {});
+
+  while (length--) {
+      method = methods[length];
+      console[method] = noop;
+  }
+}());
 
 import PouchDB from "pouchdb";
 

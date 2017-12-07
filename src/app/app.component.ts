@@ -8,7 +8,6 @@ import {
 import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { Network } from '@ionic-native/network';
-import { Keyboard } from '@ionic-native/keyboard';
 import { BackgroundMode } from '@ionic-native/background-mode';
 import _ from "lodash";
 import Raven from "raven-js";
@@ -27,8 +26,7 @@ import { PushNotificationProvider } from "../providers/push-notification/push-no
 import { LoginPage } from "../pages/login/login";
 
 @Component({
-  templateUrl: "app.html",
-  providers: [Keyboard]
+  templateUrl: "app.html"
 })
 export class MyApp {
   private appVer: string = Config.APP_VER;
@@ -46,7 +44,6 @@ export class MyApp {
     statusBar: StatusBar,
     splashScreen: SplashScreen,
     private network: Network,
-    private keyboard: Keyboard,
     private alertCtrl: AlertController,
     private menuCrl: MenuController,
     private clienteServ: ClientesProvider,
@@ -111,7 +108,6 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
-      this.backgroundMode.enable();
 
       // watch network for a disconnect
       let disconnectSubscription = this.network.onDisconnect().subscribe(() => {
@@ -123,9 +119,10 @@ export class MyApp {
         this.util.onlineOffline = true;
       });
 
-      keyboard.hideKeyboardAccessoryBar(false);
-
       this.pushNotification.init();
+
+      this.backgroundMode.enable();
+      this.backgroundMode.overrideBackButton();
 
     });
   }

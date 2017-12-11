@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import { AlertController } from 'ionic-angular';
 import superlogin from 'superlogin-client';
 import { Http, RequestOptions, Response, URLSearchParams } from '@angular/http';
 import { Storage } from '@ionic/storage';
 import _ from 'lodash';
+import Raven from "raven-js";
 
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
@@ -36,10 +38,13 @@ export class AuthProvider {
     timeout: 0
   };
 
+
   constructor(
     private storage: Storage,
+    private alertCtrl: AlertController,
     public dbServ: DbProvider,
-    private http: Http
+    private http: Http,
+    private util: Config
   ) {
     superlogin.configure(this.config);
   }
@@ -51,7 +56,47 @@ export class AuthProvider {
   }
 
   public logout(): Promise<any>{
-    return superlogin.logout();
+    let loading = this.util.showLoading();
+
+    return new Promise((resolve, reject)=>{
+      this.isOnline()
+        .then(res=>{
+
+          if( _.has(res, 'status') && res.status == 'ok' ){
+            return superlogin.logout();
+          }else{
+            throw "El api de autenticacion no esta disponible";
+          }
+        })
+        .then( () => {
+          this.removeTokenJosefa().catch(err=>{
+            console.error('error al eliminar el token de josefa',err);
+            Raven.captureException( new Error(`error al eliminar el token de josefa: ${JSON.stringify(err)}`), {
+              extra: err
+            } );
+          })
+          Raven.setUserContext();
+          loading.dismiss();
+          resolve();
+        })
+        .catch(err=>{
+
+          loading.dismiss();
+          console.error('error en el logout',err);
+          Raven.captureException( new Error(`error en el logout: ${JSON.stringify(err)}`), {
+            extra: err
+          } );
+          //if(err.ok == false || err.message == "Network Error"){
+            this.alertCtrl.create({
+              title: "Ocurrio un error.",
+              message: "Debe estar conectado a la red para desconectarse.",
+              buttons: ['Ok']
+            }).present();
+          //}
+          reject();
+        })
+
+    })
   }
 
   public register( registerData ): Promise<any>{

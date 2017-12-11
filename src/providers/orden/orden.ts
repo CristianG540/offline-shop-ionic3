@@ -23,7 +23,6 @@ import { DbProvider } from "../db/db";
 import { Orden } from './models/orden';
 import { CarItem } from "../carrito/models/carItem";
 import { AuthProvider } from "../auth/auth";
-import { Node } from "@angular/compiler";
 
 @Injectable()
 export class OrdenProvider {
@@ -88,9 +87,10 @@ export class OrdenProvider {
   }
 
   public destroyDB(): void{
-    this.dbServ.destroyDB().then( () => this._ordenes = [] );
+    this.dbServ.destroyDB()
+    .then( () => this._ordenes = [] )
+    .catch( err => this.util.errorHandler( JSON.stringify(err), err ) );
   }
-
 
   public sendOrdersSap(): Promise<any> {
 

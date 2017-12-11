@@ -30,7 +30,7 @@ export class DbProvider {
         }
       });
 
-      this._replication = PouchDB.replicate(this._db, this._remoteDB, { batch_size : 500 })
+      this._replication = PouchDB.replicate(this._remoteDB, this._db, { batch_size : 500 })
       .on('change', function (info) {
         console.warn("Orders-Primera replicada change", info);
       })
@@ -54,17 +54,18 @@ export class DbProvider {
       retry: true
     };
 
-    this._sync = this._db.sync(this._remoteDB, replicationOptions)
+
+    this._sync = PouchDB.sync(this._remoteDB, this._db, replicationOptions)
     .on('paused', function (info) {
       console.log("db_averno-replication was paused,usually because of a lost connection", info);
-    }).on('active', function (info) {
-      console.log("db_averno-replication was resumed", info);
+    }).on('active', function () {
+      console.log("db_averno-replication was resumed");
     }).on('denied', function (err) {
       console.error("db_averno-a document failed to replicate (e.g. due to permissions)", err);
       Raven.captureException( new Error(`db_averno - No se pudo replicar la BD con las ordenes debido a permisos 👮: ${JSON.stringify(err)}`), {
         extra: err
       } );
-    }).on('error', (err) => {
+    }).on('error', (err: any) => {
       console.error("db_averno-totally unhandled error (shouldn't happen)", err);
 
       if(_.has(err, 'error')){

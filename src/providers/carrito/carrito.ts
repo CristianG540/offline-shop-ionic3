@@ -226,7 +226,7 @@ export class CarritoProvider {
         return this.initDB();
       }
     })
-    .catch(console.log.bind(console));
+    .catch( err => this.util.errorHandler(JSON.stringify(err), err) );
   }
 
   ///////////////////////// GETTERS and SETTERS ////////////////////

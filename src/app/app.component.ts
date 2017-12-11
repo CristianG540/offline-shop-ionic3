@@ -119,7 +119,7 @@ export class MyApp {
         this.util.onlineOffline = true;
       });
 
-      this.pushNotification.init();
+      this.pushNotification.init(this.content);
 
       this.backgroundMode.enable();
       this.backgroundMode.overrideBackButton();
@@ -142,49 +142,14 @@ export class MyApp {
 
   private logout(): void {
 
-    let loading = this.util.showLoading();
+    this.authService.logout().then(()=>{
+      this.cargarPagina(LoginPage);
+      // Paro el timer que verifica las ordenes
+      clearInterval(this.ordenServ.intervalValOrders);
+      this.ordenServ.destroyDB();
+      this.cartServ.destroyDB();
+    })
 
-    this.authService.isOnline()
-      .then(res=>{
-
-        if( _.has(res, 'status') && res.status == 'ok' ){
-          return this.authService.logout()
-        }else{
-          throw "El api de autenticacion no esta disponible";
-        }
-      })
-      .then( () => {
-
-        this.authService.removeTokenJosefa()
-          .catch(err=>{
-            console.error('error al eliminar el token de josefa',err);
-            Raven.captureException( new Error(`error al eliminar el token de josefa: ${JSON.stringify(err)}`), {
-              extra: err
-            } );
-          })
-        this.ordenServ.destroyDB();
-        this.cartServ.destroyDB();
-        this.cargarPagina(LoginPage);
-        Raven.setUserContext();
-        // Paro el timer que verifica las ordenes
-        clearInterval(this.ordenServ.intervalValOrders);
-        loading.dismiss();
-      })
-      .catch(err=>{
-
-        loading.dismiss();
-        console.error('error en el logout',err);
-        Raven.captureException( new Error(`error en el logout: ${JSON.stringify(err)}`), {
-          extra: err
-        } );
-        //if(err.ok == false || err.message == "Network Error"){
-          this.alertCtrl.create({
-            title: "Ocurrio un error.",
-            message: "Debe estar conectado a la red para desconectarse.",
-            buttons: ['Ok']
-          }).present();
-        //}
-      })
   }
 
   private verificarOrdenes(): void {

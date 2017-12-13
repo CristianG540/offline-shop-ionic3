@@ -98,16 +98,17 @@ export class ProductosProvider {
     //PouchDB.plugin(PouchLoad);
     //PouchDB.plugin(cordovaSqlitePlugin);
     //this._db = new PouchDB("productos.db", {adapter: 'cordova-sqlite'});
-    this._db = new PouchDB("productos_prod", {revs_limit: 5, auto_compaction: true});
-    this._remoteDB = new PouchDB(Config.CDB_URL, {
+    const replication_opt = {
       auth: {
-        username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
-        password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
+        username: Config.CDB_USER,
+        password: Config.CDB_PASS
       },
       ajax: {
         timeout: 60000
       }
-    });
+    };
+    this._db = new PouchDB("productos_prod", {revs_limit: 5, auto_compaction: true});
+    this._remoteDB = new PouchDB(Config.CDB_URL, replication_opt);
 
     /**
      * postMessage se encarga de enviar un mensaje al worker
@@ -123,15 +124,7 @@ export class ProductosProvider {
       },
       remote: {
         name: Config.CDB_URL,
-        options : {
-          auth: {
-            username: Config.CDB_USER,
-            password: Config.CDB_PASS
-          },
-          ajax: {
-            timeout: 60000
-          }
-        }
+        options : replication_opt
       }
     });
 

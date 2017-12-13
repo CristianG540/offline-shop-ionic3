@@ -3,6 +3,7 @@ import { Events, AlertController } from 'ionic-angular';
 
 // libs terceros
 import PouchDB from 'pouchdb';
+import PouchUpsert from 'pouchdb-upsert';
 import Raven from 'raven-js';
 import _ from 'lodash';
 
@@ -23,6 +24,7 @@ export class DbProvider {
 
   public init(urlDB: string): Promise<any> {
     return new Promise( (resolve, reject) => {
+      PouchDB.plugin(PouchUpsert);
       this._db = new PouchDB('db_averno');
       this._remoteDB = new PouchDB(urlDB, {
         ajax: {

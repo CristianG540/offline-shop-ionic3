@@ -12,7 +12,6 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/of';
 
 /* Librerias de terceros */
-import PouchDB from 'pouchdb';
 import _ from 'lodash';
 import * as moment from 'moment';
 
@@ -83,7 +82,16 @@ export class OrdenProvider {
   }
 
   public pushItem(orden: Orden) : Promise<any>{
-    return this._db.put(orden);
+
+    return this._db.upsert(orden._id, (oldOrden: Orden) => {
+      orden.updated_at = Date.now().toString();
+      return orden;
+    });
+
+  }
+
+  private checkSameError(orden: Orden, oldOrden: Orden): boolean {
+    return false;
   }
 
   public destroyDB(): void{
@@ -190,13 +198,13 @@ export class OrdenProvider {
                   localdbRes : res
                 })
               }).catch(err => {
-
+                //si falla el promise.all
                 reject(err)
               })
 
             },
             err => {
-
+              //Si falla el observable forkjoin
               reject(err)
             }
           )

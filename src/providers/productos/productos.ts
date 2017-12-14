@@ -161,7 +161,13 @@ export class ProductosProvider {
          * en ese caso no la recargo por q entra en un loop infinito cuando el celular
          * no tiene conexion
          */
-        if(_.has(d.info, 'message') && d.info.message != "getCheckpoint rejected with " ){
+        let error;
+        try {
+          error = d.info.message;
+        } catch (e) {
+          error = "";
+        }
+        if(error != "getCheckpoint rejected with " ){
           window.location.reload();
         }
         break;

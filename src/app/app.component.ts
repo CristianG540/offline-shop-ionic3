@@ -122,7 +122,7 @@ export class MyApp {
       this.pushNotification.init(this.content);
 
       this.backgroundMode.enable();
-      this.backgroundMode.overrideBackButton();
+      //this.backgroundMode.overrideBackButton();
 
     });
   }

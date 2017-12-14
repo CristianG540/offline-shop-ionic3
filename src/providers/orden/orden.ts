@@ -84,13 +84,45 @@ export class OrdenProvider {
   public pushItem(orden: Orden) : Promise<any>{
 
     return this._db.upsert(orden._id, (oldOrden: Orden) => {
+      if( this.checkSameError(orden, oldOrden) ){
+        return false
+      }
       orden.updated_at = Date.now().toString();
       return orden;
     });
 
   }
 
+  /**
+   * Esta funcion se encarga de checkear si la orden que se quiere modificar
+   * tiene el mismo error de la anterior orden
+   *
+   * @private
+   * @param {Orden} orden
+   * @param {Orden} oldOrden
+   * @returns {boolean}
+   * @memberof OrdenProvider
+   */
   private checkSameError(orden: Orden, oldOrden: Orden): boolean {
+    if(orden.error && oldOrden.error){
+      let oldCodeError;
+      let codeError;
+      try {
+        oldCodeError = JSON.parse(oldOrden.error).soap_res.Code.Subcode.Value;
+        codeError = JSON.parse(orden.error).soap_res.Code.Subcode.Value;
+      } catch (e) {
+        oldCodeError = "";
+        codeError = "";
+      }
+
+      if( (oldCodeError && codeError) && oldCodeError == codeError ) {
+        return true;
+      }
+
+      return false;
+
+    }
+
     return false;
   }
 
@@ -193,17 +225,20 @@ export class OrdenProvider {
                   }
                 })
               ).then(res=>{
+
                 resolve({
                   apiRes     : responsesApi,
                   localdbRes : res
                 })
               }).catch(err => {
+
                 //si falla el promise.all
                 reject(err)
               })
 
             },
             err => {
+
               //Si falla el observable forkjoin
               reject(err)
             }

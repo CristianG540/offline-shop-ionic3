@@ -48,7 +48,10 @@ export class OrdenesPage {
     this._ordenes = this.ordenServ.ordenesDesc;
   }
 
-  public iconOrden(orden) : string {
+  public iconOrden(orden: Orden) : string {
+    if(orden.estado == "seen"){
+      return 'eye'
+    }
     if(orden.error){
       return 'warning'
     }

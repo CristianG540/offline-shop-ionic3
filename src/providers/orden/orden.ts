@@ -310,7 +310,8 @@ export class OrdenProvider {
    * @memberof OrdenProvider
    */
   public get ordenesPendientes() : Orden[] {
-    return JSON.parse( JSON.stringify( _.filter(this._ordenes, ['estado', false]) ) );
+    let ordenesPendientes: Orden[] = _.filter(this._ordenes, ['estado', false]);
+    return JSON.parse( JSON.stringify(ordenesPendientes) );
   }
 
 

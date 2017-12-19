@@ -146,7 +146,7 @@ export class ProductosProvider {
          * Cuando la bd se termina de replicar y esta disponible local
          * creo una bandera en el storage que me indica que ya esta lista
          */
-        this.storage.set('prods-db-status', true).catch(err => {
+        this.storage.set('prods-status', true).catch(err => {
           Raven.captureException( new Error(`Productos- Error al guardar la bandera estado de la bd😫: ${JSON.stringify(err)}`), { extra: err } );
         });
         this.statusDB = true;
@@ -299,7 +299,7 @@ export class ProductosProvider {
      * entonces lanzo un error para que el metodo doLocalFirst
      * intente de nuevo la consulta pero con la bd remota
      */
-    if(! await this.storage.get('prods-db-status') && !db._remote ){
+    if(! await this.storage.get('prods-status') && !db._remote ){
       throw new Error('No se ha completado la replicacion');
     }
     return res;
@@ -310,7 +310,7 @@ export class ProductosProvider {
       include_docs : true,
       keys         : ids
     });
-    if(! await this.storage.get('prods-db-status') && !db._remote ){
+    if(! await this.storage.get('prods-status') && !db._remote ){
 
       throw new Error('No se ha completado la replicacion');
     }
@@ -324,7 +324,7 @@ export class ProductosProvider {
       group       : true,
       reduce      : true
     });
-    if(! await this.storage.get('prods-db-status') && !db._remote ){
+    if(! await this.storage.get('prods-status') && !db._remote ){
       throw new Error('No se ha completado la replicacion');
     }
     return res;
@@ -337,7 +337,7 @@ export class ProductosProvider {
       limit        : this.cantProdsPag,
       include_docs : true
     })
-    if(! await this.storage.get('prods-db-status') && !db._remote ){
+    if(! await this.storage.get('prods-status') && !db._remote ){
       throw new Error('No se ha completado la replicacion');
     }
     return res;

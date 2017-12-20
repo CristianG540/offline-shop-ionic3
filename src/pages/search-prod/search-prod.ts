@@ -57,14 +57,22 @@ export class SearchProdPage {
         this.cartService.pushItem({
           _id: producto._id,
           cantidad: d.txtCantidad,
-          totalPrice: producto.precio * d.txtCantidad
+          totalPrice: producto.precio * d.txtCantidad,
+          titulo: producto.titulo
         }).then(res=>{
           loading.dismiss();
           this.util.showToast(`El producto ${res.id} se agrego correctamente`);
         }).catch(err=>{
+
           if(err=="duplicate"){
             loading.dismiss();
             this.util.showToast(`El producto ya esta en el carrito`);
+          }else if(err=="no_timsum_llantas"){
+            loading.dismiss();
+            this.util.showToast(`No puede agregar llantas timsum a este pedido`);
+          }else if(err=="timsum_llantas"){
+            loading.dismiss();
+            this.util.showToast(`Solo puede agregar llantas timsum a este pedido`);
           }else{
             this.util.errorHandler(err.message, err, loading);
           }

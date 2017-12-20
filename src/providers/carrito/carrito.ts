@@ -165,14 +165,20 @@ export class CarritoProvider {
     // que solo puede agregar llantas al carrito
     let flag: boolean = await this.checkFlag('_local/timsum_flag');
 
-    if(flag && item._id.substring(0,2) != "TY" && item.titulo.substring(0,6) != "LLANTA"){
-      return "timsum_llantas";
+    if(flag){
+      if(item._id.substring(0,2) == "TY"){
+        if (item.titulo.substring(0,6) != "LLANTA") {
+          return "timsum_llantas";
+        }
+      }else{
+        return "timsum_llantas";
+      }
     }
 
     // Verifica si la bandera para todo lo q no sean llantas timsum esta creada
     // y verifico que el producto que se esta ingresando sea una llanta timsum,
     // si es una llanta timsum entonces retorno un error que le indica al usuario
-    // que solo puede agregar llantas al pedido
+    // que solo puede agregar repuestos al pedido o cosas q no sean llantas timsum
     let flagNoLlantas: boolean = await this.checkFlag('_local/not_timsum_flag');
 
     if(flagNoLlantas && item._id.substring(0,2) == "TY" && item.titulo.substring(0,6) == "LLANTA"){

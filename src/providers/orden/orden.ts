@@ -95,7 +95,8 @@ export class OrdenProvider {
 
   /**
    * Esta funcion se encarga de checkear si la orden que se quiere modificar
-   * tiene el mismo error de la anterior orden
+   * tiene el mismo error de la anterior orden, evitando que se actualize
+   * infinitamete
    *
    * @private
    * @param {Orden} orden

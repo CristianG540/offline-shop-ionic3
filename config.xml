@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.igb.offlineshop" version="1.4.4" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.igb.offlineshop" version="1.4.5" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Tienda IGB</name>
     <description>Tienda con funcionalidades offline para IGB.</description>
     <author email="cristianneatproy@gmail.com" href="https://registry.jsonresume.org/a59637ee">CristianG540</author>
@@ -82,7 +82,7 @@
     <engine name="browser" spec="^4.1.0" />
     <plugin name="cordova-plugin-background-mode" spec="^0.7.2" />
     <plugin name="cordova-plugin-console" spec="^1.0.5" />
-    <plugin name="cordova-plugin-device" spec="^1.1.4" />
+    <plugin name="cordova-plugin-device" spec="^1.1.7" />
     <plugin name="cordova-plugin-ionic-webview" spec="^1.1.11" />
     <plugin name="cordova-plugin-network-information" spec="^1.3.3" />
     <plugin name="cordova-plugin-splashscreen" spec="^4.0.3" />

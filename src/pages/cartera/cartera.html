@@ -14,12 +14,39 @@
       <ion-item>
         <ion-label>NIT Cliente</ion-label>
         <ion-input formControlName="cliente" type="text"></ion-input>
-        <button medium ion-button item-right tappable (click)="onSubmit()">
+        <button medium ion-button item-right tappable [disabled]="!searchForm.valid" (click)="onSubmit()">
           <ion-icon name="search"></ion-icon>
         </button>
       </ion-item>
     </form>
   </ion-row>
 
+  <ion-grid *ngIf="loading">
+    <ion-row>
+      <ion-col text-center class="empty-categories">
+          <ion-icon name="sync" class="icon-5x"></ion-icon>
+          <br>
+          Cargando espere por favor...
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <br>
+  <div text-center>
+    <h3 *ngIf="carteraItems.length > 0">Saldo pendiente: {{ totalCliente | currency:'USD': 'symbol': '1.0-0' }}</h3>
+  </div>
+
+  <ion-card text-wrap *ngFor="let item of carteraItems">
+    <ion-card-header text-center>
+      <b>{{item._id}}</b>
+    </ion-card-header>
+
+    <ion-card-content>
+      <b>Saldo Factura:</b> {{ item.valor | currency:'USD': 'symbol': '1.0-0' }} <br>
+      <b>Total Factura:</b> {{ item.valor_total | currency:'USD': 'symbol': '1.0-0' }} <br>
+      <b>Fecha de Factura:</b> {{ item.fecha_emision }} <br>
+      <b>Fecha de Vencimiento:</b> {{ item.fecha_vencimiento }}
+    </ion-card-content>
+  </ion-card>
 
 </ion-content>

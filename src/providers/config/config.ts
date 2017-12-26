@@ -54,6 +54,8 @@ export class Config {
   static readonly CDB_URL: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/producto';
   // Url base de la BD de los Clientes en couch
   static readonly CDB_URL_CLIENTES: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/clientes';
+   // Url base de la BD de cartera en couch
+   static readonly CDB_URL_CARTERA: string = 'https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com:443/cartera';
 
   static readonly CDB_USER: string = "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix";
   static readonly CDB_PASS: string = "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e";

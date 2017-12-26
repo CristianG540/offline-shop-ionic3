@@ -26,6 +26,7 @@ export class ClientesProvider {
   private _dbLocal: any;
   private _remoteDB: any;
   private _clientes: Cliente[] = [];
+  //Esta variable se encarga de mostrar el estado de la bd en el menu
   public statusDB: boolean = false;
   private replicationWorker: Worker;
 
@@ -83,8 +84,8 @@ export class ClientesProvider {
       // Base de datos remota en couchdb
       this._remoteDB = new PouchDB(cg.CDB_URL_CLIENTES, {
         auth: {
-          username: "3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix",
-          password: "42d8545f6e5329d97b9c77fbe14f8e6579cefb7d737bdaa0bae8500f5d8d567e"
+          username: cg.CDB_USER,
+          password: cg.CDB_PASS
         }
       });
       /**

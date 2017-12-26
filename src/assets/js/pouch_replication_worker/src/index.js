@@ -97,6 +97,9 @@ class Producto extends DbActions {
 class Cliente extends DbActions {
 }
 
+class Cartera extends DbActions {
+}
+
 self.onmessage = e => {
   let d = e.data
   let localDB = new PouchDB(d.local.name, d.local.options)
@@ -111,6 +114,11 @@ self.onmessage = e => {
     case 'clientes':
       let clientes = new Cliente(localDB, remoteDB)
       clientes.replicate()
+      break
+
+    case 'cartera':
+      let cartera = new Cartera(localDB, remoteDB)
+      cartera.replicate()
       break
 
     default:

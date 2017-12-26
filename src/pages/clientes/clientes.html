@@ -1,0 +1,23 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Clientes</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+  <ion-list>
+    <button ion-item [navPush]="ordenesDetallePage">
+      <ion-icon name="search" item-start></ion-icon>
+      Buscar cliente
+    </button>
+    <button ion-item [navPush]="carteraPage">
+      <ion-icon name="sad" item-start></ion-icon>
+      Consultar cartera
+    </button>
+  </ion-list>
+
+</ion-content>

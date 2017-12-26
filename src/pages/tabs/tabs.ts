@@ -16,6 +16,7 @@ export class TabsPage {
   ordenes: any = 'OrdenesPage'
   carrito: any = 'CarritoPage'
   buscar: any = 'SearchProdPage'
+  clientes: any = 'ClientesPage'
 
   constructor(
     private cartService: CarritoProvider

@@ -36,7 +36,7 @@
         "@types/pouchdb-replication": "^6.1.4",
         "@types/pouchdb-upsert": "^2.2.2",
         "build": "^0.1.4",
-        "cordova-android": "^7.0.0",
+        "cordova-android": "^6.2.3",
         "cordova-browser": "^5.0.2",
         "cordova-plugin-background-mode": "^0.7.2",
         "cordova-plugin-console": "^1.1.0",

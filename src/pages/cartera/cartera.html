@@ -10,15 +10,17 @@
 <ion-content padding>
 
   <ion-row>
-    <form [formGroup]="searchForm" >
-      <ion-item>
-        <ion-label>NIT Cliente</ion-label>
-        <ion-input formControlName="cliente" type="text"></ion-input>
-        <button medium ion-button item-right tappable [disabled]="!searchForm.valid" (click)="onSubmit()">
-          <ion-icon name="search"></ion-icon>
-        </button>
-      </ion-item>
-    </form>
+    <ion-col>
+      <form [formGroup]="searchForm" >
+          <ion-item>
+            <ion-label>NIT Cliente</ion-label>
+            <ion-input formControlName="cliente" type="text"></ion-input>
+            <button medium ion-button item-right tappable [disabled]="!searchForm.valid" (click)="onSubmit()">
+              <ion-icon name="search"></ion-icon>
+            </button>
+          </ion-item>
+        </form>
+    </ion-col>
   </ion-row>
 
   <ion-grid *ngIf="loading">

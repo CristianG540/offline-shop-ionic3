@@ -3,7 +3,7 @@ import { Storage } from '@ionic/storage';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Response } from '@angular/http/src/static_response';
 import { Observable } from 'rxjs/Observable';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, timeout } from 'rxjs/operators';
 import 'rxjs/add/operator/toPromise';
 
 // lib terceros
@@ -69,7 +69,11 @@ export class CarteraProvider {
           break;
 
         case "changes":
-         // this._reactToChanges(d);
+          /**
+           * en este modulo de cartera no es necesario estar pendiente de los cambios
+           * ya que no necesito cambiar nada en tiempo real ni cosas del estilo
+           */
+          // this._reactToChanges(d);
           break;
 
         default:
@@ -249,7 +253,8 @@ export class CarteraProvider {
       let res = await this.http.get( url, options ).pipe(
         map((res: Response) => {
           return res;
-        })
+        }),
+        timeout(5000)
       ).toPromise();
 
       return res;
@@ -260,7 +265,7 @@ export class CarteraProvider {
        * Para mas informacion sobre este plugin la pagina principal:
        * https://github.com/pouchdb-community/pouchdb-quick-search
        */
-      return this._db.search({
+      let res = await this._db.search({
         query: nitCliente,
         fields: ["cod_cliente"],
         filter: doc => {
@@ -269,6 +274,7 @@ export class CarteraProvider {
         include_docs: true
         //stale: 'update_after'
       });
+      return res;
     }
 
   }

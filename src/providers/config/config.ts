@@ -12,20 +12,12 @@ import Raven from "raven-js";
 
 @Injectable()
 export class Config {
+
   public loading: Loading;
   public onlineOffline: boolean = navigator.onLine;
-  constructor(
-    private alertCtrl: AlertController,
-    private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController,
-  ){
-    window.addEventListener('online', () => {
-      this.onlineOffline = true;
-    });
-    window.addEventListener('offline', () => {
-      this.onlineOffline = false;
-    });
-  }
+
+  private _countPush: number = 0;
+  private _eggsterFlag: boolean = false;
 
   static readonly APP_VER: string = "1.4.5";
   static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
@@ -45,9 +37,6 @@ export class Config {
     return options;
   }
   /* ************************* Fin Cosas de JOSEFA *****************************/
-
-
-
 
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD de los productos en couch
@@ -75,7 +64,6 @@ export class Config {
     return options;
   }
   /* ************************* Fin Cosas de CouchDB *****************************/
-
 
   // Esta es una version mas rapida del "_.find" de lodash :3
   // Gracias a https://pouchdb.com/2015/02/28/efficiently-managing-ui-state-in-pouchdb.html
@@ -114,6 +102,20 @@ export class Config {
       }
     }
   }
+
+  constructor(
+    private alertCtrl: AlertController,
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController,
+  ){
+    window.addEventListener('online', () => {
+      this.onlineOffline = true;
+    });
+    window.addEventListener('offline', () => {
+      this.onlineOffline = false;
+    });
+  }
+
   /**
    * Esta funcion me crea una alerta con un input para preguntarle al
    * usuario cuantas unidades del producto va a agregar al carrito
@@ -190,5 +192,20 @@ export class Config {
       closeButtonText: "cerrar"
     }).present();
   }
+
+  // Estos setter y getter son para la pendejadita del ester egg
+  public set countPush(v : number) {
+    this._countPush = v;
+  }
+  public get countPush() : number {
+    return this._countPush;
+  }
+  public set eggsterFlag(v : boolean) {
+    this._eggsterFlag = v;
+  }
+  public get eggsterFlag() : boolean {
+    return this._eggsterFlag;
+  }
+
 
 }

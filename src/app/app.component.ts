@@ -196,4 +196,20 @@ export class MyApp {
     window.location.reload();
   }
 
+  /**
+   * Se encarga de mostrar el eggster egg del kirby bailando :3
+   *
+   * @private
+   * @param {any} e
+   * @memberof MyApp
+   */
+  private pressToEgg(e){
+    this.util.countPush++;
+    console.log("Se presiono", this.util.countPush);
+    if(this.util.countPush == 4){
+      this.util.eggsterFlag = !this.util.eggsterFlag;
+      this.util.countPush = 0;
+    }
+  }
+
 }

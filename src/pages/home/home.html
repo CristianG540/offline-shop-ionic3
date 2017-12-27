@@ -13,7 +13,7 @@
 </ion-header>
 
 <ion-content>
-  <!--<img alt="" src="https://nolanlawson.github.io/database-comparison/kirby.gif">-->
+  <img alt="" src="https://nolanlawson.github.io/database-comparison/kirby.gif" *ngIf="util.eggsterFlag">
   <ion-grid>
     <ion-row no-padding>
       <ion-col col-6 no-padding *ngFor="let prod of prodsService.prods; trackBy: trackByProds">

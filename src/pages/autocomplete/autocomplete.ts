@@ -1,5 +1,5 @@
 import { Component, NgZone } from "@angular/core";
-import { IonicPage, ViewController } from 'ionic-angular';
+import { IonicPage, ViewController, NavParams, NavController } from 'ionic-angular';
 import _ from "lodash";
 
 import { ClientesProvider } from "../../providers/clientes/clientes";
@@ -12,9 +12,12 @@ import { Config } from "../../providers/config/config";
 })
 export class AutocompletePage {
   private autocompleteItems;
+  private clienteInfoPage = "ClienteInfoPage";
 
   constructor(
     public viewCtrl: ViewController,
+    private navParams: NavParams,
+    private navCtrl: NavController,
     private clienteServ: ClientesProvider,
     private util : Config,
     private zone: NgZone
@@ -27,7 +30,11 @@ export class AutocompletePage {
   }
 
   chooseItem(item: any) {
-    this.viewCtrl.dismiss(item);
+    if(this.navParams.get('type') == "page"){
+      this.navCtrl.push(this.clienteInfoPage, item.data);
+    }else{
+      this.viewCtrl.dismiss(item);
+    }
   }
 
   updateSearch(ev: any) {
@@ -46,9 +53,10 @@ export class AutocompletePage {
         this.autocompleteItems = _.map(res.rows, (row: any) => {
           let name: string = _.has(row, 'highlighting') ? row.highlighting.nombre_cliente : row.doc.nombre_cliente;
           return {
-            nit  : row.doc._id,
-            name : name.toLowerCase() + ' - '+ row.doc._id,
-            transp : row.doc.transportadora
+            nit    : row.doc._id,
+            name   : name.toLowerCase() + ' - '+ row.doc._id,
+            transp : row.doc.transportadora,
+            data   : row.doc
           }
         });
       })

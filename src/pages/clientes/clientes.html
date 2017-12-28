@@ -10,7 +10,7 @@
 <ion-content padding>
 
   <ion-list>
-    <button ion-item [navPush]="ordenesDetallePage">
+    <button ion-item [navPush]="searchClientPage" [navParams]="{type: 'page'}">
       <ion-icon name="search" item-start></ion-icon>
       Buscar cliente
     </button>

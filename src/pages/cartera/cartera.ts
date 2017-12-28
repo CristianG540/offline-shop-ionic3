@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
 import { FormGroup, FormArray, FormBuilder, Validators  } from "@angular/forms";
 
 //Libs terceros
@@ -27,6 +27,7 @@ export class CarteraPage {
   private loading: boolean = false;
 
   constructor(
+    public viewCtrl: ViewController,
     public navCtrl: NavController,
     public navParams: NavParams,
     private fb: FormBuilder,
@@ -39,9 +40,17 @@ export class CarteraPage {
   }
 
   private initializeForm(): void {
-    this.searchForm = this.fb.group({
-      cliente: ['', Validators.required]
-    });
+    if(this.navParams.get('_id')){
+      this.searchForm = this.fb.group({
+        cliente: [this.navParams.get('_id'), Validators.required]
+      });
+      this.onSubmit();
+    }else{
+      this.searchForm = this.fb.group({
+        cliente: ['', Validators.required]
+      });
+    }
+
   }
 
   private onSubmit(): void {
@@ -66,6 +75,10 @@ export class CarteraPage {
       })
     }
 
+  }
+
+  dismiss() {
+    this.viewCtrl.dismiss();
   }
 
 }

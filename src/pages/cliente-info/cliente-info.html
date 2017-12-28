@@ -1,0 +1,25 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Informaci&oacute;n Cliente</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+  <b>Nombre:</b> {{ cliente?.nombre_cliente }}
+  <br><br>
+  <b>NIT:</b> {{ cliente?._id }}
+  <br><br>
+  <b>Ciudad:</b> {{ cliente?.ciudad }}
+  <br><br>
+  <b>Direcci&oacute;n:</b> {{ cliente?.direccion }}
+  <br><br>
+
+  <ion-row>
+    <button ion-button block icon-left (click)="showCarteraModal()" ><ion-icon name="usd"></ion-icon>Cartera</button>
+  </ion-row>
+
+</ion-content>

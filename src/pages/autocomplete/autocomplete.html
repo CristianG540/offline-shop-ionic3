@@ -1,9 +1,9 @@
 <ion-header>
   <ion-navbar color="primary">
     <ion-title>Buscar Cliente</ion-title>
-    <ion-buttons right>
+    <ion-buttons right *ngIf="navParams.get('type') != 'page'">
       <button ion-button (click)="dismiss()">
-        <ion-icon name="md-close" ></ion-icon>
+        <ion-icon style="zoom:2.0;" name="md-close" ></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>

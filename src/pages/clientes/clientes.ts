@@ -9,6 +9,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 export class ClientesPage {
 
   private carteraPage = 'CarteraPage';
+  private searchClientPage = 'AutocompletePage';
 
   constructor(
     public navCtrl: NavController,

@@ -130,7 +130,7 @@ export class ProductosProvider {
 
   }
 
-  private _replicateDB(d): void {
+  private _replicateDB(d: WorkerRes): void {
     switch (d.event) {
       /**
        * Esto lo comento por que el enviar muchos mensajes al hilo
@@ -150,7 +150,7 @@ export class ProductosProvider {
           Raven.captureException( new Error(`Productos- Error al guardar la bandera estado de la bd😫: ${JSON.stringify(err)}`), { extra: err } );
         });
         this.statusDB = true;
-        console.warn('Prods- First Replication complete');
+        console.warn('Prods- First Replication complete', d.info);
         break;
       case "error":
         console.error("Prods-totally unhandled error (shouldn't happen)", d.info);

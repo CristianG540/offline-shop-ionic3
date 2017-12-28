@@ -24,7 +24,6 @@ import { WorkerRes } from "../config/models/workerRes"
 export class CarteraProvider {
 
   private _db: any;
-  private _dbLocal: any;
   private _remoteDB: any;
   private _cartera: Cartera[] = [];
   private replicationWorker: Worker;
@@ -91,19 +90,9 @@ export class CarteraProvider {
         }
       });
       /**
-       * Base de datos local en pouch, lo diferente de esta BD
-       * es que se mantiene en memoria, creo q es mucho mas rapida
-       * que una que almacene en el dispositivo, pero lo malo es que
-       * los datos se pierden si la app se cierra
+       * Base de datos local en pouch
        */
-      this._db = new PouchDB("cartera_mem", {adapter: 'memory', auto_compaction: true});
-      /**
-       * Base de datos local en pouch, esta BD almacena los datos en
-       * el dispositivo usando IndexDB, la ventaja es q los datos se mantienen
-       * si la app se cierra, la desventaja es que creo q es mas lenta
-       * que la BD en memoria
-       */
-      this._dbLocal = new PouchDB("cartera",{revs_limit: 5, auto_compaction: true});
+      this._db = new PouchDB("cartera",{revs_limit: 5, auto_compaction: true});
 
       /**
        * postMessage se encarga de enviar un mensaje al worker
@@ -135,7 +124,7 @@ export class CarteraProvider {
 
   } // Fin constructor
 
-  private _replicateDB(d): void {
+  private _replicateDB(d: WorkerRes): void {
     switch (d.event) {
 
       case "complete":
@@ -148,7 +137,6 @@ export class CarteraProvider {
         });
         this.statusDB = true;
         console.warn("Cartera-Primera replicada completa", d.info);
-        this.syncDB();
         break;
 
       case "error":
@@ -160,45 +148,20 @@ export class CarteraProvider {
          * en ese caso no la recargo por q entra en un loop infinito cuando el celular
          * no tiene conexion
          */
-        if(_.has(d.info, 'message') && d.info.message != "getCheckpoint rejected with " ){
+        let error;
+        try {
+          error = d.info.message;
+        } catch (e) {
+          error = "";
+        }
+        if(error != "getCheckpoint rejected with " ){
           window.location.reload();
         }
-        this.syncDB();
         break;
 
       default:
         break;
     }
-  }
-
-  private syncDB(): void {
-    let replicationOptions = {
-      live: true,
-      retry: true
-    };
-    /**
-     * Que mierda estoy haciendo aqui me preguntare cuando se me olvide esto,
-     * como la bd en memoria es muy rapida pero no conserva los datos, y como
-     * la bd normal si los almacena pero es mas lenta, entonces lo que hago
-     * es replicar los datos de una a la otra, asi puedo hacer las operaciones
-     * CRUD por asi decirlo en la de memoria que es muy rapida, y replicar los
-     * datos a la otra para que los preserve, en teoria deberia funcionar como
-     * una especia de ram o cache algo asi.
-     */
-    PouchDB.sync(this._dbLocal, this._db, replicationOptions)
-    .on("denied", err => {
-      console.error("Cartera*inMemory - a failed to replicate due to permissions",err);
-      Raven.captureException( new Error(`Cartera*inMemory - No se pudo replicar debido a permisos 👮: ${JSON.stringify(err)}`), {
-        extra: err
-      } );
-    })
-    .on("error", err => {
-      console.error("Cartera*inMemory - totally unhandled error (shouldn't happen)", err);
-      Raven.captureException( new Error(`Cartera*inMemory - Error que no deberia pasar 😫: ${JSON.stringify(err)}`), {
-        extra: err
-      } );
-    });
-
   }
 
   public destroyDB(): void{
@@ -274,6 +237,7 @@ export class CarteraProvider {
         include_docs: true
         //stale: 'update_after'
       });
+
       return res;
     }
 

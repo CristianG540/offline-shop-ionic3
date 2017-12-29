@@ -3,7 +3,7 @@ import { Storage } from '@ionic/storage';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Response } from '@angular/http/src/static_response';
 import { Observable } from 'rxjs/Observable';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, timeout } from 'rxjs/operators';
 import 'rxjs/add/operator/toPromise';
 
 // lib terceros
@@ -242,7 +242,8 @@ export class ClientesProvider {
       let res = await this.http.get( url, options ).pipe(
         map((res: Response) => {
           return res;
-        })
+        }),
+        timeout(5000)
       ).toPromise();
 
       return res;

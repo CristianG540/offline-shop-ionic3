@@ -291,17 +291,18 @@ export class ClientesProvider {
     return this._db.allDocs({
         include_docs: true
       }).then(res => {
-        this._clientes = res.rows.map(row => {
-          return new Cliente(
-            row.doc._id,
-            row.doc.asesor,
-            row.doc.asesor_nombre,
-            row.doc.ciudad,
-            row.doc.direccion,
-            row.doc.nombre_cliente,
-            row.doc.transportadora,
-            row.doc._rev
-          );
+        this._clientes = res.rows.map((row): Cliente => {
+          return {
+            _id            : row.doc._id,
+            asesor         : row.doc.asesor,
+            asesor_nombre  : row.doc.asesor_nombre,
+            ciudad         : row.doc.ciudad,
+            direccion      : row.doc.direccion,
+            nombre_cliente : row.doc.nombre_cliente,
+            transportadora : row.doc.transportadora,
+            telefono       : row.doc.telefono,
+            _rev           : row.doc._rev
+          };
         });
         console.log("_all_docs clientes pouchDB", res.total_rows);
         return res;
@@ -322,18 +323,17 @@ export class ClientesProvider {
       case "upsert":
         // updated/inserted
         // change.doc holds the new doc
-        this._onUpdatedOrInserted(
-          new Cliente(
-            d.info.doc._id,
-            d.info.doc.asesor,
-            d.info.doc.asesor_nombre,
-            d.info.doc.ciudad,
-            d.info.doc.direccion,
-            d.info.doc.nombre_cliente,
-            d.info.doc.transportadora,
-            d.info.doc._rev
-          )
-        );
+        this._onUpdatedOrInserted({
+          _id              : d.info.doc._id,
+          asesor         : d.info.doc.asesor,
+          asesor_nombre  : d.info.doc.asesor_nombre,
+          ciudad         : d.info.doc.ciudad,
+          direccion      : d.info.doc.direccion,
+          nombre_cliente : d.info.doc.nombre_cliente,
+          transportadora : d.info.doc.transportadora,
+          telefono       : d.info.doc.telefono,
+          _rev           : d.info.doc._rev
+        });
         break;
 
       case "error":

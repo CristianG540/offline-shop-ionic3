@@ -7,6 +7,7 @@ export class Cliente {
     public direccion: string,
     public nombre_cliente: string,
     public transportadora: number,
+    public telefono: string,
     public _rev?: string
   ) {}
 }

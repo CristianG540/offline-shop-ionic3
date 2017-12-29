@@ -48,9 +48,9 @@
     </ion-card-header>
 
     <ion-card-content>
-      <b>Saldo Factura:</b> {{ item.valor | currency:'USD': 'symbol': '1.0-0' }} <br>
-      <b>Total Factura:</b> {{ item.valor_total | currency:'USD': 'symbol': '1.0-0' }} <br>
-      <b>Fecha de Factura:</b> {{ item.fecha_emision }} <br>
+      <b>Saldo:</b> {{ item.valor | currency:'USD': 'symbol': '1.0-0' }} <br>
+      <b>Total:</b> {{ item.valor_total | currency:'USD': 'symbol': '1.0-0' }} <br>
+      <b>Fecha:</b> {{ item.fecha_emision }} <br>
       <b>Fecha de Vencimiento:</b> {{ item.fecha_vencimiento }}
     </ion-card-content>
   </ion-card>

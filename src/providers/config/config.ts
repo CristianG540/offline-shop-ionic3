@@ -19,7 +19,7 @@ export class Config {
   private _countPush: number = 0;
   private _eggsterFlag: boolean = false;
 
-  static readonly APP_VER: string = "1.5.0";
+  static readonly APP_VER: string = "1.5.1";
   static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
 
   /* **************************** Cosas de JOSEFA  *************************** */

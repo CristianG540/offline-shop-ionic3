@@ -1,6 +1,6 @@
 {
     "name": "igb-store",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "author": "Cristian Gonzalez V",
     "homepage": "https://registry.jsonresume.org/a59637ee",
     "private": true,
@@ -40,7 +40,7 @@
         "cordova-browser": "^5.0.2",
         "cordova-plugin-background-mode": "^0.7.2",
         "cordova-plugin-console": "^1.1.0",
-        "cordova-plugin-device": "^2.0.0",
+        "cordova-plugin-device": "^2.0.1",
         "cordova-plugin-ionic-webview": "^1.1.16",
         "cordova-plugin-network-information": "^2.0.0",
         "cordova-plugin-splashscreen": "^5.0.0",

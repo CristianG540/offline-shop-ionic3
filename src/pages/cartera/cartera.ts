@@ -61,14 +61,19 @@ export class CarteraPage {
       this.loading = true;
       this.carteraServ.searchCartera(form.cliente).then(res=>{
         this.loading = false;
-        this.carteraItems = _.map(res.rows, (row: any): Cartera => {
-          this.totalCliente += parseInt(row.doc.valor);
-          row.doc.valor = parseInt(row.doc.valor);
-          row.doc.valor_total = parseInt(row.doc.valor_total);
-          row.doc.fecha_emision = moment(row.doc.fecha_emision).format("YYYY-MM-DD");
-          row.doc.fecha_vencimiento = moment(row.doc.fecha_vencimiento).format("YYYY-MM-DD");
-          return row.doc;
-        });
+
+        this.carteraItems = _.chain(res.rows)
+          .map((row: any): Cartera => {
+            this.totalCliente += parseInt(row.doc.valor);
+            row.doc.valor = parseInt(row.doc.valor);
+            row.doc.valor_total = parseInt(row.doc.valor_total);
+            row.doc.fecha_emision = moment(row.doc.fecha_emision).format("YYYY-MM-DD");
+            row.doc.fecha_vencimiento = moment(row.doc.fecha_vencimiento).format("YYYY-MM-DD");
+            return row.doc;
+          })
+          .orderBy(['fecha_emision'], ['asc'])
+          .value();
+
       }).catch( err => {
         this.loading = false;
         this.util.errorHandler(err.message, err);

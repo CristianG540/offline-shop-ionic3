@@ -8,7 +8,7 @@
       <p class="name">{{ authService.session?.user_id }}</p>
       <p class="e-mail">{{ authService.session?.profile?.email }}</p>
       <p class="e-mail">{{ authService.asesorId }}</p>
-      <p class="e-mail" (press)="pressToEgg($event)">Version: {{ appVer }}</p>
+      <p class="e-mail" (click)="pressToEgg($event)">Version: {{ appVer }}</p>
       <hr>
       <p class="bd-status">BD Productos: <ion-icon [ngClass]="(prodServ.statusDB)?'green':'red'" name="radio-button-on" item-left></ion-icon></p>
       <p class="bd-status">BD Clientes: <ion-icon [ngClass]="(clienteServ.statusDB)?'green':'red'" name="radio-button-on" item-left></ion-icon></p>

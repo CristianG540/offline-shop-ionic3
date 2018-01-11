@@ -1,4 +1,12 @@
 page-home {
+
+  ion-card {
+    img {
+      width: 400px;
+      height: 400px;
+    }
+  }
+
   .pins {
     column-count: 2;
   }

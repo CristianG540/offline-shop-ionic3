@@ -626,6 +626,8 @@ export class ProductosProvider {
       let prodsToUpdate = _.map(prods, (prod: Producto)=>{
         let itemId = Config.binarySearch(carItems, '_id', prod._id);
         prod.existencias -= carItems[itemId].cantidad;
+        prod.origen = 'app';
+        prod.updated_at = Date.now();
         return prod;
       });
       return prodsToUpdate;

@@ -9,6 +9,8 @@ export class Producto {
     public unidad: string,
     public existencias: number,
     public precio: number,
-    public _rev ?: string
+    public _rev ?: string,
+    public origen?: string,
+    public updated_at?: number
   ) { }
 }

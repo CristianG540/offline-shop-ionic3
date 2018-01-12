@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Headers, RequestOptions, Response } from '@angular/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { map, catchError, timeout } from 'rxjs/operators';
+import 'rxjs/add/operator/toPromise';
 import {
   Loading,
   AlertController,
   LoadingController,
   ToastController
 } from "ionic-angular";
+import { Storage } from '@ionic/storage';
 
 //libs terceros
 import Raven from "raven-js";
@@ -107,6 +111,8 @@ export class Config {
     private alertCtrl: AlertController,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
+    private storage: Storage,
+    private http: HttpClient
   ){
     window.addEventListener('online', () => {
       this.onlineOffline = true;
@@ -191,6 +197,37 @@ export class Config {
       showCloseButton: false,
       closeButtonText: "cerrar"
     }).present();
+  }
+
+  public async checkToken(): Promise<any> {
+
+    let token = await this.storage.get('josefa-token');
+
+    let url: string = Config.JOSEFA_URL+'/sap';
+    let options = {
+      headers: new HttpHeaders({
+        'Accept'       : 'application/json',
+        'Content-Type' : 'application/json',
+        'Authorization': 'Bearer ' + token
+      })
+    };
+
+
+    try {
+
+      let res = await this.http.get( url, options ).pipe(
+        map((res: Response) => {
+          return res;
+        })
+      ).toPromise();
+
+      return res;
+
+    } catch (e) {
+      console.error("Error al checkear el token de josefa: ", e);
+      throw new Error(e.statusText);
+    }
+
   }
 
   // Estos setter y getter son para la pendejadita del ester egg

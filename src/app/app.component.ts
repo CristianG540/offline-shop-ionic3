@@ -73,6 +73,15 @@ export class MyApp {
             this.logout();
           }
         });
+
+        this.util.checkToken().then(res => {
+          console.log("estado del api josefa", res);
+        }).catch( (e: Error) => {
+          console.error('error en el api josefa', e);
+          if(e.message == 'Unauthorized'){
+            this.logout();
+          }
+        })
       }
 
       // Inicio la base de datos del usuario, en esta bd es en las que guardan

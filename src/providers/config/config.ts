@@ -23,7 +23,7 @@ export class Config {
   private _countPush: number = 0;
   private _eggsterFlag: boolean = false;
 
-  static readonly APP_VER: string = "1.5.1";
+  static readonly APP_VER: string = "1.5.2";
   static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
 
   /* **************************** Cosas de JOSEFA  *************************** */
@@ -200,8 +200,14 @@ export class Config {
   }
 
   public async checkToken(): Promise<any> {
-
-    let token = await this.storage.get('josefa-token');
+    let token: string = '';
+    try {
+      token = await this.storage.get('josefa-token');
+    } catch (e) {
+      console.error("Error al recuperal el token de josefa del storage: ", e);
+      e.statusText = 'Unauthorized';
+      throw new Error(e.statusText);
+    }
 
     let url: string = Config.JOSEFA_URL+'/sap';
     let options = {
@@ -212,17 +218,13 @@ export class Config {
       })
     };
 
-
     try {
-
       let res = await this.http.get( url, options ).pipe(
         map((res: Response) => {
           return res;
         })
       ).toPromise();
-
       return res;
-
     } catch (e) {
       console.error("Error al checkear el token de josefa: ", e);
       throw new Error(e.statusText);

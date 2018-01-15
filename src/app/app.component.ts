@@ -3,7 +3,8 @@ import {
   Platform,
   AlertController,
   NavController,
-  MenuController
+  MenuController,
+  Events
 } from "ionic-angular";
 import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
@@ -56,7 +57,8 @@ export class MyApp {
     private carteraServ: CarteraProvider,
     private util: Config,
     private pushNotification: PushNotificationProvider,
-    private backgroundMode: BackgroundMode
+    private backgroundMode: BackgroundMode,
+    private evts: Events
   ) {
 
     if( this.authService.isLogged ){
@@ -105,8 +107,8 @@ export class MyApp {
         id: this.authService.asesorId
       });
 
-      // Creo un setinterval que verifica las ordenes cada X tiempo
-      this.ordenServ.setIntervalOrdersSap();
+      this.ordenServ.setIntervalOrdersSap(); // Creo un setinterval que verifica las ordenes cada X tiempo
+      this.util.setTimerCheckJosefa(); // Creo un setinterval que verifica el token de josefa
 
       this.rootPage = 'TabsPage';
 
@@ -135,6 +137,10 @@ export class MyApp {
       this.backgroundMode.enable();
       //this.backgroundMode.overrideBackButton();
 
+      this.evts.subscribe('timer:checkTokenJosefa', () => {
+        this.logout();
+      });
+
     });
   }
 
@@ -155,8 +161,8 @@ export class MyApp {
 
     this.authService.logout().then(()=>{
       this.cargarPagina(LoginPage);
-      // Paro el timer que verifica las ordenes
-      clearInterval(this.ordenServ.intervalValOrders);
+      clearInterval(this.ordenServ.intervalValOrders); // Paro el timer que verifica las ordenes
+      clearInterval(this.util.timerCheckTokenJose); // Paro el timer que verifica el token de josefa no este vencido
       this.ordenServ.destroyDB();
       this.cartServ.destroyDB();
     })

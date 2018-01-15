@@ -85,6 +85,7 @@ export class LoginPage {
       });
       // Creo un setinterval que verifica las ordenes cada X tiempo
       this.ordenServ.setIntervalOrdersSap();
+      this.util.setTimerCheckJosefa();
       this.navCtrl.setRoot('TabsPage');
       loading.dismiss();
 

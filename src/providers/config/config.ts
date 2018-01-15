@@ -7,7 +7,8 @@ import {
   Loading,
   AlertController,
   LoadingController,
-  ToastController
+  ToastController,
+  Events
 } from "ionic-angular";
 import { Storage } from '@ionic/storage';
 
@@ -22,6 +23,7 @@ export class Config {
 
   private _countPush: number = 0;
   private _eggsterFlag: boolean = false;
+  public timerCheckTokenJose: NodeJS.Timer;
 
   static readonly APP_VER: string = "1.5.2";
   static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
@@ -112,7 +114,8 @@ export class Config {
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     private storage: Storage,
-    private http: HttpClient
+    private http: HttpClient,
+    private evts: Events
   ){
     window.addEventListener('online', () => {
       this.onlineOffline = true;
@@ -230,6 +233,20 @@ export class Config {
       throw new Error(e.statusText);
     }
 
+  }
+
+  public setTimerCheckJosefa(): void {
+    this.timerCheckTokenJose = setInterval( () => {
+
+      this.checkToken().then(res => {
+        console.log("estado del api josefa", res);
+      }).catch( (e: Error) => {
+        if(e.message == 'Unauthorized'){
+          this.evts.publish('timer:checkTokenJosefa');
+        }
+      })
+
+    }, 60000 );
   }
 
   // Estos setter y getter son para la pendejadita del ester egg

@@ -15,6 +15,7 @@ import { Config } from '../config/config';
 Raven
   .config("https://fe7ba4a5cedd4b828f9c5e5ab35b8da0@sentry.io/239622", {
     release: Config.APP_VER,
+    allowSecretKey: true,
     dataCallback: data => {
       if (data.culprit) {
         data.culprit = data.culprit.substring(data.culprit.lastIndexOf("/"));

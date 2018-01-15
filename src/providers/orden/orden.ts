@@ -128,9 +128,7 @@ export class OrdenProvider {
   }
 
   public destroyDB(): void{
-    this.dbServ.destroyDB()
-    .then( () => this._ordenes = [] )
-    .catch( err => this.util.errorHandler( JSON.stringify(err), err ) );
+    this._ordenes = [];
   }
 
   public sendOrdersSap(): Promise<any> {

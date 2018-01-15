@@ -238,13 +238,17 @@ export class Config {
   public setTimerCheckJosefa(): void {
     this.timerCheckTokenJose = setInterval( () => {
 
-      this.checkToken().then(res => {
-        console.log("estado del api josefa", res);
-      }).catch( (e: Error) => {
-        if(e.message == 'Unauthorized'){
-          this.evts.publish('timer:checkTokenJosefa');
-        }
-      })
+      if(this.onlineOffline){
+
+        this.checkToken().then(res => {
+          console.log("estado del api josefa", res);
+        }).catch( (e: Error) => {
+          if(e.message == 'Unauthorized'){
+            this.evts.publish('timer:checkTokenJosefa');
+          }
+        })
+
+      }
 
     }, 60000 );
   }

@@ -128,6 +128,7 @@ export class OrdenProvider {
   }
 
   public destroyDB(): void{
+    this.dbServ.destroyDB();
     this._ordenes = [];
   }
 

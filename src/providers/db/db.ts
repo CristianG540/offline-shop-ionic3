@@ -152,16 +152,9 @@ export class DbProvider {
     }
   }
 
-  public destroyDB(): Promise<any> {
+  public destroyDB(): void {
     this._replication.cancel();
     this._sync.cancel();
-    return this._db.destroy().then(() => {
-      console.log(" db_averno - database removed");
-    }).catch(err=>{
-      Raven.captureException( new Error(`db_averno - Error al eliminar la bd 😫: ${JSON.stringify(err)}`), {
-        extra: err
-      } );
-    });
   }
 
 }

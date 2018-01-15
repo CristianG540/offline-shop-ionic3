@@ -53,7 +53,7 @@ export class SignupPage {
       console.log(res);
       this.loading.dismiss();
 
-      this.dbServ.init(res.userDBs.supertest).then( info => {
+      this.dbServ.init(res.userDBs.supertest, this.authService.userId).then( info => {
         console.warn('DbAverno- First Replication complete');
       }).catch( err => {
         console.error("DbAverno-totally unhandled error (shouldn't happen)", err);

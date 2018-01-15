@@ -23,9 +23,8 @@ export class DbProvider {
   ) {
   }
 
-  public init(urlDB: string): Promise<any> {
+  public init(urlDB: string, user: string): Promise<any> {
     return new Promise( (resolve, reject) => {
-
 
       PouchDB.plugin(PouchUpsert);
       /**
@@ -36,7 +35,7 @@ export class DbProvider {
       */
       PouchDB.plugin(cordovaSqlitePlugin);
       let dbConf = {adapter: 'cordova-sqlite', iosDatabaseLocation: 'default'};
-      this._db = new PouchDB('db_averno.db', dbConf);
+      this._db = new PouchDB(`db_averno_${user}.db`, dbConf);
 
       this._remoteDB = new PouchDB(urlDB, {
         ajax: {

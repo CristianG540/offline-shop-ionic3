@@ -87,7 +87,7 @@ export class MyApp {
       // Inicio la base de datos del usuario, en esta bd es en las que guardan
       // las ordenes, la crea automaticamente superlogin y me envia la url
       console.log("los datos de la bd son", this.authService.dbUrl);
-      this.dbServ.init( this.authService.dbUrl ).then( info => {
+      this.dbServ.init( this.authService.dbUrl, this.authService.userId ).then( info => {
         console.warn('DbAverno- First Replication complete');
       }).catch( err => {
         console.error("DbAverno-totally unhandled error (shouldn't happen)", err);

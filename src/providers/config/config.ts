@@ -25,7 +25,7 @@ export class Config {
   private _eggsterFlag: boolean = false;
   public timerCheckTokenJose: NodeJS.Timer;
 
-  static readonly APP_VER: string = "1.5.2";
+  static readonly APP_VER: string = "1.5.3";
   static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
 
   /* **************************** Cosas de JOSEFA  *************************** */

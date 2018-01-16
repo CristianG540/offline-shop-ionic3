@@ -1,3 +1,8 @@
+interface Coordenadas {
+  latitud: number,
+  longitud: number
+}
+
 export class Cliente {
   constructor(
     public _id: string,
@@ -8,6 +13,8 @@ export class Cliente {
     public nombre_cliente: string,
     public transportadora: number,
     public telefono: string,
-    public _rev?: string
+    public _rev?: string,
+    public ubicacion?: Coordenadas, //Ubicacion en coordenadas del cliente
+    public updated_at?: number
   ) {}
 }

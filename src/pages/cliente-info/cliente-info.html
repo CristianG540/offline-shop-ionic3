@@ -21,7 +21,12 @@
   <br><br>
 
   <ion-row>
-    <button ion-button block icon-left (click)="showCarteraModal()" ><ion-icon name="usd"></ion-icon>Cartera</button>
+    <ion-col>
+      <button ion-button block icon-left (click)="showCarteraModal()" > <ion-icon name="calculator"></ion-icon> Cartera </button>
+    </ion-col>
+    <ion-col>
+      <button ion-button block icon-left color="secondary" (click)="showCarteraModal()" ><ion-icon name="locate"></ion-icon>Marcar ubicaci&oacute;n</button>
+    </ion-col>
   </ion-row>
 
 </ion-content>

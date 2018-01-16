@@ -27,4 +27,8 @@ export class ClienteInfoPage {
     this.modalCtrl.create("CarteraPage", this.cliente).present();
   }
 
+  private setLocation(): void {
+
+  }
+
 }

@@ -9,6 +9,7 @@ import 'rxjs/add/operator/toPromise';
 // lib terceros
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
+import PouchUpsert from 'pouchdb-upsert';
 import pouchAdapterMem from 'pouchdb-adapter-memory';
 import Raven from 'raven-js';
 
@@ -37,6 +38,7 @@ export class ClientesProvider {
     private http: HttpClient
   ) {
     PouchDB.plugin(require("pouchdb-quick-search"));
+    PouchDB.plugin(PouchUpsert);
     PouchDB.plugin(pouchAdapterMem);
 
     /**
@@ -368,4 +370,54 @@ export class ClientesProvider {
     }
   }
   /** *********** Fin Manejo de el estado de la ui    ********************** */
+
+  /************************ Metodos Offline First ***************************** */
+
+  /**
+   * Los metodos acontinuacion los uso para usar alguna clase de implementacion
+   * de Offline first, lo qsignifica que primero intento consultar los datos
+   * en la base de datos local, pero si estos aun no estan disponibles, entonces
+   * consulto la base de datos en linea
+   */
+
+  private async doLocalFirst(dbFun) {
+    // hit the local DB first; if it 404s, then hit the remote
+    try {
+      return await dbFun(this._db);
+    } catch (err) {
+      return await dbFun(this._remoteDB);
+    }
+  }
+
+  private async getManyByIds(db, ids): Promise<any> {
+    let res = await db.allDocs({
+      include_docs : true,
+      keys         : ids
+    });
+    if(! this.statusDB && !db._remote ){
+      throw new Error('No se ha completado la replicacion');
+    }
+
+    return res;
+  }
+
+  private async updateLocation(db, id, lat: number, long: number): Promise<any> {
+    if(! this.statusDB && !db._remote ){
+      throw new Error('No se ha completado la replicacion');
+    }
+    //El cliente que recibe el callback es cliente que esta actualmente en la bd/couchdb
+    let res = await db.upsert(id, (cliente: Cliente) => {
+      cliente.ubicacion = {
+        latitud: lat,
+        longitud: long
+      }
+      cliente.updated_at = Date.now();
+      return cliente;
+    })
+    return res;
+  }
+
+  /******************** FIN Metodos Offline First ***************************** */
+
+
 }

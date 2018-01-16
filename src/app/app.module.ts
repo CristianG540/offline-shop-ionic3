@@ -10,6 +10,7 @@ import { Network } from '@ionic-native/network';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { OneSignal } from '@ionic-native/onesignal';
 import { BackgroundMode } from '@ionic-native/background-mode';
+import { Geolocation } from '@ionic-native/geolocation';
 
 //Pagaes without lazy loading
 import { HomePage } from '../pages/home/home';
@@ -27,6 +28,7 @@ import { DbProvider } from '../providers/db/db';
 import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandler';
 import { PushNotificationProvider } from '../providers/push-notification/push-notification';
 import { CarteraProvider } from '../providers/cartera/cartera';
+import { GeolocationProvider } from '../providers/geolocation/geolocation';
 
 @NgModule({
   declarations: [
@@ -68,6 +70,8 @@ import { CarteraProvider } from '../providers/cartera/cartera';
     OneSignal,
     PushNotificationProvider,
     BackgroundMode,
+    Geolocation,
+    GeolocationProvider
   ]
 })
 export class AppModule {}

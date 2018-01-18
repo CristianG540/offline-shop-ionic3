@@ -8,6 +8,4 @@ export class GeolocationProvider {
     private geolocation: Geolocation
   ) {}
 
-
-
 }

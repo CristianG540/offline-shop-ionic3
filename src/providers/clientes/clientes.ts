@@ -21,14 +21,56 @@ import { Config as cg } from "../config/config";
 import { Cliente } from "./models/cliente";
 import { WorkerRes } from "../config/models/workerRes"
 
-@Injectable()
-export class ClientesProvider {
-  private _db: any;
-  private _dbLocal: any;
-  private _remoteDB: any;
-  private _clientes: Cliente[] = [];
+class OfflineUtils {
+  protected _dbLocal: any;
+  protected _remoteDB: any;
   //Esta variable se encarga de mostrar el estado de la bd en el menu
   public statusDB: boolean = false;
+
+  /************************ Metodos Offline First ***************************** */
+  /**
+   * Los metodos acontinuacion los uso para usar alguna clase de implementacion
+   * de Offline first, lo qsignifica que primero intento consultar los datos
+   * en la base de datos local, pero si estos aun no estan disponibles, entonces
+   * consulto la base de datos en linea
+   */
+
+  protected async _doLocalFirst(dbFun) {
+    // hit the local DB first; if it 404s, then hit the remote
+    try {
+      return await dbFun(this._dbLocal);
+    } catch (err) {
+      return await dbFun(this._remoteDB);
+    }
+  }
+
+  protected async _getManyByIds(db, ids): Promise<any> {
+    if(! this.statusDB && !db._remote ){
+      throw new Error('No se ha completado la replicacion');
+    }
+    let res = await db.allDocs({
+      include_docs : true,
+      keys         : ids
+    });
+    return res;
+  }
+
+  protected async _upsert(db, id, callback): Promise<any> {
+    if(!this.statusDB && !db._remote ){
+      throw new Error('No se ha completado la replicacion');
+    }
+    //El cliente que recibe el callback es cliente que esta actualmente en la bd/couchdb
+    let res = await db.upsert(id, callback)
+    return res;
+  }
+
+  /******************** FIN Metodos Offline First ***************************** */
+}
+
+@Injectable()
+export class ClientesProvider extends OfflineUtils {
+  private _db: any;
+  private _clientes: Cliente[] = [];
   private replicationWorker: Worker;
 
   constructor(
@@ -37,6 +79,7 @@ export class ClientesProvider {
     private storage: Storage,
     private http: HttpClient
   ) {
+    super();
     PouchDB.plugin(require("pouchdb-quick-search"));
     PouchDB.plugin(PouchUpsert);
     PouchDB.plugin(pouchAdapterMem);
@@ -371,53 +414,36 @@ export class ClientesProvider {
   }
   /** *********** Fin Manejo de el estado de la ui    ********************** */
 
-  /************************ Metodos Offline First ***************************** */
-
-  /**
-   * Los metodos acontinuacion los uso para usar alguna clase de implementacion
-   * de Offline first, lo qsignifica que primero intento consultar los datos
-   * en la base de datos local, pero si estos aun no estan disponibles, entonces
-   * consulto la base de datos en linea
-   */
-
-  private async doLocalFirst(dbFun) {
-    // hit the local DB first; if it 404s, then hit the remote
-    try {
-      return await dbFun(this._db);
-    } catch (err) {
-      return await dbFun(this._remoteDB);
-    }
-  }
-
-  private async getManyByIds(db, ids): Promise<any> {
-    let res = await db.allDocs({
-      include_docs : true,
-      keys         : ids
-    });
-    if(! this.statusDB && !db._remote ){
-      throw new Error('No se ha completado la replicacion');
-    }
-
-    return res;
-  }
-
-  private async updateLocation(db, id, lat: number, long: number): Promise<any> {
-    if(! this.statusDB && !db._remote ){
-      throw new Error('No se ha completado la replicacion');
-    }
-    //El cliente que recibe el callback es cliente que esta actualmente en la bd/couchdb
-    let res = await db.upsert(id, (cliente: Cliente) => {
-      cliente.ubicacion = {
-        latitud: lat,
-        longitud: long
-      }
-      cliente.updated_at = Date.now();
-      return cliente;
+  public async updateLocation(id, lat: number, long: number, accuracy: number): Promise<any> {
+    /**
+     * Bueno esto se ve complejo pero no lo es tanto, primero llamo la funcion
+     * "doLocalFirst" que se encarga de ejcutar la funcion que se le manda como parametro
+     * en la bd local, si algo falla al ejecutar la bd local entonces ejecuta la bd remota
+     *
+     * dentro de la funcion que se le pasa a "doLocalFirst" hago un upsert que me modifica el cliente
+     */
+    return await this._doLocalFirst( db => {
+      return this._upsert(db, id, (cliente: Cliente) => {
+        cliente.ubicacion = {
+          latitud: lat,
+          longitud: long,
+          accuracy: accuracy
+        }
+        cliente.updated_at = Date.now();
+        return cliente;
+      })
     })
-    return res;
+
   }
 
-  /******************** FIN Metodos Offline First ***************************** */
+  public async getClientesByIds( ids: any[] ) {
+    let res = await this._doLocalFirst( db => this._getManyByIds(db, ids) )
+    if (res && res.rows.length > 0) {
+      return res.rows;
+    }else{
+      return [];
+    }
+  }
 
 
 }

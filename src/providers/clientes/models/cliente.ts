@@ -1,6 +1,7 @@
 interface Coordenadas {
   latitud: number,
-  longitud: number
+  longitud: number,
+  accuracy: number
 }
 
 export class Cliente {

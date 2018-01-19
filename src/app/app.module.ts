@@ -11,6 +11,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { OneSignal } from '@ionic-native/onesignal';
 import { BackgroundMode } from '@ionic-native/background-mode';
 import { Geolocation } from '@ionic-native/geolocation';
+import { Diagnostic } from '@ionic-native/diagnostic';
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
 
 //Pagaes without lazy loading
 import { HomePage } from '../pages/home/home';
@@ -71,7 +73,9 @@ import { GeolocationProvider } from '../providers/geolocation/geolocation';
     PushNotificationProvider,
     BackgroundMode,
     Geolocation,
-    GeolocationProvider
+    GeolocationProvider,
+    Diagnostic,
+    LocationAccuracy
   ]
 })
 export class AppModule {}

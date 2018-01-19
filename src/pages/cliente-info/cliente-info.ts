@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController, AlertController } from 'ionic-angular';
-import { Geolocation } from '@ionic-native/geolocation';
 
 // Providers
 import { Config as cg } from "../../providers/config/config";
 import { ClientesProvider } from "../../providers/clientes/clientes";
+import { GeolocationProvider } from "../../providers/geolocation/geolocation";
 
 //Models
 import { Cliente } from '../../providers/clientes/models/cliente';
@@ -23,7 +23,7 @@ export class ClienteInfoPage {
     private navParams: NavParams,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
-    private geolocation: Geolocation,
+    private geolocation: GeolocationProvider,
     private clienteServ: ClientesProvider,
     private utils: cg
   ) {}
@@ -53,12 +53,8 @@ export class ClienteInfoPage {
 
             let loading = this.utils.showLoading();
             // get current position
-            this.geolocation.getCurrentPosition({
-              maximumAge: 3000,
-              timeout: 60000,
-              enableHighAccuracy : true
-            }).then(pos => {
-              return this.clienteServ.updateLocation(this.cliente._id, pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+            this.geolocation.getCurrentPosition().then(pos => {
+              return this.clienteServ.updateLocation(this.cliente._id, pos.latitude, pos.longitude, pos.accuracy);
             }).then(res => {
               return this.clienteServ.getClientesByIds([res.id])
             }).then(res => {

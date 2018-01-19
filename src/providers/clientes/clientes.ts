@@ -16,60 +16,15 @@ import Raven from 'raven-js';
 //Providers
 import { AuthProvider } from '../auth/auth';
 import { Config as cg } from "../config/config";
+import { OfflineUtils } from "../offline/offline";
 
 //Models
 import { Cliente } from "./models/cliente";
 import { WorkerRes } from "../config/models/workerRes"
 
-class OfflineUtils {
-  protected _dbLocal: any;
-  protected _remoteDB: any;
-  //Esta variable se encarga de mostrar el estado de la bd en el menu
-  public statusDB: boolean = false;
-
-  /************************ Metodos Offline First ***************************** */
-  /**
-   * Los metodos acontinuacion los uso para usar alguna clase de implementacion
-   * de Offline first, lo qsignifica que primero intento consultar los datos
-   * en la base de datos local, pero si estos aun no estan disponibles, entonces
-   * consulto la base de datos en linea
-   */
-
-  protected async _doLocalFirst(dbFun) {
-    // hit the local DB first; if it 404s, then hit the remote
-    try {
-      return await dbFun(this._dbLocal);
-    } catch (err) {
-      return await dbFun(this._remoteDB);
-    }
-  }
-
-  protected async _getManyByIds(db, ids): Promise<any> {
-    if(! this.statusDB && !db._remote ){
-      throw new Error('No se ha completado la replicacion');
-    }
-    let res = await db.allDocs({
-      include_docs : true,
-      keys         : ids
-    });
-    return res;
-  }
-
-  protected async _upsert(db, id, callback): Promise<any> {
-    if(!this.statusDB && !db._remote ){
-      throw new Error('No se ha completado la replicacion');
-    }
-    //El cliente que recibe el callback es cliente que esta actualmente en la bd/couchdb
-    let res = await db.upsert(id, callback)
-    return res;
-  }
-
-  /******************** FIN Metodos Offline First ***************************** */
-}
-
 @Injectable()
 export class ClientesProvider extends OfflineUtils {
-  private _db: any;
+  private _dbInMemory: any;
   private _clientes: Cliente[] = [];
   private replicationWorker: Worker;
 
@@ -124,7 +79,7 @@ export class ClientesProvider extends OfflineUtils {
 
     }
 
-    if (!this._db) {
+    if (!this._dbInMemory) {
 
       // Base de datos remota en couchdb
       this._remoteDB = new PouchDB(cg.CDB_URL_CLIENTES, {
@@ -139,14 +94,14 @@ export class ClientesProvider extends OfflineUtils {
        * que una que almacene en el dispositivo, pero lo malo es que
        * los datos se pierden si la app se cierra
        */
-      this._db = new PouchDB("cliente_mem", {adapter: 'memory', auto_compaction: true});
+      this._dbInMemory = new PouchDB("cliente_mem", {adapter: 'memory', auto_compaction: true});
       /**
        * Base de datos local en pouch, esta BD almacena los datos en
        * el dispositivo usando IndexDB, la ventaja es q los datos se mantienen
        * si la app se cierra, la desventaja es que creo q es mas lenta
        * que la BD en memoria
        */
-      this._dbLocal = new PouchDB("cliente",{revs_limit: 5, auto_compaction: true});
+      this._db = new PouchDB("cliente",{revs_limit: 5, auto_compaction: true});
 
       /**
        * postMessage se encarga de enviar un mensaje al worker
@@ -227,7 +182,7 @@ export class ClientesProvider extends OfflineUtils {
      * datos a la otra para que los preserve, en teoria deberia funcionar como
      * una especia de ram o cache algo asi.
      */
-    PouchDB.sync(this._dbLocal, this._db, replicationOptions)
+    PouchDB.sync(this._db, this._dbInMemory, replicationOptions)
     .on("denied", err => {
       console.error("Clientes*inMemory - a failed to replicate due to permissions",err);
       Raven.captureException( new Error(`Clientes*inMemory - No se pudo replicar debido a permisos 👮: ${JSON.stringify(err)}`), {
@@ -299,7 +254,7 @@ export class ClientesProvider extends OfflineUtils {
        * Para mas informacion sobre este plugin la pagina principal:
        * https://github.com/pouchdb-community/pouchdb-quick-search
        */
-      return this._db.search({
+      return this._dbInMemory.search({
         query: query,
         fields: ["nombre_cliente"],
         filter: doc => {
@@ -315,7 +270,7 @@ export class ClientesProvider extends OfflineUtils {
   }
 
   public indexDbClientes(): any {
-    return this._db.search({
+    return this._dbInMemory.search({
       fields: ["nombre_cliente"],
       filter: doc => {
         return doc.asesor == this.authService.asesorId; // solo los del asesor en sesion
@@ -334,7 +289,7 @@ export class ClientesProvider extends OfflineUtils {
 
   public fetchAndRenderAllDocs(): Promise<any> {
 
-    return this._db.allDocs({
+    return this._dbInMemory.allDocs({
         include_docs: true
       }).then(res => {
         this._clientes = res.rows.map((row): Cliente => {
@@ -436,7 +391,7 @@ export class ClientesProvider extends OfflineUtils {
 
   }
 
-  public async getClientesByIds( ids: any[] ) {
+  public async getClientesByIds( ids: any[] ): Promise<any> {
     let res = await this._doLocalFirst( db => this._getManyByIds(db, ids) )
     if (res && res.rows.length > 0) {
       return res.rows;

@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController, AlertController } from 'ionic-angular';
 
+//librerias terceros
+import _ from 'lodash';
+import Raven from "raven-js";
+
 // Providers
 import { Config as cg } from "../../providers/config/config";
 import { ClientesProvider } from "../../providers/clientes/clientes";
@@ -59,11 +63,22 @@ export class ClienteInfoPage {
               return this.clienteServ.getClientesByIds([res.id])
             }).then(res => {
               loading.dismiss();
-              console.log("Su madre en bragas: ", res)
+              console.log("Respueta getCurrentPosition: ", res)
               alert(`Las cordenadas son ${res[0].doc.ubicacion.latitud}, ${res[0].doc.ubicacion.longitud} - precision: ${res[0].doc.ubicacion.accuracy}`)
-            }).catch(err => {
+            }).catch( (err) => {
               loading.dismiss();
-              console.log('su puta madre', err)
+              console.error("error gps", err);
+              if (_.has(err, 'code') && err.code === 4) {
+                this.alertCtrl.create({
+                  title: "Error.",
+                  message: 'Por favor habilite el uso del gps, para poder marcar la posicion del cliente',
+                  buttons: ['Ok']
+                }).present();
+              } else {
+                Raven.captureException( new Error(`GPS- Error al marcar la posicion del cliente 😫: ${JSON.stringify(err)}`), {
+                  extra: err
+                } );
+              }
             });
 
           }

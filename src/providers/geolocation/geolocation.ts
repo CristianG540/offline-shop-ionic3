@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Geolocation } from '@ionic-native/geolocation';
+import { Geolocation, GeolocationOptions } from '@ionic-native/geolocation';
 import { Diagnostic } from '@ionic-native/diagnostic';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
+//Libs terceros
+import _ from 'lodash';
 
 @Injectable()
 export class GeolocationProvider {
@@ -14,20 +16,29 @@ export class GeolocationProvider {
   ) {}
 
   public async getCurrentPosition(): Promise<Coordinates> {
-
+    let geoLocOpts: GeolocationOptions = {
+      maximumAge: 3000,
+      timeout: 60000,
+      enableHighAccuracy : true
+    };
     this._isGpsEnabled = await this.diagnostic.isGpsLocationEnabled();
     if(this._isGpsEnabled){
-      let geoRes = await this.geolocation.getCurrentPosition({
-        maximumAge: 3000,
-        timeout: 60000,
-        enableHighAccuracy : true
-      });
+
+      let geoRes = await this.geolocation.getCurrentPosition(geoLocOpts);
       this._coords = geoRes.coords;
       return this._coords;
-    }else{
 
+    }else{
       let res = await this._askForTurnOnGps();
-      debugger;
+      if(_.has(res, 'code') && res.code == 1) {
+
+        let geoRes = await this.geolocation.getCurrentPosition(geoLocOpts);
+        this._coords = geoRes.coords;
+        return this._coords;
+
+      }else{
+        throw new Error(`Error inesperado al recuperar la posicion: ${JSON.stringify(res)}`);
+      }
     }
 
   }
@@ -35,12 +46,8 @@ export class GeolocationProvider {
   private async _askForTurnOnGps(): Promise<any> {
     let canRequest: boolean = await this.locationAccuracy.canRequest();
     if (canRequest) {
-      try {
-        let res = await this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY)
-        return res;
-      } catch (error) {
-        throw new Error('Ocurrio un error al solicitar el gps: '+JSON.stringify(error) );
-      }
+      let res = await this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY)
+      return res;
     } else {
       throw new Error('No se pudo obtener la unicacion, puede que el gps este apagado');
     }

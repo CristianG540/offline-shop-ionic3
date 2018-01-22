@@ -31,6 +31,7 @@ import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandl
 import { PushNotificationProvider } from '../providers/push-notification/push-notification';
 import { CarteraProvider } from '../providers/cartera/cartera';
 import { GeolocationProvider } from '../providers/geolocation/geolocation';
+import { AgmCoreModule } from '@agm/core';
 
 @NgModule({
   declarations: [

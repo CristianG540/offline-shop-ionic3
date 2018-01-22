@@ -27,6 +27,7 @@ export class Config {
 
   static readonly APP_VER: string = "1.5.3";
   static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
+  static readonly G_MAPS_KEY: string = 'AIzaSyAtVh-4gg1RRcS_jUlDtatc6SjwP-5XI70';
 
   /* **************************** Cosas de JOSEFA  *************************** */
   static readonly JOSEFA_URL: string = 'https://gatortyres.com';

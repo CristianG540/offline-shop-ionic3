@@ -35,4 +35,12 @@
     </ion-col>
   </ion-row>
 
+  <ion-row>
+    <ion-col >
+      <agm-map [latitude]="cliente?.ubicacion?.latitud" [longitude]="cliente?.ubicacion?.longitud" [zoom]="zoom">
+        <agm-marker [latitude]="cliente?.ubicacion?.latitud" [longitude]="cliente?.ubicacion?.longitud" [label]="cliente?._id"></agm-marker>
+      </agm-map>
+    </ion-col>
+  </ion-row>
+
 </ion-content>

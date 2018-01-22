@@ -21,6 +21,7 @@ import { Cliente } from '../../providers/clientes/models/cliente';
 export class ClienteInfoPage {
 
   private cliente: Cliente;
+  private zoom: number = 16;
 
   constructor(
     private navCtrl: NavController,
@@ -64,7 +65,7 @@ export class ClienteInfoPage {
             }).then(res => {
               loading.dismiss();
               console.log("Respueta getCurrentPosition: ", res)
-              alert(`Las cordenadas son ${res[0].doc.ubicacion.latitud}, ${res[0].doc.ubicacion.longitud} - precision: ${res[0].doc.ubicacion.accuracy}`)
+              this.navCtrl.popToRoot();
             }).catch( (err) => {
               loading.dismiss();
               console.error("error gps", err);

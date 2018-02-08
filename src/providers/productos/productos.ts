@@ -12,7 +12,6 @@ import PouchDB from 'pouchdb';
 //import PouchUpsert from 'pouchdb-upsert';
 //import PouchLoad from 'pouchdb-load';
 
-//import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
 //Providers
 import { Config } from '../config/config'
 // Models
@@ -96,8 +95,6 @@ export class ProductosProvider {
   public initDB(): void {
     //PouchDB.plugin(PouchUpsert);
     //PouchDB.plugin(PouchLoad);
-    //PouchDB.plugin(cordovaSqlitePlugin);
-    //this._db = new PouchDB("productos.db", {adapter: 'cordova-sqlite'});
     const replication_opt = {
       auth: {
         username: Config.CDB_USER,
@@ -578,10 +575,6 @@ export class ProductosProvider {
    * @memberof ProductosProvider
    */
   public async searchAutocomplete(query: string): Promise<any> {
-    /**
-     * Para mas informacion sobre este plugin la pagina principal:
-     * https://github.com/pouchdb-community/pouchdb-quick-search
-     */
     query = (query) ? query.toUpperCase() : "";
 
     let res = await await this.doLocalFirst(db => {

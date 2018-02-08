@@ -41,7 +41,7 @@ export class ClienteInfoPage {
     this.modalCtrl.create("CarteraPage", this.cliente).present();
   }
 
-  private setLocation(): void {
+  private askForLocation(): void {
 
     this.alertCtrl.create({
       title: 'Alerta',
@@ -54,39 +54,39 @@ export class ClienteInfoPage {
         },
         {
           text: 'Si',
-          handler: () => {
-
-            let loading = this.utils.showLoading();
-            // get current position
-            this.geolocation.getCurrentPosition().then(pos => {
-              return this.clienteServ.updateLocation(this.cliente._id, pos.latitude, pos.longitude, pos.accuracy);
-            }).then(res => {
-              return this.clienteServ.getClientesByIds([res.id])
-            }).then(res => {
-              loading.dismiss();
-              console.log("Respueta getCurrentPosition: ", res)
-              this.navCtrl.popToRoot();
-            }).catch( (err) => {
-              loading.dismiss();
-              console.error("error gps", err);
-              if (_.has(err, 'code') && err.code === 4) {
-                this.alertCtrl.create({
-                  title: "Error.",
-                  message: 'Por favor habilite el uso del gps, para poder marcar la posicion del cliente',
-                  buttons: ['Ok']
-                }).present();
-              } else {
-                Raven.captureException( new Error(`GPS- Error al marcar la posicion del cliente 😫: ${JSON.stringify(err)}`), {
-                  extra: err
-                } );
-              }
-            });
-
-          }
+          handler: () => { this.setLocation() }
         }
       ]
     }).present();
 
+  }
+
+  private setLocation(): void {
+    let loading = this.utils.showLoading();
+    // get current position
+    this.geolocation.getCurrentPosition().then(pos => {
+      return this.clienteServ.updateLocation(this.cliente._id, pos.latitude, pos.longitude, pos.accuracy);
+    }).then(res => {
+      return this.clienteServ.getClientesByIds([res.id])
+    }).then(res => {
+      loading.dismiss();
+      console.log("Respueta getCurrentPosition: ", res)
+      this.navCtrl.popToRoot();
+    }).catch( (err) => {
+      loading.dismiss();
+      console.error("error gps", err);
+      if (_.has(err, 'code') && err.code === 4 || err.code === 1) {
+        this.alertCtrl.create({
+          title: "Error.",
+          message: 'Por favor habilite el uso del gps, para poder marcar la posicion del cliente',
+          buttons: ['Ok']
+        }).present();
+      } else {
+        Raven.captureException( new Error(`GPS- Error al marcar la posicion del cliente 😫: ${JSON.stringify(err)}`), {
+          extra: err
+        } );
+      }
+    });
   }
 
 }

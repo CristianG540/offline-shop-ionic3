@@ -26,6 +26,11 @@ export class GeolocationProvider {
 
       let geoRes = await this.geolocation.getCurrentPosition(geoLocOpts);
       this._coords = geoRes.coords;
+
+      if(this._coords.accuracy > 50){
+        throw new Error("Por favor active el wifi y los datos antes de marcar la ubicacion.");
+      }
+
       return this._coords;
 
     }else{

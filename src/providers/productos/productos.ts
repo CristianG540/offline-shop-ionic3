@@ -104,7 +104,13 @@ export class ProductosProvider {
         timeout: 60000
       }
     };
-    this._db = new PouchDB("producto", {revs_limit: 5, auto_compaction: true});
+
+    /*** Intento eliminar la bd anterior */
+    const oldDB: PouchDB.Database = new PouchDB("producto", {revs_limit: 5, auto_compaction: true});
+    oldDB.destroy();
+    /*********************************** */
+
+    this._db = new PouchDB("producto_1", {revs_limit: 5, auto_compaction: true});
     this._remoteDB = new PouchDB(Config.CDB_URL, replication_opt);
 
     /**
@@ -116,7 +122,7 @@ export class ProductosProvider {
     this.replicationWorker.postMessage({
       db: "productos",
       local: {
-        name: "producto",
+        name: "producto_1",
         options: {revs_limit: 5, auto_compaction: true}
       },
       remote: {

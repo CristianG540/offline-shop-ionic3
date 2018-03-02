@@ -202,6 +202,7 @@ export class ProductosProvider {
    * @returns {Promise<any>}
    * @memberof ProductosProvider
    */
+  /*
   private async loadDB(db, filename, numFiles?): Promise<any> {
 
     if (await this.checkReplicated(db)) {
@@ -244,6 +245,7 @@ export class ProductosProvider {
       Raven.captureException( new Error(`Error al marcar la replica 🐛: ${JSON.stringify(err)}`) );
     }
   }
+  */
 
   /**
    * Esta funciontrata de recuperar un documento local de couchdb/pouchdb

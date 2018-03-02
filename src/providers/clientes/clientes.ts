@@ -217,36 +217,38 @@ export class ClientesProvider extends OfflineUtils {
      * traer digace fallo de conexion o lo que sea, entonces busco los clientes
      * en la base de datos local
      */
-    let url: string = "https://3ea7c857-8a2d-40a3-bfe6-970ddf53285a-bluemix.cloudant.com/clientes/_design/app/_search/client_search";
+    let url: string = `${cg.ELASTIC_URL}/_search`;
     let params = new HttpParams()
-      .set('q', `nombre_cliente:"${query}"~ AND asesor:"${this.authService.asesorId}"`)
-      .set('limit', "50")
-      .set('include_docs', "true");
+      .set('q', `doc.nombre_cliente:"${query}"~ AND doc.asesor:"${this.authService.asesorId}"`)
     let options = {
       headers: new HttpHeaders({
         'Accept'       : 'application/json',
-        'Content-Type' : 'application/json',
-        'Authorization': 'Basic ' + btoa(`${cg.CDB_USER}:${cg.CDB_PASS}`)
+        'Content-Type' : 'application/json'
       }),
       params: params
     };
 
     /**
      * aqui haciendo uso del async/await hago un try/catch que primero
-     * intenta traer los datos mediante http de cloudant, si por algun motivo
+     * intenta traer los datos mediante http de elsaticsearch, si por algun motivo
      * la petcion falla entonces el catch se encarga de buscar los clientes
-     * en la bd local
+     * en la bd local pouchdb
      */
     try {
 
       let res = await this.http.get( url, options ).pipe(
-        map((res: Response) => {
+        map((res: any) => {
           return res;
         }),
         timeout(5000)
       ).toPromise();
 
-      return res;
+      let data = { rows: [] };
+      data.rows = _.map(res.hits.hits, (hit: any) => {
+        return hit._source
+      });
+
+      return data;
 
     } catch (error) {
       console.error("Error buscando clientes online: ", error)

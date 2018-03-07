@@ -9,7 +9,6 @@ import 'rxjs/add/operator/toPromise';
 // lib terceros
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
-import pouchAdapterMem from 'pouchdb-adapter-memory';
 import Raven from 'raven-js';
 
 //Providers
@@ -35,7 +34,12 @@ export class CarteraProvider {
     private authService: AuthProvider,
     private storage: Storage,
     private http: HttpClient
-  ) {}
+  ) {
+    /*** Intento eliminar la bd anterior */
+    const oldDB: PouchDB.Database = new PouchDB("cartera", {revs_limit: 5, auto_compaction: true});
+    oldDB.destroy();
+    /*********************************** */
+  }
 
   /**
    * Esta funcion se encarga de buscar la cartera del cliente, segun el asesor

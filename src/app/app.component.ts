@@ -22,7 +22,6 @@ import { OrdenProvider } from "../providers/orden/orden";
 import { CarritoProvider } from "../providers/carrito/carrito";
 import { ProductosProvider } from "../providers/productos/productos";
 import { PushNotificationProvider } from "../providers/push-notification/push-notification";
-import { CarteraProvider } from "../providers/cartera/cartera";
 
 //Pages
 import { LoginPage } from "../pages/login/login";
@@ -54,7 +53,6 @@ export class MyApp {
     private ordenServ: OrdenProvider,
     private cartServ: CarritoProvider,
     private prodServ: ProductosProvider,
-    private carteraServ: CarteraProvider,
     private util: Config,
     private pushNotification: PushNotificationProvider,
     private backgroundMode: BackgroundMode,

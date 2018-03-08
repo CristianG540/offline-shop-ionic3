@@ -52,7 +52,7 @@ export class CarteraProvider {
    * @memberof CarteraProvider
    */
   public async searchCartera(nitCliente: string): Promise<any> {
-
+    try {
     let token = await this.storage.get('josefa-token');
     /**
      * Bueno aqui hago todo lo contrario a lo que hago con los productos
@@ -82,7 +82,7 @@ export class CarteraProvider {
      * la petcion falla entonces el catch se encarga de buscar los clientes
      * en la bd local
      */
-    try {
+
 
       let res = await this.http.post( url, body, options ).pipe(
         map((res: Response) => {
@@ -94,7 +94,8 @@ export class CarteraProvider {
       return res;
 
     } catch (error) {
-      throw new Error("Error en cartera debido a un fallo con la conexion, verifique los datos o busque una red wifi: "+JSON.parse(error))
+      console.error("Error al buscar en cartera", error);
+      throw "Error en cartera debido a un fallo con la conexion, verifique los datos o busque una red wifi: "+JSON.stringify(error);
     }
 
   }

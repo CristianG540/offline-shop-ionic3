@@ -76,7 +76,7 @@ export class CarteraPage {
 
       }).catch( err => {
         this.loading = false;
-        this.util.errorHandler(err.message, err);
+        this.util.errorHandler(JSON.stringify(err), err);
       })
     }
 

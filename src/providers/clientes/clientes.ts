@@ -369,8 +369,19 @@ export class ClientesProvider extends OfflineUtils {
       this._clientes.splice(index, 0, newDoc);
     }
   }
-  /** *********** Fin Manejo de el estado de la ui    ********************** */
+  // *********** Fin Manejo de el estado de la ui    **********************
 
+  /**
+   * Esta funcion se encarga de actualizar la posicion geografica del cliente
+   * de esta forma puedo mostrar la ubicacion del cliente en un mapa de gmaps
+   *
+   * @param {any} id
+   * @param {number} lat
+   * @param {number} long
+   * @param {number} accuracy
+   * @returns {Promise<any>}
+   * @memberof ClientesProvider
+   */
   public async updateLocation(id, lat: number, long: number, accuracy: number): Promise<any> {
     /**
      * Bueno esto se ve complejo pero no lo es tanto, primero llamo la funcion

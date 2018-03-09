@@ -1,5 +1,10 @@
 import { CarItem } from "../../carrito/models/carItem";
 
+interface Coordenadas {
+  lat: number,
+  lon: number
+}
+
 export class Orden {
   constructor(
     public _id: string, // El id de la orden es un timestamp de esta forma garantizo q sea unico y diferente
@@ -15,5 +20,7 @@ export class Orden {
     public type: string = "orden",
     public updated_at?: string , // bueno, guardo un timestamp de la ultima vez que se modifico la voltereta
     public _rev?: string,
+    public location?: Coordenadas,
+    public accuracy?: number
   ) {}
 }

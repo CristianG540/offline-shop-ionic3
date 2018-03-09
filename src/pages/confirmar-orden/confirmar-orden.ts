@@ -10,12 +10,14 @@ import { FormGroup, FormArray, FormBuilder, Validators  } from "@angular/forms";
 
 //Libs terceros
 import _ from 'lodash';
+import Raven from "raven-js";
 
 //Providers
 import { CarritoProvider } from "../../providers/carrito/carrito";
 import { ClientesProvider } from "../../providers/clientes/clientes";
 import { OrdenProvider } from "../../providers/orden/orden";
 import { ProductosProvider } from "../../providers/productos/productos";
+import { GeolocationProvider } from "../../providers/geolocation/geolocation";
 import { Config as cg } from "../../providers/config/config";
 
 //Models
@@ -44,6 +46,7 @@ export class ConfirmarOrdenPage {
     private clienteServ: ClientesProvider,
     private ordenServ: OrdenProvider,
     private prodServ: ProductosProvider,
+    private geolocation: GeolocationProvider,
     private util: cg
   ) {
   }
@@ -78,13 +81,60 @@ export class ConfirmarOrdenPage {
 
   private onSubmit(): void {
     let loading = this.util.showLoading();
+
+    // get current position
+    this.geolocation.getCurrentPosition().then(pos => {
+
+      this.procesarOrden({
+        lat: pos.latitude,
+        lon: pos.longitude,
+        accuracy: pos.accuracy
+      });
+      loading.dismiss();
+    }).catch( (err) => {
+      loading.dismiss();
+      console.error("error gps", err);
+      if (_.has(err, 'code') && err.code === 4 || err.code === 1) {
+        this.alertCtrl.create({
+          title: "Error.",
+          message: 'Por favor habilite el uso del gps, para poder marcar la posicion del pedido',
+          buttons: ['Ok']
+        }).present();
+
+      } else {
+        this.procesarOrden();
+        console.error('GPS- Error al marcar la posicion de pedido 😫: '+err)
+        Raven.captureException( new Error(`GPS- Error al marcar la posicion de pedido 😫: ${JSON.stringify(err)}`), {
+          extra: err
+        } );
+      }
+    });
+
+
+  }
+
+  /**
+   * Se encarga de procesar la orden, enviarla a sap, guardarla en el registro en mysql
+   * y guardarla en CouchDB
+   *
+   * @private
+   * @param {any} [position=""] Recibe un objeto con la latitud, longitud y presicion sacada de la
+   * posicion gps del celular, si no se ingresa el objeto el default es un objeto vacio
+   * {
+   *    lat: 213,
+   *    lon: 321,
+   *    accuracy : 20
+   * }
+   * @memberof ConfirmarOrdenPage
+   */
+  private procesarOrden(position:any = ""): void {
+    let loading = this.util.showLoading();
     /**
      * recupero los items del carrito para guardarlos en la orden
      */
     let carItems: CarItem[] = this.cartServ.carItems;
     let orden: Orden;
     let observaciones = this.ordenForm.get('observaciones').value;
-
     /**
      * Si el cliente no es nuevo ya sea porque se sabia el nit y lo
      * ingreso manualmente o desde el buscador de clientes entonces recupero
@@ -100,7 +150,12 @@ export class ConfirmarOrdenPage {
         total: this.cartServ.totalPrice,
         transp: this.transportadora,
         estado: false,
-        type: "orden"
+        type: "orden",
+        location: {
+          lat : position.lat,
+          lon : position.lon
+        },
+        accuracy: position.accuracy
       }
     }
     /**
@@ -117,7 +172,12 @@ export class ConfirmarOrdenPage {
         items: carItems,
         total: this.cartServ.totalPrice,
         estado: false,
-        type: "orden"
+        type: "orden",
+        location: {
+          lat : position.lat,
+          lon : position.lon
+        },
+        accuracy: position.accuracy
       }
     }
 

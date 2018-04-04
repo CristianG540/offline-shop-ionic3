@@ -83,6 +83,7 @@ export class MyApp {
           }
         })
       }
+      console.warn('El nit cliente es: '+this.authService.nitCliente)
 
       // Inicio la base de datos del usuario, en esta bd es en las que guardan
       // las ordenes, la crea automaticamente superlogin y me envia la url

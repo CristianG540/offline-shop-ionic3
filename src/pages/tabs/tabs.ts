@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
+
 import { CarritoProvider } from "../../providers/carrito/carrito";
+import { AuthProvider } from '../../providers/auth/auth';
 
 import { HomePage } from '../home/home';
 import { IonicPage } from 'ionic-angular';
@@ -17,9 +19,11 @@ export class TabsPage {
   carrito: any = 'CarritoPage'
   buscar: any = 'SearchProdPage'
   clientes: any = 'ClientesPage'
+  carteraPage = 'CarteraPage';
 
   constructor(
-    private cartService: CarritoProvider
+    private cartService: CarritoProvider,
+    private authService: AuthProvider,
   ) {
   }
 

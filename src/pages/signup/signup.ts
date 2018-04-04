@@ -18,6 +18,7 @@ export class SignupPage {
   private name: string;
   private username: string;
   private asesor_id: number;
+  private nitCliente: string = '';
   private email: string;
   private password: string;
   private confirmPassword: string;
@@ -41,7 +42,8 @@ export class SignupPage {
       email: this.email,
       profile: {
         asesor_id: this.asesor_id,
-        email: this.email
+        email: this.email,
+        nit_cliente: this.nitCliente
       },
       asesor_id: this.asesor_id,
       password: this.password,

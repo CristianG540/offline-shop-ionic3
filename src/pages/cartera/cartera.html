@@ -18,7 +18,7 @@
       <form [formGroup]="searchForm" >
           <ion-item>
             <ion-label>NIT Cliente</ion-label>
-            <ion-input formControlName="cliente" type="text"></ion-input>
+            <ion-input formControlName="cliente" type="text" [readonly]="authService.nitCliente ? true : false"></ion-input>
             <button medium ion-button item-right tappable [disabled]="!searchForm.valid" (click)="onSubmit()">
               <ion-icon name="search"></ion-icon>
             </button>

@@ -18,6 +18,7 @@ import { ClientesProvider } from "../../providers/clientes/clientes";
 import { OrdenProvider } from "../../providers/orden/orden";
 import { ProductosProvider } from "../../providers/productos/productos";
 import { GeolocationProvider } from "../../providers/geolocation/geolocation";
+import { AuthProvider } from "../../providers/auth/auth";
 import { Config as cg } from "../../providers/config/config";
 
 //Models
@@ -42,6 +43,7 @@ export class ConfirmarOrdenPage {
     private alertCtrl: AlertController,
     private navParams: NavParams,
     private fb: FormBuilder,
+    private authService: AuthProvider,
     private cartServ: CarritoProvider,
     private clienteServ: ClientesProvider,
     private ordenServ: OrdenProvider,
@@ -57,9 +59,10 @@ export class ConfirmarOrdenPage {
   }
 
   private initializeForm(): void {
+
     this.ordenForm = this.fb.group({
       observaciones: [''],
-      cliente: ['', Validators.required]
+      cliente: [this.authService.nitCliente, Validators.required]
     });
 
     this.newClient = this.fb.group({

@@ -56,7 +56,7 @@
       <ion-item *ngIf="!newClientFlag; else elseBlock">
         <ion-label>Cliente</ion-label>
         <ion-input formControlName="cliente" type="text" readonly="true"></ion-input>
-        <button large ion-button item-right icon-only  tappable (click)="showAddressModal()">
+        <button large ion-button item-right icon-only  tappable (click)="showAddressModal()" *ngIf="!authService.nitCliente">
           <ion-icon name="search"></ion-icon>
         </button>
       </ion-item>
@@ -91,7 +91,7 @@
       </button>
     </ion-buttons>
     <ion-buttons right>
-        <button ion-button icon-right solid ion-button (click)="newClientFlag = !newClientFlag" tooltip="Crear un cliente nuevo" positionV="top" event="press">
+        <button ion-button icon-right solid ion-button (click)="newClientFlag = !newClientFlag" tooltip="Crear un cliente nuevo" positionV="top" event="press" *ngIf="!authService.nitCliente">
           cliente nuevo
           <ion-icon name="person-add"></ion-icon>
         </button>

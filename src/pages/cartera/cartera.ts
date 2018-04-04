@@ -12,6 +12,7 @@ import { Config as cg} from '../../providers/config/config';
 
 //Models
 import { Cartera } from "../../providers/cartera/models/cartera_mdl";
+import { AuthProvider } from '../../providers/auth/auth';
 
 
 @IonicPage()
@@ -32,6 +33,7 @@ export class CarteraPage {
     public navParams: NavParams,
     private fb: FormBuilder,
     private carteraServ: CarteraProvider,
+    private authService: AuthProvider,
     private util : cg,
   ) {}
 
@@ -47,8 +49,11 @@ export class CarteraPage {
       this.onSubmit();
     }else{
       this.searchForm = this.fb.group({
-        cliente: ['', Validators.required]
+        cliente: ['C'+this.authService.nitCliente, Validators.required]
       });
+    }
+    if(this.authService.nitCliente){
+      this.onSubmit();
     }
 
   }

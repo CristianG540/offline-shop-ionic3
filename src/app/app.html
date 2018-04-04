@@ -7,7 +7,8 @@
       />-->
       <p class="name">{{ authService.session?.user_id }}</p>
       <p class="e-mail">{{ authService.session?.profile?.email }}</p>
-      <p class="e-mail">{{ authService.asesorId }}</p>
+      <p class="e-mail">Asesor: {{ authService.asesorId }}</p>
+      <p *ngIf="this.authService?.nitCliente" class="e-mail">NIT: {{ this.authService?.nitCliente }}</p>
       <p class="e-mail" (click)="pressToEgg($event)">Version: {{ appVer }}</p>
       <hr>
       <p class="bd-status">BD Productos: <ion-icon [ngClass]="(prodServ.statusDB)?'green':'red'" name="radio-button-on" item-left></ion-icon></p>

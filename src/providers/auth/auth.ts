@@ -175,6 +175,17 @@ export class AuthProvider {
   }
 
   /**
+   * Me devuelve el nit del cliente de la cuenta, si es q la cuenta lo tiene
+   *
+   * @readonly
+   * @type {string}
+   * @memberof AuthProvider
+   */
+  public get nitCliente() : string {
+    return _.has(this.session, 'profile.nit_cliente') ? this.session.profile.nit_cliente : '';
+  }
+
+  /**
    * me devuelve el id del usuario pero el q se usan en couchdb
    * algo asi como "cristian540"
    *

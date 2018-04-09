@@ -23,6 +23,7 @@ import { ProductosProvider } from '../../providers/productos/productos';
 import { CarritoProvider } from "../../providers/carrito/carrito";
 import { Config as Cg} from '../../providers/config/config';
 import { ClientesProvider } from '../../providers/clientes/clientes';
+import { AuthProvider } from '../../providers/auth/auth';
 
 @Component({
   selector: 'page-home',
@@ -43,6 +44,7 @@ export class HomePage {
     private prodsService: ProductosProvider,
     private cartService: CarritoProvider,
     private clienteServ: ClientesProvider,
+    private authService: AuthProvider,
     private util: Cg,
     private storage: Storage
   ) {

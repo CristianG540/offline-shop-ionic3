@@ -20,7 +20,7 @@
             </ion-thumbnail>
             <h2>{{ item._id }}</h2>
             <p>{{ item.titulo }}</p>
-            <p><b>Disponibles: </b> {{ item.existencias }} </p>
+            <p *ngIf="!this.authService?.nitCliente" ><b>Disponibles: </b> {{ item.existencias }} </p>
             <p><b>Precio: </b> {{ item.precio | currency: 'USD': 'symbol': '1.0-0' }} </p>
             <button large clear ion-button item-right icon-only color="dark" (click)="addProd(item)" [disabled]="item.existencias < 1">
                 <ion-icon name='add-circle'></ion-icon>

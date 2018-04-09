@@ -25,7 +25,7 @@
       <ion-col col-6>
         <b>Precio:</b> {{ producto.precio | currency:'USD':'symbol': '1.0-0'  }}
       </ion-col>
-      <ion-col col-6>
+      <ion-col col-6 *ngIf="!this.authService?.nitCliente" >
         <b>Cantidad:</b> {{ producto.existencias }} {{ producto.unidad }}
       </ion-col>
       <ion-col col-6>

@@ -6,6 +6,7 @@ import _ from "lodash";
 import { ProductosProvider } from "../../providers/productos/productos";
 import { CarritoProvider } from '../../providers/carrito/carrito';
 import { Config as cg } from "../../providers/config/config";
+import { AuthProvider } from '../../providers/auth/auth';
 //Models
 import { Producto } from "../../providers/productos/models/producto";
 
@@ -25,6 +26,7 @@ export class SearchProdPage {
     private navParams: NavParams,
     private prodsService: ProductosProvider,
     private cartService: CarritoProvider,
+    private authService: AuthProvider,
     private util: cg
   ) {
   }

@@ -8,6 +8,7 @@ import {
 import { Producto } from '../../providers/productos/models/producto';
 import { CarritoProvider } from "../../providers/carrito/carrito";
 import { Config } from "../../providers/config/config";
+import { AuthProvider } from '../../providers/auth/auth';
 
 @IonicPage()
 @Component({
@@ -23,7 +24,8 @@ export class ProductoPage {
     private toastCtrl: ToastController,
     private util: Config,
     private navParams: NavParams,
-    private cartService: CarritoProvider
+    private cartService: CarritoProvider,
+    private authService: AuthProvider
   ) {
     this.producto = this.navParams.data;
   }

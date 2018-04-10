@@ -196,7 +196,7 @@ export class ConfirmarOrdenPage {
         /** Vacio el carrito y envio el usuario al tab de ordenes */
         this.cartServ.destroyDB(true);
         this.navCtrl.popToRoot();
-        this.navCtrl.parent.select(4);
+        this.navCtrl.parent.select(5);
         /** *** *** *** *** *** *** *** *** *** *** *** *** ***   */
         loading.dismiss();
 

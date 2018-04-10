@@ -349,11 +349,11 @@ export class ProductosProvider {
   }
 
   private async doLocalFirst(dbFun) {
-    // hit the local DB first; if it 404s, then hit the remote
+    // hit the remote DB first; if it 404s, then hit the local
     try {
-      return await dbFun(this._db);
-    } catch (err) {
       return await dbFun(this._remoteDB);
+    } catch (err) {
+      return await dbFun(this._db);
     }
   }
 

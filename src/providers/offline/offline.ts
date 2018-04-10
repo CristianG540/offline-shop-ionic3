@@ -4,20 +4,20 @@ export class OfflineUtils {
   //Esta variable se encarga de mostrar el estado de la bd en el menu
   public statusDB: boolean = false;
 
-  /************************ Metodos Offline First ***************************** */
+  /************************ Metodos online First ***************************** */
   /**
    * Los metodos acontinuacion los uso para usar alguna clase de implementacion
-   * de Offline first, lo qsignifica que primero intento consultar los datos
-   * en la base de datos local, pero si estos aun no estan disponibles, entonces
-   * consulto la base de datos en linea
+   * de online first, lo q significa que primero intento consultar los datos
+   * en la base de datos remota, pero si estos aun no estan disponibles, entonces
+   * consulto la base de datos en local
    */
 
   protected async _doLocalFirst(dbFun) {
-    // hit the local DB first; if it 404s, then hit the remote
+    // hit the remote DB first; if it 404s, then hit the local
     try {
-      return await dbFun(this._db);
-    } catch (err) {
       return await dbFun(this._remoteDB);
+    } catch (err) {
+      return await dbFun(this._db);
     }
   }
 

@@ -65,6 +65,20 @@ export class ConfirmarOrdenPage {
       cliente: [this.authService.nitCliente, Validators.required]
     });
 
+    if( this.authService.nitCliente ){
+
+      this.ordenForm = this.fb.group({
+        observaciones: [''],
+        cliente: ['C'+this.authService.nitCliente, Validators.required]
+      });
+    }else{
+
+      this.ordenForm = this.fb.group({
+        observaciones: [''],
+        cliente: [this.authService.nitCliente, Validators.required]
+      });
+    }
+
     this.newClient = this.fb.group({
       nombre: ['', Validators.required],
       codCliente: ['', Validators.required]

@@ -109,6 +109,7 @@ export class ConfirmarOrdenPage {
       });
       loading.dismiss();
     }).catch( (err) => {
+
       loading.dismiss();
       console.error("error gps", err);
       if (_.has(err, 'code') && err.code === 4 || err.code === 1) {
@@ -145,6 +146,7 @@ export class ConfirmarOrdenPage {
    * @memberof ConfirmarOrdenPage
    */
   private procesarOrden(position:any = ""): void {
+
     let loading = this.util.showLoading();
     /**
      * recupero los items del carrito para guardarlos en la orden
@@ -203,21 +205,25 @@ export class ConfirmarOrdenPage {
      */
     this.ordenServ.pushItem(orden)
       .then(res=>{
+
         // Actualizo la cantidad de los productos que se ordenaron
         return this.prodServ.updateQuantity(carItems)
       })
       .then(res=>{
+
         /** Vacio el carrito y envio el usuario al tab de ordenes */
         this.cartServ.destroyDB(true);
         this.navCtrl.popToRoot();
         this.navCtrl.parent.select(5);
         /** *** *** *** *** *** *** *** *** *** *** *** *** ***   */
+
         loading.dismiss();
 
         return this.ordenServ.sendOrdersSap();
 
       })
       .then(responses=>{
+
         let failOrders = _.filter(responses.apiRes, (res: any) => {
           return res.responseApi.code >= 400;
         })

@@ -585,7 +585,7 @@ export class ProductosProvider {
   public async searchAutocomplete(query: string): Promise<any> {
     query = (query) ? query.toUpperCase() : "";
 
-    let res = await await this.doLocalFirst(db => {
+    let res = await this.doLocalFirst(db => {
       return this.allDocs(db, {
         include_docs : true,
         startkey     : query,
@@ -624,6 +624,7 @@ export class ProductosProvider {
     let prodsId = _.map(carItems, "_id");
     return this.fetchProdsByids(prodsId)
     .then((prods: Producto[])=>{
+
       let prodsToUpdate = _.map(prods, (prod: Producto)=>{
         let itemId = Config.binarySearch(carItems, '_id', prod._id);
         prod.existencias -= carItems[itemId].cantidad;
@@ -634,7 +635,8 @@ export class ProductosProvider {
       return prodsToUpdate;
     })
     .then( prodsToUpdate => {
-      return this._db.bulkDocs(prodsToUpdate)
+
+      return this.doLocalFirst( db => db.bulkDocs(prodsToUpdate) )
     })
 
   }

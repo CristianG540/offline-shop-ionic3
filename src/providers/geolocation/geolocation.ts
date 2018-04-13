@@ -18,7 +18,7 @@ export class GeolocationProvider {
   public async getCurrentPosition(): Promise<Coordinates> {
     let geoLocOpts: GeolocationOptions = {
       maximumAge: 3000,
-      timeout: 60000,
+      timeout: 20000,
       enableHighAccuracy : true
     };
     this._isGpsEnabled = await this.diagnostic.isGpsLocationEnabled();

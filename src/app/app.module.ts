@@ -17,6 +17,7 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy';
 //Pagaes without lazy loading
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
+import { OrdenesPage } from '../pages/ordenes/ordenes'
 
 import { MyApp } from './app.component';
 import { CarritoProvider } from '../providers/carrito/carrito';
@@ -37,7 +38,8 @@ import { AgmCoreModule } from '@agm/core';
   declarations: [
     MyApp,
     HomePage,
-    LoginPage
+    LoginPage,
+    OrdenesPage
   ],
   imports: [
     BrowserModule,
@@ -54,7 +56,8 @@ import { AgmCoreModule } from '@agm/core';
   entryComponents: [
     MyApp,
     HomePage,
-    LoginPage
+    LoginPage,
+    OrdenesPage
   ],
   providers: [
     StatusBar,

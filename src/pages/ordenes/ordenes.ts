@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
+import { NavController, NavParams, Events } from 'ionic-angular';
 
 //Providers
 import { OrdenProvider } from "../../providers/orden/orden";
@@ -8,7 +8,6 @@ import { Config } from '../../providers/config/config';
 //Models
 import { Orden } from '../../providers/orden/models/orden';
 
-@IonicPage()
 @Component({
   selector: 'page-ordenes',
   templateUrl: 'ordenes.html',

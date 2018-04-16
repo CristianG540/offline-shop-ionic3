@@ -25,7 +25,7 @@ export class Config {
   private _eggsterFlag: boolean = false;
   public timerCheckTokenJose: NodeJS.Timer;
 
-  static readonly APP_VER: string = "1.6.1";
+  static readonly APP_VER: string = "1.6.3";
   static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
   static readonly G_MAPS_KEY: string = 'AIzaSyAtVh-4gg1RRcS_jUlDtatc6SjwP-5XI70';
 
@@ -47,7 +47,7 @@ export class Config {
 
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD de los productos en couch
-  static readonly CDB_URL: string = 'https://www.gatortyres.com:6984/producto_1';
+  static readonly CDB_URL: string = 'https://www.gatortyres.com:6984/producto_2';
   // Url base de la BD de los Clientes en couch
   static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes';
   // Url base de la BD de cartera en couch

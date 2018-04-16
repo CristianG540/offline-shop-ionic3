@@ -4,7 +4,9 @@ import { CarritoProvider } from "../../providers/carrito/carrito";
 import { AuthProvider } from '../../providers/auth/auth';
 
 import { HomePage } from '../home/home';
+import { OrdenesPage } from '../ordenes/ordenes'
 import { IonicPage } from 'ionic-angular';
+
 
 @IonicPage()
 @Component({
@@ -15,7 +17,7 @@ export class TabsPage {
 
   home: any = HomePage
   categorias: any = 'CategoriasPage'
-  ordenes: any = 'OrdenesPage'
+  ordenes: any = OrdenesPage
   carrito: any = 'CarritoPage'
   buscar: any = 'SearchProdPage'
   clientes: any = 'ClientesPage'

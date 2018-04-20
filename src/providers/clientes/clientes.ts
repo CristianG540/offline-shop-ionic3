@@ -151,15 +151,7 @@ export class ClientesProvider extends OfflineUtils {
       case "error":
         console.error("Clientes- first replication totally unhandled error (shouldn't happen)", d.info);
         Raven.captureException( new Error(`Clientes - Primera replica error que no deberia pasar 😫: ${JSON.stringify(d.info)}`), { extra: d.info } );
-        /**
-         * si algun error se presenta recargo la aplicacion,
-         * a menos que sea un error de conexion por falta de datos o de conexion
-         * en ese caso no la recargo por q entra en un loop infinito cuando el celular
-         * no tiene conexion
-         */
-        if(_.has(d.info, 'message') && d.info.message != "getCheckpoint rejected with " ){
-          window.location.reload();
-        }
+
         this.syncDB();
         break;
 

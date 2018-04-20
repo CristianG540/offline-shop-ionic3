@@ -158,21 +158,7 @@ export class ProductosProvider {
       case "error":
         console.error("Prods-totally unhandled error (shouldn't happen)", d.info);
         Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(d.info)}`), { extra: d.info } );
-        /**
-         * si algun error se presenta recargo la aplicacion,
-         * a menos que sea un error de conexion por falta de datos o de conexion
-         * en ese caso no la recargo por q entra en un loop infinito cuando el celular
-         * no tiene conexion
-         */
-        let error;
-        try {
-          error = d.info.message;
-        } catch (e) {
-          error = "";
-        }
-        if(error != "getCheckpoint rejected with " ){
-          window.location.reload();
-        }
+
         break;
 
       default:

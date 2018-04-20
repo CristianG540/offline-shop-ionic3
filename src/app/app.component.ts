@@ -144,15 +144,14 @@ export class MyApp {
   }
 
   private indexDb(): void {
-    let loading = this.util.showLoading();
+
     this.clienteServ
       .indexDbClientes()
       .then(res => {
-        loading.dismiss();
         this.util.showToast("Indice construido");
       })
       .catch(err => {
-        this.util.errorHandler(err.message, err, loading);
+        this.util.errorHandler(err.message, err);
       });
   }
 

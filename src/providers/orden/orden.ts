@@ -160,7 +160,7 @@ export class OrdenProvider {
               }
             });
             // url y cuerpo de la peticion
-            let url: string = cg.JOSEFA_URL+'/sap/order_v2';
+            let url: string = cg.JOSEFA_URL+'/sap/order';
             let body: string = JSON.stringify({
               id             : orden._id,
               fecha_creacion : moment(parseInt(orden._id)).format("YYYY-MM-DD"),
@@ -169,7 +169,9 @@ export class OrdenProvider {
               comentarios    : orden.observaciones+` ##${this.authService.asesorId}## ++${cg.APP_VER}++`,
               productos      : items,
               asesor         : this.authService.userId,
-              asesor_id      : this.authService.asesorId
+              asesor_id      : this.authService.asesorId,
+              user_email     : this.authService.userEmail,
+              total          : orden.total
             });
 
             return this.http.post(url, body, options).map( (res: Response) => {

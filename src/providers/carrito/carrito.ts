@@ -74,10 +74,12 @@ export class CarritoProvider {
         // change.id holds the deleted id
         this._onDeleted(change.id);
       } else { // updated/inserted
+
         // change.doc holds the new doc
         this._onUpdatedOrInserted({
           _id : change.doc._id,
           cantidad : change.doc.cantidad,
+          titulo : change.doc.titulo,
           totalPrice : change.doc.totalPrice,
           _rev : change.doc._rev
         })
@@ -227,6 +229,7 @@ export class CarritoProvider {
     return new Promise( (resolve, reject) => {
 
       this.checkBodega(item).then(val=>{
+
         switch (val) {
           case 'ok':
             /**

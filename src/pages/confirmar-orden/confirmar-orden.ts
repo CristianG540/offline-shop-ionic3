@@ -160,6 +160,7 @@ export class ConfirmarOrdenPage {
      * la info desde el form de estandar y se la asigno a la orden
      */
     if (!this.newClientFlag && this.ordenForm.valid) {
+
       let form = JSON.parse(JSON.stringify(this.ordenForm.value));
       orden = {
         _id : Date.now().toString(),
@@ -183,6 +184,7 @@ export class ConfirmarOrdenPage {
      * recupero los datos y se los asigno a la orden
      */
     if (this.newClientFlag && this.newClient.valid) {
+
       let form = JSON.parse(JSON.stringify(this.newClient.value));
       orden = {
         _id : Date.now().toString(),

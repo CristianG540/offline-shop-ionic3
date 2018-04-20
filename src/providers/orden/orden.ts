@@ -156,6 +156,8 @@ export class OrdenProvider {
               return {
                 referencia : item._id,
                 cantidad   : item.cantidad,
+                titulo     : item.titulo,
+                total      : item.totalPrice,
                 descuento  : 0
               }
             });

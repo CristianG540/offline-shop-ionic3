@@ -107,4 +107,8 @@ export class LoginPage {
     this.navCtrl.push('SignupPage');
   }
 
+  private requestAccount(): void {
+    this.navCtrl.push('FormNewAccountPage');
+  }
+
 }

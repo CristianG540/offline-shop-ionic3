@@ -1,0 +1,60 @@
+
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Solicitar cuenta</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+  <ion-row text-center>
+    <ion-col>
+      <b style="font-size: 18px;">Regálanos tus datos para ser contactado por un asesor</b>
+      <p style="font-size: 12px;">Tambien puedes solicitar tu usuario y contraseña llamando al (57)(4)4442025</p>
+    </ion-col>
+  </ion-row>
+  <form [formGroup]="newAccountForm" margin-top >
+      <ion-item>
+        <ion-label stacked>Nombre</ion-label>
+        <ion-input type="text" formControlName="nombre"></ion-input>
+      </ion-item>
+      <ion-item >
+        <ion-label stacked>E-mail</ion-label>
+        <ion-input type="email" formControlName="eMail"></ion-input>
+      </ion-item>
+      <ion-item >
+        <ion-label stacked>NIT</ion-label>
+        <ion-input type="number" formControlName="nit"></ion-input>
+      </ion-item>
+      <ion-item >
+        <ion-label stacked>Numero de telefono</ion-label>
+        <ion-input type="tel" formControlName="telefono"></ion-input>
+      </ion-item>
+      <ion-item >
+        <ion-label stacked>Ciudad</ion-label>
+        <ion-input type="text" formControlName="ciudad"></ion-input>
+      </ion-item>
+      <ion-item >
+        <ion-label stacked>¿Por qu&eacute; nos contactas?</ion-label>
+        <ion-select formControlName="motivoContacto">
+          <ion-option value="duda">Duda</ion-option>
+          <ion-option value="queja">Queja</ion-option>
+          <ion-option value="sugerencia">Sugerencia</ion-option>
+          <ion-option value="quiero ser cliente de igb">Quiero ser cliente de igb</ion-option>
+          <ion-option value="no tengo usuario y contraseña">No tengo usuario y contrase&ntilde;a</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item >
+        <ion-label stacked>Observaci&oacute;n</ion-label>
+        <ion-input type="text" formControlName="observacion"></ion-input>
+      </ion-item>
+    </form>
+    <ion-row text-center>
+      <ion-col>
+        <button type="submit" ion-button class="login-button" [disabled]="!newAccountForm.valid">Enviar</button>
+      </ion-col>
+    </ion-row>
+</ion-content>

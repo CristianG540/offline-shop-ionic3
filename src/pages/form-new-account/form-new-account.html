@@ -16,7 +16,7 @@
       <p style="font-size: 12px;">Tambien puedes solicitar tu usuario y contraseña llamando al (57)(4)4442025</p>
     </ion-col>
   </ion-row>
-  <form [formGroup]="newAccountForm" margin-top >
+  <form [formGroup]="newAccountForm" (ngSubmit)="enviar()" margin-top >
       <ion-item>
         <ion-label stacked>Nombre</ion-label>
         <ion-input type="text" formControlName="nombre"></ion-input>
@@ -51,10 +51,10 @@
         <ion-label stacked>Observaci&oacute;n</ion-label>
         <ion-input type="text" formControlName="observacion"></ion-input>
       </ion-item>
+      <ion-row text-center>
+        <ion-col>
+          <button type="submit" ion-button class="login-button" [disabled]="!newAccountForm.valid">Enviar</button>
+        </ion-col>
+      </ion-row>
     </form>
-    <ion-row text-center>
-      <ion-col>
-        <button type="submit" ion-button class="login-button" [disabled]="!newAccountForm.valid">Enviar</button>
-      </ion-col>
-    </ion-row>
 </ion-content>

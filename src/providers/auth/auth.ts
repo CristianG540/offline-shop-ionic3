@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AlertController } from 'ionic-angular';
-import superlogin from 'superlogin-client';
-import { Http, RequestOptions, Response, URLSearchParams } from '@angular/http';
 import { Storage } from '@ionic/storage';
+import { Http, RequestOptions, Response, URLSearchParams } from '@angular/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
+import { map, catchError, timeout } from 'rxjs/operators';
+import 'rxjs/add/operator/toPromise';
+
+
 import _ from 'lodash';
 import Raven from "raven-js";
+import superlogin from 'superlogin-client';
 
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
@@ -44,6 +50,7 @@ export class AuthProvider {
     private alertCtrl: AlertController,
     public dbServ: DbProvider,
     private http: Http,
+    private httpClient: HttpClient,
     private util: Config
   ) {
     superlogin.configure(this.config);
@@ -149,6 +156,43 @@ export class AuthProvider {
 
   public removeTokenJosefa(): Promise<any>{
     return this.storage.remove('josefa-token');
+  }
+
+  public async requestAccount(data: any): Promise<any>{
+    try {
+      await this.getTokenJosefa();
+      let token = await this.storage.get('josefa-token');
+      /**
+       * Bueno aqui hago todo lo contrario a lo que hago con los productos
+       * en vez de hacer un offline first (que deberia ser lo correcto)
+       * hago un online first por asi decirlo, lo que hago es buscar primero
+       * en cloudant/couchdb por los clientes, si por algun motivo no los puedo
+       * traer digace fallo de conexion o lo que sea, entonces busco los clientes
+       * en la base de datos local
+       */
+      let url: string = Config.JOSEFA_URL+'/sap/request_account';
+      let options = {
+        headers: new HttpHeaders({
+          'Accept'       : 'application/json',
+          'Content-Type' : 'application/json',
+          'Authorization': 'Bearer ' + token
+        })
+      };
+      let body: string = JSON.stringify(data);
+
+      let res = await this.httpClient.post( url, body, options ).pipe(
+        map((res: Response) => {
+          return res;
+        }),
+        timeout(7000)
+      ).toPromise();
+
+      return res;
+
+    } catch (error) {
+      console.error("Error al solicitar una cuenta nueva", error);
+      throw "Error al solicitar una cuenta nueva debido a un fallo con la conexion, verifique los datos o busque una red wifi: "+JSON.stringify(error);
+    }
   }
 
   public get isLogged(): boolean {

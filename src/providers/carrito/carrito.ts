@@ -5,6 +5,7 @@ import { Events } from 'ionic-angular';
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import PouchUpsert from 'pouchdb-upsert';
+import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
 
 //Providers
 import { Config as cg } from "../config/config";
@@ -32,7 +33,10 @@ export class CarritoProvider {
   public initDB(){
     //let loading = this.util.showLoading();
     PouchDB.plugin(PouchUpsert);
-    this._db = new PouchDB('cart');
+    PouchDB.plugin(cordovaSqlitePlugin);
+    let dbConf = {adapter: 'cordova-sqlite', iosDatabaseLocation: 'default'};
+    this._db = new PouchDB('cart.db', dbConf);
+
     this.fetchAndRenderAllDocs()
       .then( res => {
         this._reactToChanges()

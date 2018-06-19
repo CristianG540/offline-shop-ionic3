@@ -47,7 +47,7 @@ export class Config {
 
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD de los productos en couch
-  static readonly CDB_URL: string = 'https://www.gatortyres.com:6984/producto_2';
+  static readonly CDB_URL: string = 'https://www.gatortyres.com:6984/producto_3';
   // Url base de la BD de los Clientes en couch
   static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes';
   // Url base de la BD de cartera en couch
@@ -56,7 +56,7 @@ export class Config {
   static readonly CDB_USER: string = "admin";
   static readonly CDB_PASS: string = "admin";
 
-  static readonly ELASTIC_URL: string = `https://www.gatortyres.com:9209/couchdb1`;
+  static readonly SEARCH_CLIENTS_URL: string = `https://www.gatortyres.com:1339/clientes/igb/search`;
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http
   //el header de autotizacion creoq se puede hacer de una forma mejor
   static CDB_OPTIONS(): RequestOptions{

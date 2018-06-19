@@ -209,9 +209,10 @@ export class ClientesProvider extends OfflineUtils {
      * traer digace fallo de conexion o lo que sea, entonces busco los clientes
      * en la base de datos local
      */
-    let url: string = `${cg.ELASTIC_URL}/_search`;
+    let url: string = cg.SEARCH_CLIENTS_URL;
     let params = new HttpParams()
-      .set('q', `doc.nombre_cliente:"${query}"~ AND doc.asesor:"${this.authService.asesorId}"`)
+      .set('keyword', query)
+      .set('asesor', String(this.authService.asesorId) );
     let options = {
       headers: new HttpHeaders({
         'Accept'       : 'application/json',
@@ -236,8 +237,10 @@ export class ClientesProvider extends OfflineUtils {
       ).toPromise();
 
       let data = { rows: [] };
-      data.rows = _.map(res.hits.hits, (hit: any) => {
-        return hit._source
+      data.rows = _.map(res, (hit: any) => {
+        return {
+          doc : hit
+        }
       });
 
       return data;

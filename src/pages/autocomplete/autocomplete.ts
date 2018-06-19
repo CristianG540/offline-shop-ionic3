@@ -31,7 +31,14 @@ export class AutocompletePage {
 
   chooseItem(item: any) {
     if(this.navParams.get('type') == "page"){
-      this.navCtrl.push(this.clienteInfoPage, item.data);
+
+      this.clienteServ.getClientesByIds([item.nit]).then(res => {
+        this.navCtrl.push(this.clienteInfoPage, res[0].doc);
+      }).catch(err => {
+        console.error('error chooseItem() pages - autocomplete.ts', err);
+        this.util.errorHandler(err.message, err);
+      })
+
     }else{
       this.viewCtrl.dismiss(item);
     }

@@ -1,5 +1,7 @@
 import { Injectable, ApplicationRef } from '@angular/core';
 import { Http, RequestOptions, Response, URLSearchParams } from '@angular/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { timeout } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
@@ -25,7 +27,7 @@ declare var emit:any;
 @Injectable()
 export class ProductosProvider {
 
-  private _db: any;
+  private _db: PouchDB.Database;
   private _remoteDB: any;
   private _prods: Producto[] = [];
   private _categorias: Categoria[] = [];
@@ -49,6 +51,7 @@ export class ProductosProvider {
 
   constructor(
     public http: Http,
+    private httpClient: HttpClient, // angular 5+
     private appRef: ApplicationRef, // lo uso para actualizar la UI cuando se hace un cambio fiera de la ngZone
     private util: Config,
     private storage: Storage
@@ -355,7 +358,7 @@ export class ProductosProvider {
    */
   public fetchCategorias(): Promise<any> {
     // create a design doc
-    var ddoc = {
+    let ddoc: any = {
       _id: '_design/categoriaview',
       views: {
         categoriaview: {
@@ -568,39 +571,62 @@ export class ProductosProvider {
    * @param {string} query
    * @memberof ProductosProvider
    */
-  public async searchAutocomplete(query: string): Promise<any> {
+  public async searchAutocomplete(query: string): Promise<Producto[]> {
     query = (query) ? query.toUpperCase() : "";
 
-    let res = await this.doLocalFirst(db => {
-      return this.allDocs(db, {
+    const url: string = Config.SEARCH_PRODS_URL;
+    const params = new HttpParams()
+      .set('keyword', query);
+    const options = {
+      headers: new HttpHeaders({
+        'Accept'       : 'application/json',
+        'Content-Type' : 'application/json',
+      }),
+      params: params,
+    };
+
+    let res: Producto[] = []; // Guardo la respuesta con los productos
+
+    try {
+      res = await this.httpClient.get<Producto[]>( url, options ).pipe(
+        timeout(10000),
+      ).toPromise();
+
+      return res.slice(0, 31);
+    } catch (error) {
+
+      const pouchRes = await this._db.allDocs({
         include_docs : true,
         startkey     : query,
         endkey       : query+"\uffff",
         limit        : 30
       })
-    });
 
-    if (res && res.rows.length > 0) {
-      return _.map(res.rows, (v: any) => {
-        let precio: number = 0;
-        if(_.has(v.doc, 'precio')){
-          precio = v.doc.precio;
-          return new Producto(
-            v.doc._id,
-            v.doc.titulo,
-            v.doc.aplicacion,
-            v.doc.imagen,
-            v.doc.categoria,
-            v.doc.marcas,
-            v.doc.unidad,
-            parseInt(v.doc.existencias),
-            precio,
-            v.doc._rev
-          );
-        }
-      }) ;
-    }else{
-      return [];
+      if (pouchRes && pouchRes.rows.length > 0) {
+        res = _.map(pouchRes.rows, (v: any) => {
+          let precio: number = 0;
+          if(_.has(v.doc, 'precio')){
+            precio = v.doc.precio;
+            return new Producto(
+              v.doc._id,
+              v.doc.titulo,
+              v.doc.aplicacion,
+              v.doc.imagen,
+              v.doc.categoria,
+              v.doc.marcas,
+              v.doc.unidad,
+              parseInt(v.doc.existencias),
+              precio,
+              v.doc._rev
+            );
+          }
+        }) ;
+
+        return res;
+      }else{
+        return [];
+      }
+
     }
 
   }

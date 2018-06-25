@@ -57,6 +57,7 @@ export class Config {
   static readonly CDB_PASS: string = "admin";
 
   static readonly SEARCH_CLIENTS_URL: string = `https://www.gatortyres.com:1339/clientes/igb/search`;
+  static readonly SEARCH_PRODS_URL: string = `https://www.gatortyres.com:1339/prods/igb/search`;
   //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http
   //el header de autotizacion creoq se puede hacer de una forma mejor
   static CDB_OPTIONS(): RequestOptions{

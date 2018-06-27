@@ -10,7 +10,6 @@ import 'rxjs/add/operator/toPromise';
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import PouchUpsert from 'pouchdb-upsert';
-import pouchAdapterMem from 'pouchdb-adapter-memory';
 import Raven from 'raven-js';
 
 //Providers
@@ -24,7 +23,7 @@ import { WorkerRes } from "../config/models/workerRes"
 
 @Injectable()
 export class ClientesProvider extends OfflineUtils {
-  private _dbInMemory: any;
+
   private _clientes: Cliente[] = [];
   private replicationWorker: Worker;
 
@@ -37,7 +36,6 @@ export class ClientesProvider extends OfflineUtils {
     super();
     PouchDB.plugin(require("pouchdb-quick-search"));
     PouchDB.plugin(PouchUpsert);
-    PouchDB.plugin(pouchAdapterMem);
 
     /**
      * Creo un nuevo worker desde el bundle que hago con webpack en los assets
@@ -79,57 +77,48 @@ export class ClientesProvider extends OfflineUtils {
 
     }
 
-    if (!this._dbInMemory) {
+    // Base de datos remota en couchdb
+    this._remoteDB = new PouchDB(cg.CDB_URL_CLIENTES, {
+      auth: {
+        username: cg.CDB_USER,
+        password: cg.CDB_PASS
+      }
+    });
 
-      // Base de datos remota en couchdb
-      this._remoteDB = new PouchDB(cg.CDB_URL_CLIENTES, {
-        auth: {
-          username: cg.CDB_USER,
-          password: cg.CDB_PASS
-        }
-      });
-      /**
-       * Base de datos local en pouch, lo diferente de esta BD
-       * es que se mantiene en memoria, creo q es mucho mas rapida
-       * que una que almacene en el dispositivo, pero lo malo es que
-       * los datos se pierden si la app se cierra
-       */
-      this._dbInMemory = new PouchDB("cliente_mem", {adapter: 'memory', auto_compaction: true});
-      /**
-       * Base de datos local en pouch, esta BD almacena los datos en
-       * el dispositivo usando IndexDB, la ventaja es q los datos se mantienen
-       * si la app se cierra, la desventaja es que creo q es mas lenta
-       * que la BD en memoria
-       */
-      this._db = new PouchDB("cliente",{revs_limit: 5, auto_compaction: true});
+    /**
+     * Base de datos local en pouch, esta BD almacena los datos en
+     * el dispositivo usando IndexDB, la ventaja es q los datos se mantienen
+     * si la app se cierra, la desventaja es que creo q es mas lenta
+     * que la BD en memoria
+     */
+    this._db = new PouchDB("cliente",{revs_limit: 5, auto_compaction: true});
 
-      /**
-       * postMessage se encarga de enviar un mensaje al worker
-       * yo aqui lo uso para enviarle los datos de la bd de la que quiero q se
-       * encargue, le mando los datos de la bd local y de la remota para q se encargue
-       * de la replicacion y la sincronizacion
-       */
-      this.replicationWorker.postMessage({
-        db: "clientes",
-        local: {
-          name: "cliente",
-          options: {revs_limit: 5, auto_compaction: true}
-        },
-        remote: {
-          name: cg.CDB_URL_CLIENTES,
-          options : {
-            auth: {
-              username: cg.CDB_USER,
-              password: cg.CDB_PASS
-            },
-            ajax: {
-              timeout: 60000
-            }
+    /**
+     * postMessage se encarga de enviar un mensaje al worker
+     * yo aqui lo uso para enviarle los datos de la bd de la que quiero q se
+     * encargue, le mando los datos de la bd local y de la remota para q se encargue
+     * de la replicacion y la sincronizacion
+     */
+    this.replicationWorker.postMessage({
+      db: "clientes",
+      local: {
+        name: "cliente",
+        options: {revs_limit: 5, auto_compaction: true}
+      },
+      remote: {
+        name: cg.CDB_URL_CLIENTES,
+        options : {
+          auth: {
+            username: cg.CDB_USER,
+            password: cg.CDB_PASS
+          },
+          ajax: {
+            timeout: 60000
           }
         }
-      });
+      }
+    });
 
-    }
   }
 
   private _replicateDB(d): void {
@@ -145,49 +134,18 @@ export class ClientesProvider extends OfflineUtils {
         });
         this.statusDB = true;
         console.warn("Clientes-Primera replicada completa", d.info);
-        this.syncDB();
+
         break;
 
       case "error":
         console.error("Clientes- first replication totally unhandled error (shouldn't happen)", d.info);
         Raven.captureException( new Error(`Clientes - Primera replica error que no deberia pasar 😫: ${JSON.stringify(d.info)}`), { extra: d.info } );
 
-        this.syncDB();
         break;
 
       default:
         break;
     }
-  }
-
-  private syncDB(): void {
-    let replicationOptions = {
-      live: true,
-      retry: true
-    };
-    /**
-     * Que mierda estoy haciendo aqui me preguntare cuando se me olvide esto,
-     * como la bd en memoria es muy rapida pero no conserva los datos, y como
-     * la bd normal si los almacena pero es mas lenta, entonces lo que hago
-     * es replicar los datos de una a la otra, asi puedo hacer las operaciones
-     * CRUD por asi decirlo en la de memoria que es muy rapida, y replicar los
-     * datos a la otra para que los preserve, en teoria deberia funcionar como
-     * una especia de ram o cache algo asi.
-     */
-    PouchDB.sync(this._db, this._dbInMemory, replicationOptions)
-    .on("denied", err => {
-      console.error("Clientes*inMemory - a failed to replicate due to permissions",err);
-      Raven.captureException( new Error(`Clientes*inMemory - No se pudo replicar debido a permisos 👮: ${JSON.stringify(err)}`), {
-        extra: err
-      } );
-    })
-    .on("error", err => {
-      console.error("Clientes*inMemory - totally unhandled error (shouldn't happen)", err);
-      Raven.captureException( new Error(`Clientes*inMemory - Error que no deberia pasar 😫: ${JSON.stringify(err)}`), {
-        extra: err
-      } );
-    });
-
   }
 
   /**
@@ -205,7 +163,7 @@ export class ClientesProvider extends OfflineUtils {
      * Bueno aqui hago todo lo contrario a lo que hago con los productos
      * en vez de hacer un offline first (que deberia ser lo correcto)
      * hago un online first por asi decirlo, lo que hago es buscar primero
-     * en cloudant/couchdb por los clientes, si por algun motivo no los puedo
+     * en el api csv para los clientes de igb, si por algun motivo no los puedo
      * traer digace fallo de conexion o lo que sea, entonces busco los clientes
      * en la base de datos local
      */
@@ -251,7 +209,7 @@ export class ClientesProvider extends OfflineUtils {
        * Para mas informacion sobre este plugin la pagina principal:
        * https://github.com/pouchdb-community/pouchdb-quick-search
        */
-      return this._dbInMemory.search({
+      return this._db.search({
         query: query,
         fields: ["nombre_cliente"],
         filter: doc => {
@@ -267,7 +225,7 @@ export class ClientesProvider extends OfflineUtils {
   }
 
   public indexDbClientes(): any {
-    return this._dbInMemory.search({
+    return this._db.search({
       fields: ["nombre_cliente"],
       filter: doc => {
         return doc.asesor == this.authService.asesorId; // solo los del asesor en sesion
@@ -286,7 +244,7 @@ export class ClientesProvider extends OfflineUtils {
 
   public fetchAndRenderAllDocs(): Promise<any> {
 
-    return this._dbInMemory.allDocs({
+    return this._db.allDocs({
         include_docs: true
       }).then(res => {
         this._clientes = res.rows.map((row): Cliente => {

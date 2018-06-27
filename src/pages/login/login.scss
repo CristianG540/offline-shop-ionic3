@@ -29,7 +29,9 @@ page-login {
   }
   span {
     color: white;
+    background-color: rgba(57, 152, 220, 0.6);padding: 4px;border-radius: 3px;cursor: pointer;
   }
+
   ion-item {
     // border-radius: 30px !important;
     padding-left: 10px !important;

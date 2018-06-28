@@ -1,4 +1,4 @@
-import { ElementRef, HostListener, Directive, OnInit } from '@angular/core';
+import { ElementRef, HostListener, Directive, OnInit } from '@angular/core'
 
 @Directive({
   selector: 'ion-textarea[autosize]'
@@ -6,21 +6,21 @@ import { ElementRef, HostListener, Directive, OnInit } from '@angular/core';
 
 export class Autosize implements OnInit {
   @HostListener('input', ['$event.target'])
-  onInput(textArea:HTMLTextAreaElement):void {
-    this.adjust();
+  onInput (textArea: HTMLTextAreaElement): void {
+    this.adjust()
   }
 
-  constructor(public element:ElementRef) {
+  constructor (public element: ElementRef) {
   }
 
-  ngOnInit():void {
-    setTimeout(() => this.adjust(), 0);
+  ngOnInit (): void {
+    setTimeout(() => this.adjust(), 0)
   }
 
-  adjust():void {
-    const textArea = this.element.nativeElement.getElementsByTagName('textarea')[0];
-    textArea.style.overflow = 'hidden';
-    textArea.style.height = 'auto';
-    textArea.style.height = textArea.scrollHeight + 'px';
+  adjust (): void {
+    const textArea = this.element.nativeElement.getElementsByTagName('textarea')[0]
+    textArea.style.overflow = 'hidden'
+    textArea.style.height = 'auto'
+    textArea.style.height = textArea.scrollHeight + 'px'
   }
 }

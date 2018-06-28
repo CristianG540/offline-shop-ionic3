@@ -1,55 +1,53 @@
-import { Injectable, ApplicationRef } from '@angular/core';
-import { Http, RequestOptions, Response, URLSearchParams } from '@angular/http';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { timeout } from 'rxjs/operators';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/toPromise';
-import { Storage } from '@ionic/storage';
+import { Injectable, ApplicationRef } from '@angular/core'
+import { Http } from '@angular/http'
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http'
+import { timeout } from 'rxjs/operators'
+import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/toPromise'
+import { Storage } from '@ionic/storage'
 
 /* librerias de terceros */
-import Raven from "raven-js";
-import _ from 'lodash';
-import PouchDB from 'pouchdb';
-//import PouchUpsert from 'pouchdb-upsert';
-//import PouchLoad from 'pouchdb-load';
+import Raven from 'raven-js'
+import _ from 'lodash'
+import PouchDB from 'pouchdb'
+// import PouchUpsert from 'pouchdb-upsert';
+// import PouchLoad from 'pouchdb-load';
 
-//Providers
+// Providers
 import { Config } from '../config/config'
 // Models
-import { Producto } from './models/producto';
-import { Categoria } from './models/categoria';
-import { CarItem } from "../carrito/models/carItem";
-import { WorkerRes } from "../config/models/workerRes"
+import { Producto } from './models/producto'
+import { Categoria } from './models/categoria'
+import { CarItem } from '../carrito/models/carItem'
+import { WorkerRes } from '../config/models/workerRes'
 // Info del por que hago esto https://github.com/domiSchenk/PouchDB-typescript-definitions/issues/4
-declare var emit:any;
+declare var emit: any
 
 @Injectable()
 export class ProductosProvider {
 
-  private _db: PouchDB.Database;
-  private _remoteDB: any;
-  private _prods: Producto[] = [];
-  private _categorias: Categoria[] = [];
-  private _prodsByCat: Producto[] = [];
-  private replicationWorker: Worker;
-  public statusDB: boolean = false;
+  private _db: PouchDB.Database
+  private _remoteDB: any
+  private _prods: Producto[] = []
+  private _categorias: Categoria[] = []
+  private _prodsByCat: Producto[] = []
+  private replicationWorker: Worker
+  public statusDB: boolean = false
 
   /* parametros usados por couchdb para la paginacion de los productos */
   /* mas info: https://pouchdb.com/2014/04/14/pagination-strategies-with-pouchdb.html */
-  private cantProdsPag:number = 10;
-  private skip:number = 0;
+  private cantProdsPag: number = 10
+  private skip: number = 0
   /**
    * este starkey lo uso para paginar los resultados de "_all_docs"
    */
-  private startkey:string = '';
+  private startkey: string = ''
   /**
    * http://docs.couchdb.org/en/2.0.0/couchapp/views/pagination.html
    */
-  private skipByCat:number = 0;
+  private skipByCat: number = 0
 
-
-  constructor(
+  constructor (
     public http: Http,
     private httpClient: HttpClient, // angular 5+
     private appRef: ApplicationRef, // lo uso para actualizar la UI cuando se hace un cambio fiera de la ngZone
@@ -61,15 +59,15 @@ export class ProductosProvider {
      * este worker se encarga de todo lo que este relacionado con la replicacion
      * y la sincroniazion de las bd mediante pouchdb
      */
-    this.replicationWorker = new Worker('./assets/js/pouch_replication_worker/dist/bundle.js');
+    this.replicationWorker = new Worker('./assets/js/pouch_replication_worker/dist/bundle.js')
 
     /**
      * bueno esto es parecido a un observable, lo que hace es recibir una funcion
      * que se ejecuta cada vez que llegue un mensaje desde el worker
      */
     this.replicationWorker.onmessage = (event) => {
-      //saco los datos que vienen en el evento
-      let d: WorkerRes = event.data;
+      // saco los datos que vienen en el evento
+      let d: WorkerRes = event.data
 
       /**
        * con este switch verifico que clase de mensaje envie desde el
@@ -77,27 +75,28 @@ export class ProductosProvider {
        * yo creo q si, si sabe como hagalo usted
        */
       switch (d.method) {
-        case "replicate":
+        case 'replicate':
           this._replicateDB(d)
-          break;
-        case "sync":
-          console.error("Prods- Error en sincronizacion 🐛", d.info);
-          Raven.captureException( new Error(`Prods- Error en sincronizacion 🐛: ${JSON.stringify(d.info)}`) );
-          break;
-        case "changes":
-          this._reactToChanges(d);
-          break;
+          break
+        case 'sync':
+          console.error('Prods- Error en sincronizacion 🐛', d.info)
+          Raven.captureException(new Error(`Prods- Error en sincronizacion 🐛: ${JSON.stringify(d.info)}`))
+          break
+        case 'changes':
+          this._reactToChanges(d)
+          break
         default:
-          break;
+          break
       }
 
     }
 
   }
 
-  public initDB(): void {
-    //PouchDB.plugin(PouchUpsert);
-    //PouchDB.plugin(PouchLoad);
+  public initDB (): void {
+    // PouchDB.plugin(PouchUpsert);
+    // PouchDB.plugin(PouchLoad);
+    // tslint:disable-next-line:variable-name
     const replication_opt = {
       auth: {
         username: Config.CDB_USER,
@@ -106,15 +105,15 @@ export class ProductosProvider {
       ajax: {
         timeout: 60000
       }
-    };
+    }
 
     /*** Intento eliminar la bd anterior */
-    const oldDB: PouchDB.Database = new PouchDB("producto_2", {revs_limit: 5, auto_compaction: true});
-    oldDB.destroy();
+    const oldDB: PouchDB.Database = new PouchDB('producto_2', { revs_limit: 5, auto_compaction: true })
+    oldDB.destroy()
     /*********************************** */
 
-    this._db = new PouchDB("producto_3", {revs_limit: 5, auto_compaction: true});
-    this._remoteDB = new PouchDB(Config.CDB_URL, replication_opt);
+    this._db = new PouchDB('producto_3', { revs_limit: 5, auto_compaction: true })
+    this._remoteDB = new PouchDB(Config.CDB_URL, replication_opt)
 
     /**
      * postMessage se encarga de enviar un mensaje al worker
@@ -123,49 +122,49 @@ export class ProductosProvider {
      * de la replicacion y la sincronizacion
      */
     this.replicationWorker.postMessage({
-      db: "productos",
+      db: 'productos',
       local: {
-        name: "producto_3",
-        options: {revs_limit: 5, auto_compaction: true}
+        name: 'producto_3',
+        options: { revs_limit: 5, auto_compaction: true }
       },
       remote: {
         name: Config.CDB_URL,
         options : replication_opt
       }
-    });
+    })
 
   }
 
-  private _replicateDB(d: WorkerRes): void {
+  private _replicateDB (d: WorkerRes): void {
     switch (d.event) {
       /**
        * Esto lo comento por que el enviar muchos mensajes al hilo
        * principal hace q se bloquee el dom entonces hay q tratat
        * de enviar la menor cantidad posible de mensajes
-      **/
+       */
       /*case "change":
         console.warn("Primera replicada change", d.info);
         this.util.setLoadingText( `Cargando productos y sus cambios: ${d.info.docs_written.toString()}` );
         break;*/
-      case "complete":
+      case 'complete':
         /**
          * Cuando la bd se termina de replicar y esta disponible local
          * creo una bandera en el storage que me indica que ya esta lista
          */
         this.storage.set('prods-status', true).catch(err => {
-          Raven.captureException( new Error(`Productos- Error al guardar la bandera estado de la bd😫: ${JSON.stringify(err)}`), { extra: err } );
-        });
-        this.statusDB = true;
-        console.warn('Prods- First Replication complete', d.info);
-        break;
-      case "error":
-        console.error("Prods-totally unhandled error (shouldn't happen)", d.info);
-        Raven.captureException( new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(d.info)}`), { extra: d.info } );
+          Raven.captureException(new Error(`Productos- Error al guardar la bandera estado de la bd😫: ${JSON.stringify(err)}`), { extra: err })
+        })
+        this.statusDB = true
+        console.warn('Prods- First Replication complete', d.info)
+        break
+      case 'error':
+        console.error("Prods-totally unhandled error (shouldn't happen)", d.info)
+        Raven.captureException(new Error(`Prods- Error en la bd local no deberia pasar 😫: ${JSON.stringify(d.info)}`), { extra: d.info })
 
-        break;
+        break
 
       default:
-        break;
+        break
     }
   }
 
@@ -248,13 +247,13 @@ export class ProductosProvider {
    * @returns {Promise<boolean>}
    * @memberof ProductosProvider
    */
-  private async checkReplicated(db): Promise<boolean> {
+  private async checkReplicated (db): Promise<boolean> {
     try {
-      await db.get('_local/v1-load-complete');
-      return true;
+      await db.get('_local/v1-load-complete')
+      return true
     } catch (err) {
-      console.log("Error al recuperar doc local", err);
-      return false;
+      console.log('Error al recuperar doc local', err)
+      return false
     }
   }
 
@@ -268,10 +267,10 @@ export class ProductosProvider {
    * @returns {Promise<any>}
    * @memberof ProductosProvider
    */
-  private async markReplicated(db): Promise<any> {
-    return await db.putIfNotExists({
+  private async markReplicated (db): Promise<any> {
+    return db.putIfNotExists({
       _id: '_local/v1-load-complete'
-    });
+    })
   }
 
   /****************************** fin replica local ******************** */
@@ -285,64 +284,64 @@ export class ProductosProvider {
    * consulto la base de datos en linea
    */
 
-  private async allDocs(db, options): Promise<any> {
-    let res = await db.allDocs(options);
+  private async allDocs (db, options): Promise<any> {
+    let res = await db.allDocs(options)
     /**
      * si la base de datos aun no se ha replicado y si la bd
      * a la que se le esta haciendo la consulta es la local
      * entonces lanzo un error para que el metodo doLocalFirst
      * intente de nuevo la consulta pero con la bd remota
      */
-    if(! await this.storage.get('prods-status') && !db._remote ){
-      throw new Error('No se ha completado la replicacion');
+    if (! await this.storage.get('prods-status') && !db._remote) {
+      throw new Error('No se ha completado la replicacion')
     }
-    return res;
+    return res
   }
 
-  private async getManyByIds(db, ids): Promise<any> {
+  private async getManyByIds (db, ids): Promise<any> {
     let res = await db.allDocs({
       include_docs : true,
       keys         : ids
-    });
-    if(! await this.storage.get('prods-status') && !db._remote ){
+    })
+    if (! await this.storage.get('prods-status') && !db._remote) {
 
-      throw new Error('No se ha completado la replicacion');
+      throw new Error('No se ha completado la replicacion')
     }
 
-    return res;
+    return res
   }
 
-  private async designDocCategoriaView(db): Promise<any>{
+  private async designDocCategoriaView (db): Promise<any> {
     let res = await db.query('categoriaview', {
       group_level : 1,
       group       : true,
       reduce      : true
-    });
-    if(! await this.storage.get('prods-status') && !db._remote ){
-      throw new Error('No se ha completado la replicacion');
+    })
+    if (! await this.storage.get('prods-status') && !db._remote) {
+      throw new Error('No se ha completado la replicacion')
     }
-    return res;
+    return res
   }
 
-  private async queryCategoriaView(db, categoria): Promise<any>{
+  private async queryCategoriaView (db, categoria): Promise<any> {
     let res = await db.query('categoriaview/producto_categoria', {
       key          : categoria,
       skip         : this.skipByCat,
       limit        : this.cantProdsPag,
       include_docs : true
     })
-    if(! await this.storage.get('prods-status') && !db._remote ){
-      throw new Error('No se ha completado la replicacion');
+    if (! await this.storage.get('prods-status') && !db._remote) {
+      throw new Error('No se ha completado la replicacion')
     }
-    return res;
+    return res
   }
 
-  private async doLocalFirst(dbFun) {
+  private async doLocalFirst (dbFun) {
     // hit the remote DB first; if it 404s, then hit the local
     try {
-      return await dbFun(this._remoteDB);
+      return await dbFun(this._remoteDB)
     } catch (err) {
-      return await dbFun(this._db);
+      return dbFun(this._db)
     }
   }
 
@@ -356,23 +355,23 @@ export class ProductosProvider {
    * @returns {Promise<any>}
    * @memberof ProductosProvider
    */
-  public fetchCategorias(): Promise<any> {
+  public fetchCategorias (): Promise<any> {
     // create a design doc
     let ddoc: any = {
       _id: '_design/categoriaview',
       views: {
         categoriaview: {
           map : function (doc) {
-            if(parseInt(doc.existencias)>0 && doc.marcas){
-              emit(doc.marcas, 1);
+            if (parseInt(doc.existencias, 10) > 0 && doc.marcas) {
+              emit(doc.marcas, 1)
             }
           }.toString(), // The .toString() at the end of the map function is necessary to prep the object for becoming valid JSON.
           reduce: '_sum'
         },
         producto_categoria: {
           map : function (doc) {
-            if(doc.marcas && parseInt(doc.existencias)>0){
-              emit(doc.marcas.toLowerCase(), null);
+            if (doc.marcas && parseInt(doc.existencias, 10) > 0) {
+              emit(doc.marcas.toLowerCase(), null)
             }
           }.toString() // The .toString() at the end of the map function is necessary to prep the object for becoming valid JSON.
         }
@@ -382,23 +381,22 @@ export class ProductosProvider {
     // save the design doc
     return this._db.put(ddoc).catch(err => {
       if (err.name !== 'conflict') {
-        throw err;
+        throw err
       }
       // ignore if doc already exists
-    }).then( () => {
-      return this.doLocalFirst( db => this.designDocCategoriaView(db) );
+    }).then(() => {
+      return this.doLocalFirst(db => this.designDocCategoriaView(db))
     }).then(res => {
       if (res && res.rows.length > 0) {
         this._categorias = _.map(res.rows, (v: any, k: number) => {
           return new Categoria(
             v.key,
             v.value
-          );
-        });
+          )
+        })
       }
-      return this._categorias;
+      return this._categorias
     })
-
 
     /**
      * otra forma de hacer todo lo anterior es la sgte
@@ -436,7 +434,7 @@ export class ProductosProvider {
    * Esta funcion es la que rcupera los productos del infinite scroll
    * de la pagina principal
    */
-  public async recuperarPagSgte(): Promise<any> {
+  public async recuperarPagSgte (): Promise<any> {
 
     let res = await this.doLocalFirst(db => {
       return this.allDocs(db, {
@@ -445,15 +443,15 @@ export class ProductosProvider {
         skip         : this.skip,
         startkey     : this.startkey
       })
-    });
+    })
 
     if (res && res.rows.length > 0) {
-      this.startkey = res.rows[res.rows.length - 1].key;
-      this.skip = 1;
+      this.startkey = res.rows[res.rows.length - 1].key
+      this.skip = 1
       let prods: Producto[] = _.map(res.rows, (v: any, k: number) => {
         // El precio llega en un formato como "$20.200" entonces lo saneo para que quede "20200"
-        let precio = (_.has(v.doc, 'precio')) ? v.doc.precio : 0;
-        precio = parseInt( (precio[0]=='$') ? precio.substring(1) : precio );
+        let precio = (_.has(v.doc, 'precio')) ? v.doc.precio : 0
+        precio = parseInt((precio[0] === '$') ? precio.substring(1) : precio, 10)
         return new Producto(
           v.doc._id,
           v.doc.titulo,
@@ -462,15 +460,15 @@ export class ProductosProvider {
           v.doc.categoria,
           v.doc.marcas,
           v.doc.unidad,
-          parseInt(v.doc.existencias),
+          parseInt(v.doc.existencias, 10),
           precio,
           v.doc._rev
-        );
-      });
-      this._prods.push(...prods );
+        )
+      })
+      this._prods.push(...prods)
     }
-    console.log("prodsProvider-recuperarPagSgte",this._prods);
-    return res;
+    console.log('prodsProvider-recuperarPagSgte',this._prods)
+    return res
 
   }
 
@@ -482,17 +480,17 @@ export class ProductosProvider {
    * @returns {*}
    * @memberof ProductosProvider
    */
-  public fetchNextPagByCategoria(categoria : string): any {
+  public fetchNextPagByCategoria (categoria: string): any {
 
-    categoria = categoria.toLocaleLowerCase();
+    categoria = categoria.toLocaleLowerCase()
 
-    return this.doLocalFirst( db => this.queryCategoriaView(db, categoria) )
+    return this.doLocalFirst(db => this.queryCategoriaView(db, categoria))
     .then(res => {
       if (res && res.rows.length > 0) {
-        this.skipByCat += this.cantProdsPag;
+        this.skipByCat += this.cantProdsPag
         let prods: Producto[] = _.map(res.rows, (v: any, k: number) => {
-          let precio = (_.has(v.doc, 'precio')) ? v.doc.precio : 0;
-          precio = parseInt( (precio[0]=='$') ? precio.substring(1) : precio );
+          let precio = (_.has(v.doc, 'precio')) ? v.doc.precio : 0
+          precio = parseInt((precio[0] === '$') ? precio.substring(1) : precio, 10)
           return new Producto(
             v.doc._id,
             v.doc.titulo,
@@ -504,31 +502,31 @@ export class ProductosProvider {
             v.doc.existencias,
             precio,
             v.doc._rev
-          );
-        });
-        this._prodsByCat.push(...prods );
+          )
+        })
+        this._prodsByCat.push(...prods)
       }
-      return res;
-    });
+      return res
+    })
 
   }
 
-  public fetchProdsByids( ids: any ): Promise<any>{
+  public fetchProdsByids (ids: any): Promise<any> {
 
-    return this.doLocalFirst( db => this.getManyByIds(db, ids) )
+    return this.doLocalFirst(db => this.getManyByIds(db, ids))
     .then(res => {
-      console.log("all_docs ids", res)
+      console.log('all_docs ids', res)
       if (res && res.rows.length > 0) {
         return _.map(res.rows, (v: any) => {
-          let precio: number = 0;
+          let precio: number = 0
           /**
            * esta validacion la hago por si se elimina un producto de la bd
            * por falta de existencias, a veces pasaba que si habia un producto
            * en el carrito y casualmente se elimina, ocurria un error donde
            * no se encontraba el _id
            */
-          if(_.has(v.doc, 'precio')){
-            precio = v.doc.precio;
+          if (_.has(v.doc, 'precio')) {
+            precio = v.doc.precio
             return new Producto(
               v.doc._id,
               v.doc.titulo,
@@ -537,11 +535,11 @@ export class ProductosProvider {
               v.doc.categoria,
               v.doc.marcas,
               v.doc.unidad,
-              parseInt(v.doc.existencias),
+              parseInt(v.doc.existencias, 10),
               precio,
               v.doc._rev
-            );
-          }else{
+            )
+          } else {
             return new Producto(
               v.id,
               'producto agotado',
@@ -553,11 +551,11 @@ export class ProductosProvider {
               0,
               0,
               ''
-            );
+            )
           }
-        }) ;
-      }else{
-        return [];
+        })
+      } else {
+        return []
       }
     })
 
@@ -571,42 +569,42 @@ export class ProductosProvider {
    * @param {string} query
    * @memberof ProductosProvider
    */
-  public async searchAutocomplete(query: string): Promise<Producto[]> {
-    query = (query) ? query.toUpperCase() : "";
+  public async searchAutocomplete (query: string): Promise<Producto[]> {
+    query = (query) ? query.toUpperCase() : ''
 
-    const url: string = Config.SEARCH_PRODS_URL;
+    const url: string = Config.SEARCH_PRODS_URL
     const params = new HttpParams()
-      .set('keyword', query);
+      .set('keyword', query)
     const options = {
       headers: new HttpHeaders({
         'Accept'       : 'application/json',
-        'Content-Type' : 'application/json',
+        'Content-Type' : 'application/json'
       }),
-      params: params,
-    };
+      params: params
+    }
 
-    let res: Producto[] = []; // Guardo la respuesta con los productos
+    let res: Producto[] = [] // Guardo la respuesta con los productos
 
     try {
-      res = await this.httpClient.get<Producto[]>( url, options ).pipe(
-        timeout(10000),
-      ).toPromise();
+      res = await this.httpClient.get<Producto[]>(url, options).pipe(
+        timeout(10000)
+      ).toPromise()
 
-      return res.slice(0, 31);
+      return res.slice(0, 31)
     } catch (error) {
 
       const pouchRes = await this._db.allDocs({
         include_docs : true,
         startkey     : query,
-        endkey       : query+"\uffff",
+        endkey       : query + '\uffff',
         limit        : 30
       })
 
       if (pouchRes && pouchRes.rows.length > 0) {
         res = _.map(pouchRes.rows, (v: any) => {
-          let precio: number = 0;
-          if(_.has(v.doc, 'precio')){
-            precio = v.doc.precio;
+          let precio: number = 0
+          if (_.has(v.doc, 'precio')) {
+            precio = v.doc.precio
             return new Producto(
               v.doc._id,
               v.doc.titulo,
@@ -615,40 +613,40 @@ export class ProductosProvider {
               v.doc.categoria,
               v.doc.marcas,
               v.doc.unidad,
-              parseInt(v.doc.existencias),
+              parseInt(v.doc.existencias, 10),
               precio,
               v.doc._rev
-            );
+            )
           }
-        }) ;
+        })
 
-        return res;
-      }else{
-        return [];
+        return res
+      } else {
+        return []
       }
 
     }
 
   }
 
-  public updateQuantity(carItems: CarItem[] ) : Promise<any> {
+  public updateQuantity (carItems: CarItem[]): Promise<any> {
 
-    let prodsId = _.map(carItems, "_id");
+    let prodsId = _.map(carItems, '_id')
     return this.fetchProdsByids(prodsId)
-    .then((prods: Producto[])=>{
+    .then((prods: Producto[]) => {
 
-      let prodsToUpdate = _.map(prods, (prod: Producto)=>{
-        let itemId = Config.binarySearch(carItems, '_id', prod._id);
-        prod.existencias -= carItems[itemId].cantidad;
-        prod.origen = 'app';
-        prod.updated_at = Date.now();
-        return prod;
-      });
-      return prodsToUpdate;
+      let prodsToUpdate = _.map(prods, (prod: Producto) => {
+        let itemId = Config.binarySearch(carItems, '_id', prod._id)
+        prod.existencias -= carItems[itemId].cantidad
+        prod.origen = 'app'
+        prod.updated_at = Date.now()
+        return prod
+      })
+      return prodsToUpdate
     })
-    .then( prodsToUpdate => {
+    .then(prodsToUpdate => {
 
-      return this.doLocalFirst( db => db.bulkDocs(prodsToUpdate) )
+      return this.doLocalFirst(db => db.bulkDocs(prodsToUpdate))
     })
 
   }
@@ -658,72 +656,71 @@ export class ProductosProvider {
    * al mostrar los productos por categoria, si no las reseteo los productos solo
    * se apiñarian uno tras otro y continuarian desde el ultimo producto paginado
    */
-  public resetProdsByCat(): void {
-    this._prodsByCat = [];
-    this.skipByCat = 0;
+  public resetProdsByCat (): void {
+    this._prodsByCat = []
+    this.skipByCat = 0
   }
 
-   /**
+   /*
    * ESTA MIERDA LA TENGO QUITAR SEGURO SE PUEDE HACER MEJOR !!!!!!!
    * Lo siguiente lo hago para resetear las variables que almacenan los datos
    * al mostrar los productos por categoria, si no las reseteo los productos solo
    * se apiñarian uno tras otro y continuarian desde el ultimo producto paginado
    */
-  public resetProds(): void {
-    this._prods= [];
-    this.startkey = '';
-    this.skip = 0;
+  public resetProds (): void {
+    this._prods = []
+    this.startkey = ''
+    this.skip = 0
   }
 
-
   /** *************** Manejo de el estado de la ui    ********************** */
-  private _reactToChanges(d: WorkerRes): void {
+  private _reactToChanges (d: WorkerRes): void {
     switch (d.event) {
-      case "deleted":
+      case 'deleted':
         // change.id holds the deleted id
-        this._onDeleted(d.info.doc._id);
-        break;
-      case "upsert":
+        this._onDeleted(d.info.doc._id)
+        break
+      case 'upsert':
         // updated/inserted
         // change.doc holds the new doc
-        this._onUpdatedOrInserted(d.info.doc);
-        break;
-      case "error":
-        console.error("Prods- Error react to changes 🐛", d.info);
-        Raven.captureException( new Error(`Prods- Error react to changes 🐛: ${JSON.stringify(d.info)}`) );
-        break;
+        this._onUpdatedOrInserted(d.info.doc)
+        break
+      case 'error':
+        console.error('Prods- Error react to changes 🐛', d.info)
+        Raven.captureException(new Error(`Prods- Error react to changes 🐛: ${JSON.stringify(d.info)}`))
+        break
       default:
-        break;
+        break
     }
   }
 
-  private _onDeleted(id: string): void {
+  private _onDeleted (id: string): void {
     let index: number = Config.binarySearch(
       this._prods,
       '_id',
       id
-    );
-    let doc = this._prods[index];
-    if (doc && doc._id == id) {
-      this._prods.splice(index, 1);
+    )
+    let doc = this._prods[index]
+    if (doc && doc._id === id) {
+      this._prods.splice(index, 1)
     }
     /**
      * Actualiza la interfaz de usuario
      * https://angular.io/api/core/ApplicationRef
      * https://goo.gl/PDi6iM
      */
-    this.appRef.tick();
+    this.appRef.tick()
   }
 
-  private _onUpdatedOrInserted(newDoc: Producto): void {
+  private _onUpdatedOrInserted (newDoc: Producto): void {
     let index: number = Config.binarySearch(
       this._prods,
       '_id',
       newDoc._id
-    );
-    let doc = this._prods[index];
-    if (doc && doc._id == newDoc._id) { // update
-      this._prods[index] = newDoc;
+    )
+    let doc = this._prods[index]
+    if (doc && doc._id === newDoc._id) { // update
+      this._prods[index] = newDoc
     } else { // insert
       /**
        * Comento esta parte del codigo, no por que este mala,
@@ -731,28 +728,28 @@ export class ProductosProvider {
        * los productos a los que se ven en el home, por ejemplo en el home se ven 5
        * si se modfica un producto en couch, se agrega al y serian 5
        */
-      //this._prods.splice(index, 0, newDoc);
+      // this._prods.splice(index, 0, newDoc);
     }
-    this.appRef.tick();
+    this.appRef.tick()
   }
   /** *********** Fin Manejo de el estado de la ui    ********************** */
 
   ///////////////////////// GETTERS and SETTERS ////////////////////
 
-  public get prods() : Producto[] {
-    return JSON.parse(JSON.stringify(this._prods));
+  public get prods (): Producto[] {
+    return JSON.parse(JSON.stringify(this._prods))
   }
 
-  public get prodsByCat() : Producto[] {
-    return JSON.parse(JSON.stringify(this._prodsByCat));
+  public get prodsByCat (): Producto[] {
+    return JSON.parse(JSON.stringify(this._prodsByCat))
   }
 
-  public set prodsByCat(v : Producto[]) {
-    this._prodsByCat = v;
+  public set prodsByCat (v: Producto[]) {
+    this._prodsByCat = v
   }
 
-  public get categorias() : Categoria[] {
-    return JSON.parse(JSON.stringify(this._categorias));
+  public get categorias (): Categoria[] {
+    return JSON.parse(JSON.stringify(this._categorias))
   }
 
 }

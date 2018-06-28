@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
-import { IonicPageModule } from 'ionic-angular';
-import { FormNewAccountPage } from './form-new-account';
+import { NgModule } from '@angular/core'
+import { IonicPageModule } from 'ionic-angular'
+import { FormNewAccountPage } from './form-new-account'
 
 @NgModule({
   declarations: [
-    FormNewAccountPage,
+    FormNewAccountPage
   ],
   imports: [
-    IonicPageModule.forChild(FormNewAccountPage),
-  ],
+    IonicPageModule.forChild(FormNewAccountPage)
+  ]
 })
 export class FormNewAccountPageModule {}

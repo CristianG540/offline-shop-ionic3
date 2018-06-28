@@ -1,51 +1,47 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 import {
   IonicPage,
   NavController,
-  NavParams,
   ModalController,
   AlertController
-} from "ionic-angular";
-import { FormGroup, FormArray, FormBuilder, Validators  } from "@angular/forms";
+} from 'ionic-angular'
+import { FormGroup, FormBuilder, Validators } from '@angular/forms'
 
-//Libs terceros
-import _ from 'lodash';
-import Raven from "raven-js";
+// Libs terceros
+import _ from 'lodash'
+import Raven from 'raven-js'
 
-//Providers
-import { CarritoProvider } from "../../providers/carrito/carrito";
-import { ClientesProvider } from "../../providers/clientes/clientes";
-import { OrdenProvider } from "../../providers/orden/orden";
-import { ProductosProvider } from "../../providers/productos/productos";
-import { GeolocationProvider } from "../../providers/geolocation/geolocation";
-import { AuthProvider } from "../../providers/auth/auth";
-import { Config as cg } from "../../providers/config/config";
+// Providers
+import { CarritoProvider } from '../../providers/carrito/carrito'
+import { OrdenProvider } from '../../providers/orden/orden'
+import { ProductosProvider } from '../../providers/productos/productos'
+import { GeolocationProvider } from '../../providers/geolocation/geolocation'
+import { AuthProvider } from '../../providers/auth/auth'
+import { Config as cg } from '../../providers/config/config'
 
-//Models
-import { Orden } from "../../providers/orden/models/orden";
-import { CarItem } from '../../providers/carrito/models/carItem';
+// Models
+import { Orden } from '../../providers/orden/models/orden'
+import { CarItem } from '../../providers/carrito/models/carItem'
 
 @IonicPage()
 @Component({
   selector: 'page-confirmar-orden',
-  templateUrl: 'confirmar-orden.html',
+  templateUrl: 'confirmar-orden.html'
 })
 export class ConfirmarOrdenPage {
 
-  private ordenForm: FormGroup;
-  private newClient: FormGroup;
-  private newClientFlag: boolean = false;
-  private transportadora: number;
+  private ordenForm: FormGroup
+  private newClient: FormGroup
+  private newClientFlag: boolean = false
+  private transportadora: number
 
-  constructor(
+  constructor (
     private navCtrl: NavController,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
-    private navParams: NavParams,
     private fb: FormBuilder,
     private authService: AuthProvider,
     private cartServ: CarritoProvider,
-    private clienteServ: ClientesProvider,
     private ordenServ: OrdenProvider,
     private prodServ: ProductosProvider,
     private geolocation: GeolocationProvider,
@@ -53,30 +49,30 @@ export class ConfirmarOrdenPage {
   ) {
   }
 
-  //Runs when the page is about to enter and become the active page.
-  ionViewWillLoad() {
-    this.initializeForm();
+  // Runs when the page is about to enter and become the active page.
+  ionViewWillLoad () {
+    this.initializeForm()
   }
 
-  private initializeForm(): void {
+  private initializeForm (): void {
 
     this.ordenForm = this.fb.group({
       observaciones: [''],
       cliente: [this.authService.nitCliente, Validators.required]
-    });
+    })
 
-    if( this.authService.nitCliente ){
+    if (this.authService.nitCliente) {
 
       this.ordenForm = this.fb.group({
         observaciones: [''],
-        cliente: ['C'+this.authService.nitCliente, Validators.required]
-      });
-    }else{
+        cliente: ['C' + this.authService.nitCliente, Validators.required]
+      })
+    } else {
 
       this.ordenForm = this.fb.group({
         observaciones: [''],
         cliente: [this.authService.nitCliente, Validators.required]
-      });
+      })
     }
 
     this.newClient = this.fb.group({
@@ -86,18 +82,18 @@ export class ConfirmarOrdenPage {
   }
 
   showAddressModal () {
-    let modal = this.modalCtrl.create("AutocompletePage");
+    let modal = this.modalCtrl.create('AutocompletePage')
     modal.onDidDismiss(data => {
-      if(data){
-        this.ordenForm.controls['cliente'].setValue(data.nit);
-        this.transportadora = data.transp;
+      if (data) {
+        this.ordenForm.controls['cliente'].setValue(data.nit)
+        this.transportadora = data.transp
       }
-    });
-    modal.present();
+    })
+    modal.present()
   }
 
-  private onSubmit(): void {
-    let loading = this.util.showLoading();
+  private onSubmit (): void {
+    let loading = this.util.showLoading()
 
     // get current position
     this.geolocation.getCurrentPosition().then(pos => {
@@ -106,28 +102,27 @@ export class ConfirmarOrdenPage {
         lat: pos.latitude,
         lon: pos.longitude,
         accuracy: pos.accuracy
-      });
-      loading.dismiss();
-    }).catch( (err) => {
+      })
+      loading.dismiss()
+    }).catch((err) => {
 
-      loading.dismiss();
-      console.error("error gps", err);
+      loading.dismiss()
+      console.error('error gps', err)
       if (_.has(err, 'code') && err.code === 4 || err.code === 1) {
         this.alertCtrl.create({
-          title: "Error.",
+          title: 'Error.',
           message: 'Por favor habilite el uso del gps, para poder marcar la posicion del pedido',
           buttons: ['Ok']
-        }).present();
+        }).present()
 
       } else {
-        this.procesarOrden();
-        console.error('GPS- Error al marcar la posicion de pedido 😫: '+err)
-        Raven.captureException( new Error(`GPS- Error al marcar la posicion de pedido 😫: ${JSON.stringify(err)}`), {
+        this.procesarOrden()
+        console.error('GPS- Error al marcar la posicion de pedido 😫: ' + err)
+        Raven.captureException(new Error(`GPS- Error al marcar la posicion de pedido 😫: ${JSON.stringify(err)}`), {
           extra: err
-        } );
+        })
       }
-    });
-
+    })
 
   }
 
@@ -145,15 +140,15 @@ export class ConfirmarOrdenPage {
    * }
    * @memberof ConfirmarOrdenPage
    */
-  private procesarOrden(position:any = ""): void {
+  private procesarOrden (position: any = ''): void {
 
-    let loading = this.util.showLoading();
+    let loading = this.util.showLoading()
     /**
      * recupero los items del carrito para guardarlos en la orden
      */
-    let carItems: CarItem[] = this.cartServ.carItems;
-    let orden: Orden;
-    let observaciones = this.ordenForm.get('observaciones').value;
+    let carItems: CarItem[] = this.cartServ.carItems
+    let orden: Orden
+    let observaciones = this.ordenForm.get('observaciones').value
     /**
      * Si el cliente no es nuevo ya sea porque se sabia el nit y lo
      * ingreso manualmente o desde el buscador de clientes entonces recupero
@@ -161,7 +156,7 @@ export class ConfirmarOrdenPage {
      */
     if (!this.newClientFlag && this.ordenForm.valid) {
 
-      let form = JSON.parse(JSON.stringify(this.ordenForm.value));
+      let form = JSON.parse(JSON.stringify(this.ordenForm.value))
       orden = {
         _id : Date.now().toString(),
         nitCliente: form.cliente,
@@ -170,7 +165,7 @@ export class ConfirmarOrdenPage {
         total: this.cartServ.totalPrice,
         transp: this.transportadora,
         estado: false,
-        type: "orden",
+        type: 'orden',
         location: {
           lat : position.lat,
           lon : position.lon
@@ -185,7 +180,7 @@ export class ConfirmarOrdenPage {
      */
     if (this.newClientFlag && this.newClient.valid) {
 
-      let form = JSON.parse(JSON.stringify(this.newClient.value));
+      let form = JSON.parse(JSON.stringify(this.newClient.value))
       orden = {
         _id : Date.now().toString(),
         newClient : form,
@@ -193,7 +188,7 @@ export class ConfirmarOrdenPage {
         items: carItems,
         total: this.cartServ.totalPrice,
         estado: false,
-        type: "orden",
+        type: 'orden',
         location: {
           lat : position.lat,
           lon : position.lon
@@ -206,45 +201,45 @@ export class ConfirmarOrdenPage {
      * Guardo la orden en la base de datos
      */
     this.ordenServ.pushItem(orden)
-      .then(res=>{
+      .then(res => {
 
         // Actualizo la cantidad de los productos que se ordenaron
         return this.prodServ.updateQuantity(carItems)
       })
-      .then(res=>{
+      .then(res => {
 
         /** Vacio el carrito y envio el usuario al tab de ordenes */
-        this.cartServ.destroyDB(true);
-        this.navCtrl.popToRoot();
-        this.navCtrl.parent.select(5);
+        this.cartServ.destroyDB(true)
+        this.navCtrl.popToRoot()
+        this.navCtrl.parent.select(5)
         /** *** *** *** *** *** *** *** *** *** *** *** *** ***   */
 
-        loading.dismiss();
+        loading.dismiss()
 
-        return this.ordenServ.sendOrdersSap();
+        return this.ordenServ.sendOrdersSap()
 
       })
-      .then(responses=>{
+      .then(responses => {
 
         let failOrders = _.filter(responses.apiRes, (res: any) => {
-          return res.responseApi.code >= 400;
+          return res.responseApi.code >= 400
         })
-        if(failOrders.length > 0){
+        if (failOrders.length > 0) {
           this.alertCtrl.create({
-            title: "Advertencia.",
-            message: failOrders.length+' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo',
+            title: 'Advertencia.',
+            message: failOrders.length + ' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo',
             buttons: ['Ok']
-          }).present();
-        }else{
+          }).present()
+        } else {
           this.alertCtrl.create({
-            title: "Info.",
-            message: "Las ordenes se subieron correctamente a sap.",
+            title: 'Info.',
+            message: 'Las ordenes se subieron correctamente a sap.',
             buttons: ['Ok']
-          }).present();
+          }).present()
         }
       })
-      .catch(err=>{
-        this.util.errorHandler(err.message, err);
+      .catch(err => {
+        this.util.errorHandler(err.message, err)
       })
   }
 
@@ -260,11 +255,11 @@ export class ConfirmarOrdenPage {
    * @type {boolean}
    * @memberof ConfirmarOrdenPage
    */
-  public get formStatus() : boolean {
+  public get formStatus (): boolean {
     if (this.newClientFlag) {
-      return this.newClient.valid;
-    }else{
-      return this.ordenForm.valid;
+      return this.newClient.valid
+    } else {
+      return this.ordenForm.valid
     }
   }
 

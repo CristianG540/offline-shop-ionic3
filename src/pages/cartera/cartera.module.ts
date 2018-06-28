@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
-import { IonicPageModule } from 'ionic-angular';
-import { CarteraPage } from './cartera';
+import { NgModule } from '@angular/core'
+import { IonicPageModule } from 'ionic-angular'
+import { CarteraPage } from './cartera'
 
 @NgModule({
   declarations: [
-    CarteraPage,
+    CarteraPage
   ],
   imports: [
-    IonicPageModule.forChild(CarteraPage),
-  ],
+    IonicPageModule.forChild(CarteraPage)
+  ]
 })
 export class CarteraPageModule {}

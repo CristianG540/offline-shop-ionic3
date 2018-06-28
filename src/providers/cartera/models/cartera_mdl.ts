@@ -1,5 +1,5 @@
 export class Cartera {
-  constructor(
+  constructor (
     public _id: string,
     public valor: number,
     public valor_total: number,

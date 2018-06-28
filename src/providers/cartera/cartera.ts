@@ -1,43 +1,39 @@
-import { Injectable } from '@angular/core';
-import { Storage } from '@ionic/storage';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Response } from '@angular/http/src/static_response';
-import { Observable } from 'rxjs/Observable';
-import { map, catchError, timeout } from 'rxjs/operators';
-import 'rxjs/add/operator/toPromise';
+import { Injectable } from '@angular/core'
+import { Storage } from '@ionic/storage'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { Response } from '@angular/http/src/static_response'
+import { map, timeout } from 'rxjs/operators'
+import 'rxjs/add/operator/toPromise'
 
 // lib terceros
-import _ from 'lodash';
-import PouchDB from 'pouchdb';
-import Raven from 'raven-js';
+import _ from 'lodash'
+import PouchDB from 'pouchdb'
+import Raven from 'raven-js'
 
-//Providers
-import { AuthProvider } from '../auth/auth';
-import { Config as cg } from "../config/config";
+// Providers
+import { AuthProvider } from '../auth/auth'
+import { Config as cg } from '../config/config'
 
-//Models
-import { Cartera } from "./models/cartera_mdl";
-import { WorkerRes } from "../config/models/workerRes"
+// Models
+import { Cartera } from './models/cartera_mdl'
 
 @Injectable()
 export class CarteraProvider {
 
-  private _db: any;
-  private _remoteDB: any;
-  private _cartera: Cartera[] = [];
-  private replicationWorker: Worker;
-  //Esta variable se encarga de mostrar el estado de la bd en el menu
-  private statusDB: boolean = false;
+  private _db: any
+  private _remoteDB: any
+  private _cartera: Cartera[] = []
+  private replicationWorker: Worker
+  // Esta variable se encarga de mostrar el estado de la bd en el menu
+  private statusDB: boolean = false
 
-  constructor(
-    private util: cg,
-    private authService: AuthProvider,
+  constructor (
     private storage: Storage,
     private http: HttpClient
   ) {
     /*** Intento eliminar la bd anterior */
-    const oldDB: PouchDB.Database = new PouchDB("cartera", {revs_limit: 5, auto_compaction: true});
-    oldDB.destroy();
+    const oldDB: PouchDB.Database = new PouchDB('cartera', { revs_limit: 5, auto_compaction: true })
+    oldDB.destroy()
     /*********************************** */
   }
 
@@ -51,9 +47,9 @@ export class CarteraProvider {
    * @returns {Promise<any>}
    * @memberof CarteraProvider
    */
-  public async searchCartera(nitCliente: string): Promise<any> {
+  public async searchCartera (nitCliente: string): Promise<any> {
     try {
-    let token = await this.storage.get('josefa-token');
+      let token = await this.storage.get('josefa-token')
     /**
      * Bueno aqui hago todo lo contrario a lo que hago con los productos
      * en vez de hacer un offline first (que deberia ser lo correcto)
@@ -62,19 +58,19 @@ export class CarteraProvider {
      * traer digace fallo de conexion o lo que sea, entonces busco los clientes
      * en la base de datos local
      */
-    let url: string = cg.JOSEFA_URL+'/sap/cartera';
-    let options = {
-      headers: new HttpHeaders({
-        'Accept'       : 'application/json',
-        'Content-Type' : 'application/json',
-        'Authorization': 'Bearer ' + token
-      })
-    };
-    let body: string = JSON.stringify({
-      and : {
-        codCliente : nitCliente
+      let url: string = cg.JOSEFA_URL + '/sap/cartera'
+      let options = {
+        headers: new HttpHeaders({
+          'Accept'       : 'application/json',
+          'Content-Type' : 'application/json',
+          'Authorization': 'Bearer ' + token
+        })
       }
-    });
+      let body: string = JSON.stringify({
+        and : {
+          codCliente : nitCliente
+        }
+      })
 
     /**
      * aqui haciendo uso del async/await hago un try/catch que primero
@@ -83,23 +79,20 @@ export class CarteraProvider {
      * en la bd local
      */
 
-
-      let res = await this.http.post( url, body, options ).pipe(
+      let res = await this.http.post(url, body, options).pipe(
         map((res: Response) => {
-          return res;
+          return res
         }),
         timeout(7000)
-      ).toPromise();
+      ).toPromise()
 
-      return res;
+      return res
 
     } catch (error) {
-      console.error("Error al buscar en cartera", error);
-      throw "Error en cartera debido a un fallo con la conexion, verifique los datos o busque una red wifi: "+JSON.stringify(error);
+      console.error('Error al buscar en cartera', error)
+      throw new Error('Error en cartera debido a un fallo con la conexion, verifique los datos o busque una red wifi: ' + JSON.stringify(error))
     }
 
   }
-
-
 
 }

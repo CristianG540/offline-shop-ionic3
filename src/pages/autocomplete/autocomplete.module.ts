@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
-import { IonicPageModule } from 'ionic-angular';
-import { AutocompletePage } from './autocomplete';
+import { NgModule } from '@angular/core'
+import { IonicPageModule } from 'ionic-angular'
+import { AutocompletePage } from './autocomplete'
 
 @NgModule({
   declarations: [
-    AutocompletePage,
+    AutocompletePage
   ],
   imports: [
-    IonicPageModule.forChild(AutocompletePage),
-  ],
+    IonicPageModule.forChild(AutocompletePage)
+  ]
 })
 export class AutocompletePageModule {}

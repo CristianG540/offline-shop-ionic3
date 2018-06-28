@@ -1,28 +1,25 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
-import _ from "lodash";
+import { Component } from '@angular/core'
+import { IonicPage, NavParams } from 'ionic-angular'
 
-//Providers
-import { ProductosProvider } from "../../providers/productos/productos";
-import { CarritoProvider } from '../../providers/carrito/carrito';
-import { Config as cg } from "../../providers/config/config";
-import { AuthProvider } from '../../providers/auth/auth';
-//Models
-import { Producto } from "../../providers/productos/models/producto";
+// Providers
+import { ProductosProvider } from '../../providers/productos/productos'
+import { CarritoProvider } from '../../providers/carrito/carrito'
+import { Config as cg } from '../../providers/config/config'
+import { AuthProvider } from '../../providers/auth/auth'
+// Models
+import { Producto } from '../../providers/productos/models/producto'
 
 @IonicPage()
 @Component({
   selector: 'page-search-prod',
-  templateUrl: 'search-prod.html',
+  templateUrl: 'search-prod.html'
 })
 export class SearchProdPage {
 
-  private autocompleteItems = [];
-  private productoPage = 'ProductoPage';
+  private autocompleteItems = []
+  private productoPage = 'ProductoPage'
 
-  constructor(
-    private navCtrl: NavController,
-    private toastCtrl: ToastController,
+  constructor (
     private navParams: NavParams,
     private prodsService: ProductosProvider,
     private cartService: CarritoProvider,
@@ -31,61 +28,61 @@ export class SearchProdPage {
   ) {
   }
 
-  updateSearch(ev: any) {
-    let loading = this.util.showLoading();
+  updateSearch (ev: any) {
+    let loading = this.util.showLoading()
     // set val to the value of the searchbar
-    let val = ev.target.value;
-    if (val == "") {
-      loading.dismiss();
-      this.autocompleteItems = [];
-      return;
+    let val = ev.target.value
+    if (val === '') {
+      loading.dismiss()
+      this.autocompleteItems = []
+      return
     }
     this.prodsService.searchAutocomplete(val)
-      .then( (prods: Producto[]) => {
-        loading.dismiss();
-        console.log("Resultados busqueda prods",prods)
-        this.autocompleteItems = prods;
-      }).catch( err => this.util.errorHandler(err.message, err, loading) )
+      .then((prods: Producto[]) => {
+        loading.dismiss()
+        console.log('Resultados busqueda prods',prods)
+        this.autocompleteItems = prods
+      }).catch(err => this.util.errorHandler(err.message, err, loading))
 
   }
 
-  private addProd(producto: Producto): void {
+  private addProd (producto: Producto): void {
 
     this.util.promptAlertCant(d => {
 
-      if( d.txtCantidad && producto.existencias >= d.txtCantidad ){
+      if (d.txtCantidad && producto.existencias >= d.txtCantidad) {
 
-        let loading = this.util.showLoading();
+        let loading = this.util.showLoading()
         this.cartService.pushItem({
           _id: producto._id,
           cantidad: d.txtCantidad,
           totalPrice: producto.precio * d.txtCantidad,
           titulo: producto.titulo
-        }).then(res=>{
-          loading.dismiss();
-          this.util.showToast(`El producto ${res.id} se agrego correctamente`);
-        }).catch(err=>{
+        }).then(res => {
+          loading.dismiss()
+          this.util.showToast(`El producto ${res.id} se agrego correctamente`)
+        }).catch(err => {
 
-          if(err=="duplicate"){
-            loading.dismiss();
-            this.util.showToast(`El producto ya esta en el carrito`);
-          }else if(err=="no_timsum_llantas"){
-            loading.dismiss();
-            this.util.showToast(`No puede agregar llantas timsum a este pedido`);
-          }else if(err=="timsum_llantas"){
-            loading.dismiss();
-            this.util.showToast(`Solo puede agregar llantas timsum a este pedido`);
-          }else{
-            this.util.errorHandler(err.message, err, loading);
+          if (err === 'duplicate') {
+            loading.dismiss()
+            this.util.showToast(`El producto ya esta en el carrito`)
+          } else if (err === 'no_timsum_llantas') {
+            loading.dismiss()
+            this.util.showToast(`No puede agregar llantas timsum a este pedido`)
+          } else if (err === 'timsum_llantas') {
+            loading.dismiss()
+            this.util.showToast(`Solo puede agregar llantas timsum a este pedido`)
+          } else {
+            this.util.errorHandler(err.message, err, loading)
           }
 
         })
-      }else{
-        this.util.showToast(`Hay ${producto.existencias} productos, ingrese una cantidad valida.`);
-        return false;
+      } else {
+        this.util.showToast(`Hay ${producto.existencias} productos, ingrese una cantidad valida.`)
+        return false
       }
 
-    });
+    })
 
   }
 

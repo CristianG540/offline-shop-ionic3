@@ -1,39 +1,31 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 import {
   IonicPage,
-  NavController,
-  NavParams,
-  Loading,
-  AlertController,
-  LoadingController
-} from 'ionic-angular';
+  NavParams
+} from 'ionic-angular'
 
-//Providers
-import { ProductosProvider } from '../../providers/productos/productos';
-import { Config } from '../../providers/config/config';
-
+// Providers
+import { ProductosProvider } from '../../providers/productos/productos'
+import { Config } from '../../providers/config/config'
 
 @IonicPage()
 @Component({
   selector: 'page-categorias',
-  templateUrl: 'categorias.html',
+  templateUrl: 'categorias.html'
 })
 export class CategoriasPage {
 
-  private productosCategoriaPage: string = 'ProductosCategoriaPage';
+  private productosCategoriaPage: string = 'ProductosCategoriaPage'
 
-  constructor(
-    private navCtrl: NavController,
-    private alertCtrl: AlertController,
-    private loadingCtrl: LoadingController,
+  constructor (
     private navParams: NavParams,
     private prodsService: ProductosProvider,
     private util: Config
   ) {}
 
-  ionViewDidLoad(){
+  ionViewDidLoad () {
     this.prodsService.fetchCategorias()
-      .catch( err => this.util.errorHandler(err.message, err) );
+      .catch(err => this.util.errorHandler(err.message, err))
   }
 
 }

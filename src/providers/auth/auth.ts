@@ -1,22 +1,21 @@
-import { Injectable } from '@angular/core';
-import { AlertController } from 'ionic-angular';
-import { Storage } from '@ionic/storage';
-import { Http, RequestOptions, Response, URLSearchParams } from '@angular/http';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import { map, catchError, timeout } from 'rxjs/operators';
-import 'rxjs/add/operator/toPromise';
+import { Injectable } from '@angular/core'
+import { AlertController } from 'ionic-angular'
+import { Storage } from '@ionic/storage'
+import { Http, RequestOptions, Response } from '@angular/http'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { map, timeout } from 'rxjs/operators'
+import 'rxjs/add/operator/toPromise'
 
+import _ from 'lodash'
+import Raven from 'raven-js'
+import superlogin from 'superlogin-client'
 
-import _ from 'lodash';
-import Raven from "raven-js";
-import superlogin from 'superlogin-client';
+// tslint:disable-next-line:no-duplicate-imports
+import 'rxjs/add/operator/toPromise'
+import 'rxjs/add/operator/map'
 
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/operator/map';
-
-import { DbProvider } from '../db/db';
-import { Config } from '../config/config';
+import { DbProvider } from '../db/db'
+import { Config } from '../config/config'
 
 @Injectable()
 export class AuthProvider {
@@ -42,10 +41,9 @@ export class AuthProvider {
     // If the request takes longer than `timeout`, the request will be aborted.
     // Default is 0, meaning it won't timeout.
     timeout: 0
-  };
+  }
 
-
-  constructor(
+  constructor (
     private storage: Storage,
     private alertCtrl: AlertController,
     public dbServ: DbProvider,
@@ -53,115 +51,115 @@ export class AuthProvider {
     private httpClient: HttpClient,
     private util: Config
   ) {
-    superlogin.configure(this.config);
+    superlogin.configure(this.config)
   }
 
-  public login(
+  public login (
     credentials: { username: string, password: string }
   ): Promise<any> {
     return superlogin.login(credentials)
   }
 
-  public logout(): Promise<any>{
-    let loading = this.util.showLoading();
+  public logout (): Promise<any> {
+    let loading = this.util.showLoading()
 
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       this.isOnline()
-        .then(res=>{
+        .then(res => {
 
-          if( _.has(res, 'status') && res.status == 'ok' ){
-            return superlogin.logout();
-          }else{
-            throw "El api de autenticacion no esta disponible";
+          if (_.has(res, 'status') && res.status === 'ok') {
+            return superlogin.logout()
+          } else {
+            throw new Error('El api de autenticacion no esta disponible')
           }
         })
-        .then( () => {
-          this.removeTokenJosefa().catch(err=>{
-            console.error('error al eliminar el token de josefa',err);
-            Raven.captureException( new Error(`error al eliminar el token de josefa: ${JSON.stringify(err)}`), {
+        .then(() => {
+          this.removeTokenJosefa().catch(err => {
+            console.error('error al eliminar el token de josefa',err)
+            Raven.captureException(new Error(`error al eliminar el token de josefa: ${JSON.stringify(err)}`), {
               extra: err
-            } );
+            })
           })
-          Raven.setUserContext();
-          loading.dismiss();
-          resolve();
+          Raven.setUserContext()
+          loading.dismiss()
+          resolve()
         })
-        .catch(err=>{
+        .catch(err => {
 
-          loading.dismiss();
-          console.error('error en el logout',err);
-          Raven.captureException( new Error(`error en el logout: ${JSON.stringify(err)}`), {
+          loading.dismiss()
+          console.error('error en el logout',err)
+          Raven.captureException(new Error(`error en el logout: ${JSON.stringify(err)}`), {
             extra: err
-          } );
-          //if(err.ok == false || err.message == "Network Error"){
-            this.alertCtrl.create({
-              title: "Ocurrio un error.",
-              message: "Debe estar conectado a la red para desconectarse.",
-              buttons: ['Ok']
-            }).present();
-          //}
-          reject();
+          })
+          // if(err.ok == false || err.message == "Network Error"){
+          this.alertCtrl.create({
+            title: 'Ocurrio un error.',
+            message: 'Debe estar conectado a la red para desconectarse.',
+            buttons: ['Ok']
+          }).present()
+          // }
+          reject()
         })
 
     })
   }
 
-  public register( registerData ): Promise<any>{
+  public register (registerData): Promise<any> {
     return superlogin.register(registerData)
   }
 
-  public isOnline(): Promise<any> {
+  public isOnline (): Promise<any> {
     return this.http.get(`${Config.SUPERLOGIN_URL}/ping`)
-    .map( (res: Response) => {
-      return res.json();
+    .map((res: Response) => {
+      return res.json()
     })
     .toPromise()
   }
 
-  public getTokenJosefa(): Promise<any> {
-    let auth: string = 'Basic ' + btoa('admin:admin1234');
-    let options:RequestOptions = Config.JOSEFA_OPTIONS(auth);
-    let url: string = Config.JOSEFA_URL+'/authenticate';
+  public getTokenJosefa (): Promise<any> {
+    let auth: string = 'Basic ' + btoa('admin:admin1234')
+    let options: RequestOptions = Config.JOSEFA_OPTIONS(auth)
+    let url: string = Config.JOSEFA_URL + '/authenticate'
 
-    return new Promise( (resolve, reject)=>{
-      this.http.post(url, "", options)
-        .map( (res: Response) => {
-          return res.json();
+    return new Promise((resolve, reject) => {
+      this.http.post(url, '', options)
+        .map((res: Response) => {
+          return res.json()
         }).subscribe(
           (res) => {
 
             this.storage.set('josefa-token', res.data.token)
-              .catch(err => reject(err));
-            resolve();
+              .catch(err => reject(err))
+            resolve()
           },
           err => {
-            reject(new Error(`Error al conectarse con JOSEFA, el api SAP 🐛: ${JSON.stringify(err)}`));
+            reject(new Error(`Error al conectarse con JOSEFA, el api SAP 🐛: ${JSON.stringify(err)}`))
           }
-        );
-    });
+        )
+    })
 
   }
 
-  public validateSession(): Promise<any> {
+  public validateSession (): Promise<any> {
 
     return this.isOnline()
-      .then(res=>{
-        if( _.has(res, 'status') && res.status == 'ok' ){
+      .then(res => {
+        if (_.has(res, 'status') && res.status === 'ok') {
           return superlogin.validateSession()
-        }else{
-          throw new Error("El api de autenticacion no esta disponible");
+        } else {
+          throw new Error('El api de autenticacion no esta disponible')
         }
       })
   }
 
-  public removeTokenJosefa(): Promise<any>{
-    return this.storage.remove('josefa-token');
+  public removeTokenJosefa (): Promise<any> {
+    return this.storage.remove('josefa-token')
   }
 
-  public async requestAccount(data: any): Promise<any>{
+  public async requestAccount (data: any): Promise<any> {
     try {
 
-      let token = await this.storage.get('josefa-token');
+      let token = await this.storage.get('josefa-token')
       /**
        * Bueno aqui hago todo lo contrario a lo que hago con los productos
        * en vez de hacer un offline first (que deberia ser lo correcto)
@@ -170,41 +168,41 @@ export class AuthProvider {
        * traer digace fallo de conexion o lo que sea, entonces busco los clientes
        * en la base de datos local
        */
-      let url: string = Config.JOSEFA_URL+'/sap/request_account';
+      let url: string = Config.JOSEFA_URL + '/sap/request_account'
       let options = {
         headers: new HttpHeaders({
           'Accept'       : 'application/json',
           'Content-Type' : 'application/json',
           'Authorization': 'Bearer ' + token
         })
-      };
-      let body: string = JSON.stringify(data);
+      }
+      let body: string = JSON.stringify(data)
 
-      let res = await this.httpClient.post( url, body, options ).pipe(
+      let res = await this.httpClient.post(url, body, options).pipe(
         map((res: Response) => {
-          return res;
+          return res
         }),
         timeout(7000)
-      ).toPromise();
+      ).toPromise()
 
-      return res;
+      return res
 
     } catch (error) {
-      console.error("Error al solicitar una cuenta nueva", error);
-      throw "Error al solicitar una cuenta nueva debido a un fallo con la conexion, verifique los datos o busque una red wifi: "+JSON.stringify(error);
+      console.error('Error al solicitar una cuenta nueva', error)
+      throw new Error('Error al solicitar una cuenta nueva debido a un fallo con la conexion, verifique los datos o busque una red wifi: ' + JSON.stringify(error))
     }
   }
 
-  public get isLogged(): boolean {
-    return superlogin.authenticated();
+  public get isLogged (): boolean {
+    return superlogin.authenticated()
   }
 
-  public get dbUrl() : string {
-    return superlogin.getDbUrl('supertest');
+  public get dbUrl (): string {
+    return superlogin.getDbUrl('supertest')
   }
 
-  public get session() : any {
-    return superlogin.getSession();
+  public get session (): any {
+    return superlogin.getSession()
   }
 
   /**
@@ -214,8 +212,8 @@ export class AuthProvider {
    * @type {string}
    * @memberof AuthProvider
    */
-  public get asesorId() : string {
-    return _.has(this.session, 'profile.asesor_id') ? this.session.profile.asesor_id : '';
+  public get asesorId (): string {
+    return _.has(this.session, 'profile.asesor_id') ? this.session.profile.asesor_id : ''
   }
 
   /**
@@ -225,8 +223,8 @@ export class AuthProvider {
    * @type {string}
    * @memberof AuthProvider
    */
-  public get nitCliente() : string {
-    return _.has(this.session, 'profile.nit_cliente') ? this.session.profile.nit_cliente : '';
+  public get nitCliente (): string {
+    return _.has(this.session, 'profile.nit_cliente') ? this.session.profile.nit_cliente : ''
   }
 
   /**
@@ -237,8 +235,8 @@ export class AuthProvider {
    * @type {string}
    * @memberof AuthProvider
    */
-  public get userId() : string {
-    return _.has(this.session, 'user_id') ? this.session.user_id : '';
+  public get userId (): string {
+    return _.has(this.session, 'user_id') ? this.session.user_id : ''
   }
 
   /**
@@ -248,8 +246,8 @@ export class AuthProvider {
    * @type {string}
    * @memberof AuthProvider
    */
-  public get userEmail() : string {
-    return _.has(this.session, 'profile.email') ? this.session.profile.email : '';
+  public get userEmail (): string {
+    return _.has(this.session, 'profile.email') ? this.session.profile.email : ''
   }
 
 }

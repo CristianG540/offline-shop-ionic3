@@ -1,41 +1,41 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Loading, LoadingController } from 'ionic-angular';
+import { Component } from '@angular/core'
+import { IonicPage, NavController, Loading, LoadingController } from 'ionic-angular'
 
-//Libs terceros
-import Raven from 'raven-js';
+// Libs terceros
+import Raven from 'raven-js'
 
 // Providers
-import { DbProvider } from '../../providers/db/db';
-import { AuthProvider } from '../../providers/auth/auth';
+import { DbProvider } from '../../providers/db/db'
+import { AuthProvider } from '../../providers/auth/auth'
 
 @IonicPage()
 @Component({
   selector: 'page-signup',
-  templateUrl: 'signup.html',
+  templateUrl: 'signup.html'
 })
 export class SignupPage {
 
-  private name: string;
-  private username: string;
-  private asesor_id: number;
-  private nitCliente: string = '';
-  private email: string;
-  private password: string;
-  private confirmPassword: string;
+  private name: string
+  private username: string
+  // tslint:disable-next-line:variable-name
+  private asesor_id: number
+  private nitCliente: string = ''
+  private email: string
+  private password: string
+  private confirmPassword: string
 
-  private loading: Loading;
+  private loading: Loading
 
-  constructor(
+  constructor (
     private navCtrl: NavController,
     private loadingCtrl: LoadingController,
-    private navParams: NavParams,
     private authService: AuthProvider,
     private dbServ: DbProvider
   ) {
   }
 
-  private register(): void {
-    this.showLoading();
+  private register (): void {
+    this.showLoading()
     let user = {
       name: this.name,
       username: this.username,
@@ -48,35 +48,35 @@ export class SignupPage {
       asesor_id: this.asesor_id,
       password: this.password,
       confirmPassword: this.confirmPassword
-    };
+    }
 
     this.authService.register(user)
-    .then(res=>{
-      console.log(res);
-      this.loading.dismiss();
+    .then(res => {
+      console.log(res)
+      this.loading.dismiss()
 
-      this.dbServ.init(res.userDBs.supertest, this.authService.userId).then( info => {
-        console.warn('DbAverno- First Replication complete');
-      }).catch( err => {
-        console.error("DbAverno-totally unhandled error (shouldn't happen)", err);
-        Raven.captureException( new Error(`DbAverno- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
+      this.dbServ.init(res.userDBs.supertest, this.authService.userId).then(info => {
+        console.warn('DbAverno- First Replication complete')
+      }).catch(err => {
+        console.error("DbAverno-totally unhandled error (shouldn't happen)", err)
+        Raven.captureException(new Error(`DbAverno- Error en la bd local no deberia pasar 😫: ${JSON.stringify(err)}`), {
           extra: err
-        } );
-      });;
+        })
+      })
 
-      this.navCtrl.setRoot('TabsPage');
-    }).catch(err=>{
-      console.log(err);
-      this.loading.dismiss();
+      this.navCtrl.setRoot('TabsPage')
+    }).catch(err => {
+      console.log(err)
+      this.loading.dismiss()
     })
 
   }
 
-  private showLoading(): void {
+  private showLoading (): void {
     this.loading = this.loadingCtrl.create({
       content: 'Loading...'
-    });
-    this.loading.present();
+    })
+    this.loading.present()
   }
 
 }

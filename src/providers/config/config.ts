@@ -1,89 +1,89 @@
-import { Injectable } from '@angular/core';
-import { Headers, RequestOptions, Response } from '@angular/http';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { map, catchError, timeout } from 'rxjs/operators';
-import 'rxjs/add/operator/toPromise';
+import { Injectable } from '@angular/core'
+import { Headers, RequestOptions, Response } from '@angular/http'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { map } from 'rxjs/operators'
+import 'rxjs/add/operator/toPromise'
 import {
   Loading,
   AlertController,
   LoadingController,
   ToastController,
   Events
-} from "ionic-angular";
-import { Storage } from '@ionic/storage';
+} from 'ionic-angular'
+import { Storage } from '@ionic/storage'
 
-//libs terceros
-import Raven from "raven-js";
+// libs terceros
+import Raven from 'raven-js'
 
 @Injectable()
 export class Config {
 
-  public loading: Loading;
-  public onlineOffline: boolean = navigator.onLine;
+  public loading: Loading
+  public onlineOffline: boolean = navigator.onLine
 
-  private _countPush: number = 0;
-  private _eggsterFlag: boolean = false;
-  public timerCheckTokenJose: NodeJS.Timer;
+  private _countPush: number = 0
+  private _eggsterFlag: boolean = false
+  public timerCheckTokenJose: NodeJS.Timer
 
-  static readonly APP_VER: string = "1.6.8";
-  static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443';
-  static readonly G_MAPS_KEY: string = 'AIzaSyAtVh-4gg1RRcS_jUlDtatc6SjwP-5XI70';
+  static readonly APP_VER: string = '1.6.8'
+  static readonly SUPERLOGIN_URL: string = 'https://www.gatortyres.com:3443'
+  static readonly G_MAPS_KEY: string = 'AIzaSyAtVh-4gg1RRcS_jUlDtatc6SjwP-5XI70'
 
   /* **************************** Cosas de JOSEFA  *************************** */
-  static readonly JOSEFA_URL: string = 'https://gatortyres.com';
-  //static readonly JOSEFA_URL: string = 'http://josefa2.igb';
-  static JOSEFA_OPTIONS(auth: string): RequestOptions{
+  static readonly JOSEFA_URL: string = 'https://gatortyres.com'
+  // static readonly JOSEFA_URL: string = 'http://josefa2.igb';
+  static JOSEFA_OPTIONS (auth: string): RequestOptions {
     let headers = new Headers({
       'Accept'       : 'application/json',
       'Content-Type' : 'application/json',
       'Authorization': auth
-    });
+    })
     let options = new RequestOptions({
       headers: headers
-    });
-    return options;
+    })
+    return options
   }
   /* ************************* Fin Cosas de JOSEFA *****************************/
 
   /* **************************** Cosas de CouchDB  *************************** */
   // Url base de la BD de los productos en couch
-  static readonly CDB_URL: string = 'https://www.gatortyres.com:6984/producto_3';
+  static readonly CDB_URL: string = 'https://www.gatortyres.com:6984/producto_3'
   // Url base de la BD de los Clientes en couch
-  static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes';
+  static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes'
   // Url base de la BD de cartera en couch
-  static readonly CDB_URL_CARTERA: string = 'https://www.gatortyres.com:6984/cartera';
+  static readonly CDB_URL_CARTERA: string = 'https://www.gatortyres.com:6984/cartera'
 
-  static readonly CDB_USER: string = "admin";
-  static readonly CDB_PASS: string = "admin";
+  static readonly CDB_USER: string = 'admin'
+  static readonly CDB_PASS: string = 'admin'
 
-  static readonly SEARCH_CLIENTS_URL: string = `https://www.gatortyres.com:1339/clientes/igb/search`;
-  static readonly SEARCH_PRODS_URL: string = `https://www.gatortyres.com:1339/prods/igb/search`;
-  //Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http
-  //el header de autotizacion creoq se puede hacer de una forma mejor
-  static CDB_OPTIONS(): RequestOptions{
+  static readonly SEARCH_CLIENTS_URL: string = `https://www.gatortyres.com:1339/clientes/igb/search`
+  static readonly SEARCH_PRODS_URL: string = `https://www.gatortyres.com:1339/prods/igb/search`
+  // Headers y otras opciones basicas para las peticiones a couchdb mdiante angular http
+  // el header de autotizacion creoq se puede hacer de una forma mejor
+  static CDB_OPTIONS (): RequestOptions {
     let headers = new Headers({
       'Accept'       : 'application/json',
       'Content-Type' : 'application/json',
       'Authorization': 'Basic ' + btoa('admin:admin')
-    });
+    })
     let options = new RequestOptions({
       headers: headers
-    });
-    return options;
+    })
+    return options
   }
   /* ************************* Fin Cosas de CouchDB *****************************/
 
   // Esta es una version mas rapida del "_.find" de lodash :3
   // Gracias a https://pouchdb.com/2015/02/28/efficiently-managing-ui-state-in-pouchdb.html
-  static binarySearch(arr: any, property: string, search: any): number {
-    let low: number = 0;
-    let high:number = arr.length;
-    let mid:number;
+  static binarySearch (arr: any, property: string, search: any): number {
+    let low: number = 0
+    let high: number = arr.length
+    let mid: number
     while (low < high) {
-      mid = (low + high) >>> 1; // faster version of Math.floor((low + high) / 2)
+      mid = (low + high) >>> 1 // faster version of Math.floor((low + high) / 2)
       arr[mid][property] < search ? low = mid + 1 : high = mid
     }
-    return low;
+    return low
   }
 
   /**
@@ -97,10 +97,10 @@ export class Config {
    * @returns {*}
    * @memberof Config
    */
-  static safeJsonParse(res: Response): any {
-    try{
-      return res.json();
-    }catch(err){
+  static safeJsonParse (res: Response): any {
+    try {
+      return res.json()
+    } catch (err) {
       return {
         data : {
           msg : res,
@@ -111,20 +111,20 @@ export class Config {
     }
   }
 
-  constructor(
+  constructor (
     private alertCtrl: AlertController,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     private storage: Storage,
     private http: HttpClient,
     private evts: Events
-  ){
+  ) {
     window.addEventListener('online', () => {
-      this.onlineOffline = true;
-    });
+      this.onlineOffline = true
+    })
     window.addEventListener('offline', () => {
-      this.onlineOffline = false;
-    });
+      this.onlineOffline = false
+    })
   }
 
   /**
@@ -135,7 +135,7 @@ export class Config {
    * la cantidad que el usuario ingreso en el input
    * @memberof Config
    */
-  public promptAlertCant(handler: any): void {
+  public promptAlertCant (handler: any): void {
     this.alertCtrl.create({
       title: 'Agregar cantidad',
       enableBackdropDismiss: false,
@@ -157,117 +157,116 @@ export class Config {
       ]
     })
     .present()
-    .then( ()=>{
-      const firstInput: any = document.querySelector('ion-alert input');
-      firstInput.focus();
-      return;
-    });
+    .then(() => {
+      const firstInput: any = document.querySelector('ion-alert input')
+      firstInput.focus()
+      return
+    })
   }
 
-  public errorHandler(err: string, errObj?: any, loading?: Loading): void {
-    if(loading){ loading.dismiss() }
+  public errorHandler (err: string, errObj?: any, loading?: Loading): void {
+    if (loading) { loading.dismiss() }
     this.alertCtrl.create({
-      title: "Ocurrio un error.",
+      title: 'Ocurrio un error.',
       message: err,
       buttons: ['Ok']
-    }).present();
-    console.error("Se presento el error: ",errObj);
-    Raven.captureException( new Error(`Se presento el error 🐛: ${JSON.stringify(errObj)}`), {
+    }).present()
+    console.error('Se presento el error: ',errObj)
+    Raven.captureException(new Error(`Se presento el error 🐛: ${JSON.stringify(errObj)}`), {
       extra: errObj
-    });
+    })
   }
 
-  public showLoading(): Loading {
+  public showLoading (): Loading {
     let loading: Loading = this.loadingCtrl.create({
       content: 'Espere por favor...'
-    });
-    loading.present();
-    return loading;
+    })
+    loading.present()
+    return loading
   }
 
   /**
    * https://chariotsolutions.com/blog/post/ionic-3-updating-loading-spinner-text/
    * @param text
    */
-  public setLoadingText(text: string) {
-    const elem = document.querySelector("div.loading-wrapper div.loading-content");
-    if(elem) elem.innerHTML = text;
+  public setLoadingText (text: string) {
+    const elem = document.querySelector('div.loading-wrapper div.loading-content')
+    if (elem) elem.innerHTML = text
   }
 
-  public showToast(msg:string): void {
+  public showToast (msg: string): void {
     this.toastCtrl.create({
       message: msg,
       duration: 3000,
       position: 'top',
       showCloseButton: false,
-      closeButtonText: "cerrar"
-    }).present();
+      closeButtonText: 'cerrar'
+    }).present()
   }
 
-  public async checkToken(): Promise<any> {
-    let token: string = '';
+  public async checkToken (): Promise<any> {
+    let token: string = ''
     try {
-      token = await this.storage.get('josefa-token');
+      token = await this.storage.get('josefa-token')
     } catch (e) {
-      console.error("Error al recuperal el token de josefa del storage: ", e);
-      e.statusText = 'Unauthorized';
-      throw new Error(e.statusText);
+      console.error('Error al recuperal el token de josefa del storage: ', e)
+      e.statusText = 'Unauthorized'
+      throw new Error(e.statusText)
     }
 
-    let url: string = Config.JOSEFA_URL+'/sap';
+    let url: string = Config.JOSEFA_URL + '/sap'
     let options = {
       headers: new HttpHeaders({
         'Accept'       : 'application/json',
         'Content-Type' : 'application/json',
         'Authorization': 'Bearer ' + token
       })
-    };
+    }
 
     try {
-      let res = await this.http.get( url, options ).pipe(
+      let res = await this.http.get(url, options).pipe(
         map((res: Response) => {
-          return res;
+          return res
         })
-      ).toPromise();
-      return res;
+      ).toPromise()
+      return res
     } catch (e) {
-      console.error("Error al checkear el token de josefa: ", e);
-      throw new Error(e.statusText);
+      console.error('Error al checkear el token de josefa: ', e)
+      throw new Error(e.statusText)
     }
 
   }
 
-  public setTimerCheckJosefa(): void {
-    this.timerCheckTokenJose = setInterval( () => {
+  public setTimerCheckJosefa (): void {
+    this.timerCheckTokenJose = setInterval(() => {
 
-      if(this.onlineOffline){
+      if (this.onlineOffline) {
 
         this.checkToken().then(res => {
-          console.log("estado del api josefa", res);
-        }).catch( (e: Error) => {
-          if(e.message == 'Unauthorized'){
-            this.evts.publish('timer:checkTokenJosefa');
+          console.log('estado del api josefa', res)
+        }).catch((e: Error) => {
+          if (e.message === 'Unauthorized') {
+            this.evts.publish('timer:checkTokenJosefa')
           }
         })
 
       }
 
-    }, 60000 );
+    }, 60000)
   }
 
   // Estos setter y getter son para la pendejadita del ester egg
-  public set countPush(v : number) {
-    this._countPush = v;
+  public set countPush (v: number) {
+    this._countPush = v
   }
-  public get countPush() : number {
-    return this._countPush;
+  public get countPush (): number {
+    return this._countPush
   }
-  public set eggsterFlag(v : boolean) {
-    this._eggsterFlag = v;
+  public set eggsterFlag (v: boolean) {
+    this._eggsterFlag = v
   }
-  public get eggsterFlag() : boolean {
-    return this._eggsterFlag;
+  public get eggsterFlag (): boolean {
+    return this._eggsterFlag
   }
-
 
 }

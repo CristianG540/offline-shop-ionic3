@@ -1,30 +1,29 @@
-import { Component } from '@angular/core';
-import { NavController, NavParams, Events } from 'ionic-angular';
+import { Component } from '@angular/core'
+import { NavController, NavParams, Events } from 'ionic-angular'
 
-//Providers
-import { OrdenProvider } from "../../providers/orden/orden";
-import { Config } from '../../providers/config/config';
+// Providers
+import { OrdenProvider } from '../../providers/orden/orden'
+import { Config } from '../../providers/config/config'
 
-//Models
-import { Orden } from '../../providers/orden/models/orden';
+// Models
+import { Orden } from '../../providers/orden/models/orden'
 
 @Component({
   selector: 'page-ordenes',
-  templateUrl: 'ordenes.html',
+  templateUrl: 'ordenes.html'
 })
 export class OrdenesPage {
 
-  private appVer: string = Config.APP_VER;
-  private ordenesDetallePage = 'OrdenesDetallePage';
+  private appVer: string = Config.APP_VER
+  private ordenesDetallePage = 'OrdenesDetallePage'
 
-  private _ordenes: Orden[] = [];
+  private _ordenes: Orden[] = []
 
-  constructor(
+  constructor (
     public navCtrl: NavController,
     public navParams: NavParams,
     private ordenServ: OrdenProvider,
-    private evts: Events,
-    private util: Config
+    private evts: Events
   ) {
     /**
      * Antes para tener en tiempo real las ordenes lo que hacia era
@@ -36,30 +35,29 @@ export class OrdenesPage {
      * solo se llama cuando se necesita y el performance aumenta mucho
      */
     this.evts.subscribe('orden:changed', (doc: Orden) => {
-      this._ordenes = this.ordenServ.ordenesDesc;
-    });
+      this._ordenes = this.ordenServ.ordenesDesc
+    })
     this.evts.subscribe('orden:deleted', (doc: Orden) => {
-      this._ordenes = this.ordenServ.ordenesDesc;
-    });
+      this._ordenes = this.ordenServ.ordenesDesc
+    })
   }
 
-  ionViewDidEnter() {
-    this._ordenes = this.ordenServ.ordenesDesc;
+  ionViewDidEnter () {
+    this._ordenes = this.ordenServ.ordenesDesc
   }
 
-  public iconOrden(orden: Orden) : string {
-    if(orden.estado == "seen"){
+  public iconOrden (orden: Orden): string {
+    if (orden.estado === 'seen') {
       return 'eye'
     }
-    if(orden.error){
+    if (orden.error) {
       return 'warning'
     }
-    return (orden.estado) ? 'checkmark' : 'time';
+    return (orden.estado) ? 'checkmark' : 'time'
   }
 
-  private trackById(index: number, orden: Orden): string {
-    return orden._id;
+  private trackById (index: number, orden: Orden): string {
+    return orden._id
   }
-
 
 }

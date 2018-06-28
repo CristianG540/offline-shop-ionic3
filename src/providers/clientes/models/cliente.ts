@@ -5,7 +5,7 @@ interface Coordenadas {
 }
 
 export class Cliente {
-  constructor(
+  constructor (
     public _id: string,
     public asesor: number,
     public asesor_nombre: string,
@@ -15,7 +15,7 @@ export class Cliente {
     public transportadora: number,
     public telefono: string,
     public _rev?: string,
-    public ubicacion?: Coordenadas, //Ubicacion en coordenadas del cliente
+    public ubicacion?: Coordenadas, // Ubicacion en coordenadas del cliente
     public updated_at?: number
   ) {}
 }

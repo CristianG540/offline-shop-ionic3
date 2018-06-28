@@ -1,13 +1,13 @@
-import { NgModule } from '@angular/core';
-import { IonicPageModule } from 'ionic-angular';
-import { ProductosCategoriaPage } from './productos-categoria';
+import { NgModule } from '@angular/core'
+import { IonicPageModule } from 'ionic-angular'
+import { ProductosCategoriaPage } from './productos-categoria'
 
 @NgModule({
   declarations: [
-    ProductosCategoriaPage,
+    ProductosCategoriaPage
   ],
   imports: [
     IonicPageModule.forChild(ProductosCategoriaPage)
-  ],
+  ]
 })
 export class ProductosCategoriaPageModule {}

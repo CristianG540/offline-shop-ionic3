@@ -1,5 +1,5 @@
 export class CarItem {
-  constructor(
+  constructor (
     public _id: string,
     public cantidad: number,
     public totalPrice?: number,

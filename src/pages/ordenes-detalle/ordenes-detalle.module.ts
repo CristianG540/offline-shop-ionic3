@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
-import { IonicPageModule } from 'ionic-angular';
-import { OrdenesDetallePage } from './ordenes-detalle';
-import { AccordionComponent } from '../../components/accordion/accordion';
+import { NgModule } from '@angular/core'
+import { IonicPageModule } from 'ionic-angular'
+import { OrdenesDetallePage } from './ordenes-detalle'
+import { AccordionComponent } from '../../components/accordion/accordion'
 
 @NgModule({
   declarations: [
@@ -10,6 +10,6 @@ import { AccordionComponent } from '../../components/accordion/accordion';
   ],
   imports: [
     IonicPageModule.forChild(OrdenesDetallePage)
-  ],
+  ]
 })
 export class OrdenesDetallePageModule {}

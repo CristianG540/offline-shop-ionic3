@@ -1,12 +1,11 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 
-import { CarritoProvider } from "../../providers/carrito/carrito";
-import { AuthProvider } from '../../providers/auth/auth';
+import { CarritoProvider } from '../../providers/carrito/carrito'
+import { AuthProvider } from '../../providers/auth/auth'
 
-import { HomePage } from '../home/home';
+import { HomePage } from '../home/home'
 import { OrdenesPage } from '../ordenes/ordenes'
-import { IonicPage } from 'ionic-angular';
-
+import { IonicPage } from 'ionic-angular'
 
 @IonicPage()
 @Component({
@@ -21,17 +20,16 @@ export class TabsPage {
   carrito: any = 'CarritoPage'
   buscar: any = 'SearchProdPage'
   clientes: any = 'ClientesPage'
-  carteraPage = 'CarteraPage';
+  carteraPage = 'CarteraPage'
 
-  constructor(
+  constructor (
     private cartService: CarritoProvider,
-    private authService: AuthProvider,
+    private authService: AuthProvider
   ) {
   }
 
-  public get itemsCart() : number {
-    return this.cartService.carItems.length;
+  public get itemsCart (): number {
+    return this.cartService.carItems.length
   }
-
 
 }

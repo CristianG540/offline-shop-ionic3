@@ -160,7 +160,7 @@ export class AuthProvider {
 
   public async requestAccount(data: any): Promise<any>{
     try {
-      await this.getTokenJosefa();
+
       let token = await this.storage.get('josefa-token');
       /**
        * Bueno aqui hago todo lo contrario a lo que hago con los productos

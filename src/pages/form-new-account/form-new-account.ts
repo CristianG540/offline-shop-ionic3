@@ -26,6 +26,7 @@ export class FormNewAccountPage {
     private util: Config,
     private fb: FormBuilder
   ) {
+    this.authServ.getTokenJosefa().catch(err => console.error('error getTokenJosefa pages/form-new-account.ts'))
   }
 
   ionViewWillLoad() {

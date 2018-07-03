@@ -76,7 +76,6 @@
         <splash height="960" src="resources/ios/splash/Default@2x~iphone.png" width="640" />
         <splash height="480" src="resources/ios/splash/Default~iphone.png" width="320" />
     </platform>
-    <engine name="android" spec="^7.1.0" />
     <engine name="browser" spec="^5.0.3" />
     <plugin name="cordova-plugin-background-mode" spec="^0.7.2" />
     <plugin name="cordova-plugin-device" spec="^2.0.2" />
@@ -93,4 +92,5 @@
     <plugin name="cordova-sqlite-storage" spec="^2.3.2" />
     <plugin name="cordova.plugins.diagnostic" spec="^4.0.8" />
     <plugin name="onesignal-cordova-plugin" spec="^2.4.1" />
+    <engine name="android" spec="~7.1.0" />
 </widget>

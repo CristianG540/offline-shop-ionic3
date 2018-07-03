@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core'
 import {
+  App,
   Platform,
   AlertController,
   NavController,
@@ -44,6 +45,7 @@ export class MyApp {
     platform: Platform,
     statusBar: StatusBar,
     splashScreen: SplashScreen,
+    app: App,
     private network: Network,
     private alertCtrl: AlertController,
     private menuCrl: MenuController,
@@ -116,6 +118,7 @@ export class MyApp {
     }
 
     platform.ready().then(() => {
+      console.log('la plataforma esta lista !!!!!!!')
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault()
@@ -134,11 +137,24 @@ export class MyApp {
       this.pushNotification.init(this.content)
 
       this.backgroundMode.enable()
-      // this.backgroundMode.overrideBackButton();
+      this.backgroundMode.overrideBackButton()
 
       this.evts.subscribe('timer:checkTokenJosefa', () => {
         this.logout()
       })
+
+    })
+
+    platform.registerBackButtonAction(() => {
+
+      let nav = app.getActiveNavs()[0]
+      let activeView = nav.getActive()
+
+      if (nav.canGoBack()) { // Can we go back?
+        nav.pop()
+      } else {
+        console.log('Application exit prevented!')
+      }
 
     })
   }

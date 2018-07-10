@@ -144,7 +144,11 @@ export class MyApp {
       })
 
     })
-
+    /**
+     * Cancelo el comportamiento del boton de back por hardware
+     * de los celulares, ya que me estaba produciendo errores en
+     * la base de datos sqlite
+     */
     platform.registerBackButtonAction(() => {
 
       let nav = app.getActiveNavs()[0]

@@ -26,6 +26,7 @@
         "@ionic-native/core": "4.8.0",
         "@ionic-native/diagnostic": "^4.8.0",
         "@ionic-native/geolocation": "^4.8.0",
+        "@ionic-native/in-app-browser": "^4.11.0",
         "@ionic-native/location-accuracy": "^4.8.0",
         "@ionic-native/network": "^4.8.0",
         "@ionic-native/onesignal": "^4.8.0",
@@ -43,6 +44,7 @@
         "cordova-plugin-background-mode": "^0.7.2",
         "cordova-plugin-device": "^2.0.2",
         "cordova-plugin-geolocation": "^4.0.1",
+        "cordova-plugin-inappbrowser": "^3.0.0",
         "cordova-plugin-ionic-keyboard": "^2.1.2",
         "cordova-plugin-ionic-webview": "^1.2.1",
         "cordova-plugin-network-information": "^2.0.1",
@@ -95,7 +97,8 @@
             },
             "cordova.plugins.diagnostic": {},
             "cordova-plugin-request-location-accuracy": {},
-            "cordova-plugin-statusbar": {}
+            "cordova-plugin-statusbar": {},
+            "cordova-plugin-inappbrowser": {}
         },
         "platforms": [
             "android",

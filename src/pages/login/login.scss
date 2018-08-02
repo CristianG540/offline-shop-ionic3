@@ -27,8 +27,12 @@ page-login {
     align-items: center;
     text-align: center;
   }
-  span {
+  .warn-txt {
     color: white;
+    font-size: 12px;
+    a {
+      color: crimson;
+    }
     background-color: rgba(57, 152, 220, 0.6);padding: 4px;border-radius: 3px;cursor: pointer;
   }
 

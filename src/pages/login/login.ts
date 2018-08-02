@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController, NavParams, MenuController } from 'ionic-angular'
 import { FormGroup, FormBuilder, Validators } from '@angular/forms'
+import { InAppBrowser } from '@ionic-native/in-app-browser'
 
 // libs terceros
 import Raven from 'raven-js'
@@ -32,7 +33,8 @@ export class LoginPage {
     private dbServ: DbProvider,
     private cartServ: CarritoProvider,
     private ordenServ: OrdenProvider,
-    private util: cg
+    private util: cg,
+    private iab: InAppBrowser
   ) {
     this.menuCtrl.enable(false)
   }
@@ -107,6 +109,10 @@ export class LoginPage {
 
   private requestAccount (): void {
     this.navCtrl.push('FormNewAccountPage')
+  }
+
+  private redirect (): void {
+    this.iab.create('https://play.google.com/store/apps/details?id=com.igb.onlineshop')
   }
 
 }

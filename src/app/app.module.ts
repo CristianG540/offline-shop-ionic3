@@ -13,6 +13,7 @@ import { BackgroundMode } from '@ionic-native/background-mode'
 import { Geolocation } from '@ionic-native/geolocation'
 import { Diagnostic } from '@ionic-native/diagnostic'
 import { LocationAccuracy } from '@ionic-native/location-accuracy'
+import { InAppBrowser } from '@ionic-native/in-app-browser'
 
 // Pagaes without lazy loading
 import { HomePage } from '../pages/home/home'
@@ -79,7 +80,8 @@ import { AgmCoreModule } from '@agm/core'
     Geolocation,
     GeolocationProvider,
     Diagnostic,
-    LocationAccuracy
+    LocationAccuracy,
+    InAppBrowser
   ]
 })
 export class AppModule {}

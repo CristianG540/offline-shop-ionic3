@@ -11,11 +11,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.3",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.1",
-    "webpack": "^3.9.1",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.5",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "webpack": "^4.12.2",
+    "webpack-cli": "^3.0.8",
     "snazzy": "*",
     "standard": "*"
   },
@@ -23,6 +24,6 @@
     "parser": "babel-eslint"
   },
   "dependencies": {
-    "pouchdb": "^6.3.4"
+    "pouchdb": "^7.0.0"
   }
 }

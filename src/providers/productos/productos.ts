@@ -101,18 +101,15 @@ export class ProductosProvider {
       auth: {
         username: Config.CDB_USER,
         password: Config.CDB_PASS
-      },
-      ajax: {
-        timeout: 60000
       }
     }
 
     /*** Intento eliminar la bd anterior */
-    const oldDB: PouchDB.Database = new PouchDB('producto_2', { revs_limit: 5, auto_compaction: true })
+    const oldDB: PouchDB.Database = new PouchDB('producto_2', { revs_limit: 500, auto_compaction: true })
     oldDB.destroy()
     /*********************************** */
 
-    this._db = new PouchDB('producto_3', { revs_limit: 5, auto_compaction: true })
+    this._db = new PouchDB('producto_3', { revs_limit: 500, auto_compaction: true })
     this._remoteDB = new PouchDB(Config.CDB_URL, replication_opt)
 
     /**
@@ -125,7 +122,7 @@ export class ProductosProvider {
       db: 'productos',
       local: {
         name: 'producto_3',
-        options: { revs_limit: 5, auto_compaction: true }
+        options: { revs_limit: 500, auto_compaction: true }
       },
       remote: {
         name: Config.CDB_URL,

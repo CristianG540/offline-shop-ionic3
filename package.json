@@ -71,7 +71,8 @@
         "zone.js": "^0.8.26"
     },
     "devDependencies": {
-        "@ionic/app-scripts": "^3.1.10",
+        "@ionic/app-scripts": "^3.1.11",
+        "@ionic/lab": "^1.0.0-rc.13",
         "@types/node": "^10.3.6",
         "@types/pouchdb": "^6.3.2",
         "tslint-config-standard": "^7.1.0",

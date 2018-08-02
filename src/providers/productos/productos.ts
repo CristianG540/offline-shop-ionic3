@@ -105,11 +105,11 @@ export class ProductosProvider {
     }
 
     /*** Intento eliminar la bd anterior */
-    const oldDB: PouchDB.Database = new PouchDB('producto_2', { revs_limit: 500, auto_compaction: true })
+    const oldDB: PouchDB.Database = new PouchDB('producto_3', { revs_limit: 500, auto_compaction: true })
     oldDB.destroy()
     /*********************************** */
 
-    this._db = new PouchDB('producto_3', { revs_limit: 500, auto_compaction: true })
+    this._db = new PouchDB('producto_4', { revs_limit: 500, auto_compaction: true })
     this._remoteDB = new PouchDB(Config.CDB_URL, replication_opt)
 
     /**
@@ -121,7 +121,7 @@ export class ProductosProvider {
     this.replicationWorker.postMessage({
       db: 'productos',
       local: {
-        name: 'producto_3',
+        name: 'producto_4',
         options: { revs_limit: 500, auto_compaction: true }
       },
       remote: {
